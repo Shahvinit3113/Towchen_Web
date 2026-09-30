@@ -1,23 +1,11 @@
 import { api } from "./client";
 import { API_ENDPOINTS } from "./endpoints";
 import {
-  TowingEstimateRequest,
-  TowingEstimateResponse,
   BookingSubmissionRequest,
   BookingConfirmation,
 } from "@/types";
 
 export const towingApi = {
-  getEstimate: async (
-    payload: TowingEstimateRequest
-  ): Promise<TowingEstimateResponse> => {
-    const res = await api.post<TowingEstimateResponse>(
-      API_ENDPOINTS.towing.estimate,
-      payload
-    );
-    return res.data;
-  },
-
   createBooking: async (
     payload: BookingSubmissionRequest
   ): Promise<BookingConfirmation> => {

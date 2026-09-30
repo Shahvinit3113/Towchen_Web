@@ -1,4 +1,4 @@
-export type UserRole = "customer" | "dealer" | "admin";
+export type UserRole = "customer" | "dealer";
 
 export interface UserSession {
   id: string;
@@ -50,34 +50,6 @@ export type TowingServiceType =
   | "lockout"
   | "winch_out"
   | "vehicle_recovery";
-
-export interface TowingEstimateRequest {
-  pickupLocation: string;
-  pickupLat?: number;
-  pickupLng?: number;
-  dropLocation: string;
-  dropLat?: number;
-  dropLng?: number;
-  vehicleCategory: VehicleCategory;
-  serviceType: TowingServiceType;
-  requiresSpecialFlatbed?: boolean;
-}
-
-export interface TowingEstimateResponse {
-  distanceKm: number;
-  baseFare: number;
-  distanceFare: number;
-  vehicleCategoryCharge: number;
-  totalEstimatedPrice: number;
-  estimatedEtaMinutes: number;
-  serviceType: TowingServiceType;
-  vehicleCategory: VehicleCategory;
-  breakdown: {
-    baseRate: number;
-    perKmRate: number;
-    taxes: number;
-  };
-}
 
 export interface BookingSubmissionRequest {
   customerName: string;

@@ -1,7 +1,6 @@
 import React from "react";
 import Link from "next/link";
 import { constructMetadata, generateLocalBusinessSchema } from "@/config/seo";
-import { EstimateWidget } from "@/components/estimate/estimate-widget";
 import {
   Truck,
   Phone,
@@ -180,12 +179,12 @@ export default function HomePage() {
                   <span>CALL NOW</span>
                 </a>
 
-                <a
-                  href="#estimate-calculator"
+                <Link
+                  href="/services"
                   className="w-full sm:w-auto inline-flex items-center justify-center rounded-2xl bg-white/10 hover:bg-white/15 text-white border border-white/30 font-bold py-4 px-8 text-base backdrop-blur-sm transition-all active:scale-95"
                 >
-                  GET A TOWING ESTIMATE
-                </a>
+                  EXPLORE SERVICES
+                </Link>
               </div>
 
               {/* Trust Indicators */}
@@ -207,26 +206,83 @@ export default function HomePage() {
               </div>
             </div>
 
-            {/* Right Column: Estimate Calculator Card (Desktop Only) */}
-            <div className="hidden lg:block lg:col-span-5 w-full max-w-lg mx-auto" id="estimate-calculator-desktop">
-              <EstimateWidget />
+            {/* Right Column: 24/7 Live Emergency Fleet Dispatch Card */}
+            <div className="lg:col-span-5 w-full max-w-lg mx-auto">
+              <div className="rounded-3xl bg-white/10 backdrop-blur-xl border border-white/20 p-6 sm:p-8 shadow-2xl shadow-black/30 space-y-6">
+                <div className="flex items-center justify-between border-b border-white/10 pb-4">
+                  <div className="flex items-center gap-2.5">
+                    <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center text-white shadow-md shadow-primary/30">
+                      <Truck className="h-5 w-5" />
+                    </div>
+                    <div>
+                      <h3 className="text-base sm:text-lg font-bold text-white leading-tight">
+                        Live Fleet Dispatch
+                      </h3>
+                      <p className="text-xs text-blue-200">Units on standby across all sectors</p>
+                    </div>
+                  </div>
+                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-500/20 border border-emerald-400/30 text-[11px] font-bold text-emerald-300">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                    STANDBY
+                  </span>
+                </div>
+
+                <div className="space-y-3">
+                  <div className="p-3.5 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center text-primary">
+                        <Clock className="h-4 w-4" />
+                      </div>
+                      <div>
+                        <p className="text-xs font-medium text-slate-300">Average Response Time</p>
+                        <p className="text-sm font-bold text-white">Under 20 Minutes</p>
+                      </div>
+                    </div>
+                    <span className="text-xs font-semibold text-emerald-400">Guaranteed</span>
+                  </div>
+
+                  <div className="p-3.5 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center text-emerald-400">
+                        <ShieldCheck className="h-4 w-4" />
+                      </div>
+                      <div>
+                        <p className="text-xs font-medium text-slate-300">Licensed & Insured Fleet</p>
+                        <p className="text-sm font-bold text-white">100% Damage Protection</p>
+                      </div>
+                    </div>
+                    <span className="text-xs font-semibold text-blue-300">Verified</span>
+                  </div>
+
+                  <div className="p-3.5 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center text-amber-400">
+                        <MapPin className="h-4 w-4" />
+                      </div>
+                      <div>
+                        <p className="text-xs font-medium text-slate-300">Metro Hub Coverage</p>
+                        <p className="text-sm font-bold text-white">Pan-India Expressways</p>
+                      </div>
+                    </div>
+                    <span className="text-xs font-semibold text-slate-300">6+ Metros</span>
+                  </div>
+                </div>
+
+                <div className="pt-2 space-y-3">
+                  <a
+                    href="tel:8005551234"
+                    className="w-full flex items-center justify-center gap-2.5 rounded-2xl bg-primary hover:bg-secondary text-white font-bold py-4 px-6 text-sm sm:text-base shadow-lg shadow-primary/30 transition-all hover:scale-[1.02] active:scale-95"
+                  >
+                    <Phone className="h-4 w-4 shrink-0" />
+                    <span>Call Emergency Dispatch Now</span>
+                  </a>
+                  <p className="text-[11px] text-center text-slate-400">
+                    Direct coordinator line • 24/7 priority towing & roadside assistance
+                  </p>
+                </div>
+              </div>
             </div>
           </div>
-        </div>
-      </section>
-
-      {/* Mobile Dedicated Estimate Widget Section (Below Hero) */}
-      <section className="lg:hidden py-10 px-4 sm:px-6 bg-[#f4f7fc] border-b border-slate-200" id="estimate-calculator">
-        <div className="max-w-md mx-auto">
-          <div className="text-center mb-6 space-y-1">
-            <h2 className="text-2xl font-bold text-slate-900 tracking-tight">
-              Get Your Estimate
-            </h2>
-            <p className="text-sm text-slate-500">
-              Upfront pricing, no surprises
-            </p>
-          </div>
-          <EstimateWidget />
         </div>
       </section>
 
@@ -518,12 +574,12 @@ export default function HomePage() {
               <span>CALL NOW — (800) 555-1234</span>
             </a>
 
-            <a
-              href="#estimate-calculator"
+            <Link
+              href="/services"
               className="w-full sm:w-auto inline-flex items-center justify-center rounded-full bg-primary hover:bg-secondary text-white border-2 border-white/40 font-bold px-7 py-3.5 sm:px-8 sm:py-4 text-sm sm:text-base transition-colors"
             >
-              Get Estimate →
-            </a>
+              View All Services →
+            </Link>
           </div>
         </div>
       </section>

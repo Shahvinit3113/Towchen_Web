@@ -131,7 +131,7 @@ export function PublicFooter() {
                 </Link>
               </li>
               <li>
-                <Link href="/#estimate-calculator" className="hover:text-white transition-colors">
+                <Link href="/contact" className="hover:text-white transition-colors">
                   Track My Tow
                 </Link>
               </li>

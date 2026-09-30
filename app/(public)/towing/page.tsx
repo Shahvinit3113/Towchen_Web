@@ -3,7 +3,6 @@ import Link from "next/link";
 import { constructMetadata } from "@/config/seo";
 import { siteConfig } from "@/config/site";
 import { ALL_SERVICES } from "@/lib/constants/services";
-import { EstimateWidget } from "@/components/estimate/estimate-widget";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -48,12 +47,12 @@ export default function TowingPage() {
               <PhoneCall className="h-4 w-4" />
               <span>Call Towing Hotline: {siteConfig.emergencyPhone}</span>
             </a>
-            <a
-              href="#towing-calculator"
+            <Link
+              href="/contact"
               className="inline-flex items-center gap-2 rounded-xl border border-slate-300 bg-white hover:bg-slate-50 text-slate-800 font-semibold px-6 py-3 text-sm"
             >
-              Calculate Towing Price
-            </a>
+              Request Emergency Tow
+            </Link>
           </div>
         </div>
       </section>
@@ -144,17 +143,36 @@ export default function TowingPage() {
         </div>
       </section>
 
-      {/* Live Calculator Widget Section */}
-      <section id="towing-calculator" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center max-w-2xl mx-auto mb-8 space-y-2">
-          <h2 className="text-3xl font-black text-slate-900 tracking-tight">
-            Calculate Upfront Towing Fare
-          </h2>
-          <p className="text-slate-600 text-sm">
-            Enter your pickup spot and destination to get an instant distance and price breakdown.
-          </p>
+      {/* Rapid Dispatch Assistance Section */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="rounded-3xl blue-gradient text-white p-8 sm:p-12 text-center space-y-6 shadow-xl shadow-primary/20">
+          <div className="w-14 h-14 rounded-2xl bg-white/10 mx-auto flex items-center justify-center text-white">
+            <Truck className="h-7 w-7" />
+          </div>
+          <div className="max-w-2xl mx-auto space-y-2">
+            <h2 className="text-2xl sm:text-3xl font-black tracking-tight text-white">
+              Immediate Tow Truck Dispatch Required?
+            </h2>
+            <p className="text-blue-100 text-sm sm:text-base">
+              Our central dispatch operators connect directly with stationed flatbed drivers in your sector. Average 20-minute arrival guarantee.
+            </p>
+          </div>
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-2">
+            <a
+              href={`tel:${siteConfig.emergencyPhoneRaw}`}
+              className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 rounded-2xl bg-white hover:bg-slate-100 text-primary font-bold py-4 px-8 text-base shadow-lg transition-transform active:scale-95"
+            >
+              <PhoneCall className="h-5 w-5" />
+              <span>Call Dispatch: {siteConfig.emergencyPhone}</span>
+            </a>
+            <Link
+              href="/contact"
+              className="w-full sm:w-auto inline-flex items-center justify-center rounded-2xl bg-white/10 hover:bg-white/15 text-white border border-white/30 font-bold py-4 px-8 text-base transition-colors"
+            >
+              Online Dispatch Request
+            </Link>
+          </div>
         </div>
-        <EstimateWidget />
       </section>
     </div>
   );

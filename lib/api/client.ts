@@ -18,7 +18,8 @@ export class ApiError extends Error {
   }
 }
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "https://towchen-api-1.onrender.com";
+const rawBaseUrl = process.env.NEXT_PUBLIC_API_URL || "https://towchen-api-1.onrender.com";
+const API_BASE_URL = rawBaseUrl.replace(/\/+$/, "");
 
 interface RequestOptions extends RequestInit {
   timeoutMs?: number;
@@ -130,42 +131,6 @@ async function handleMockOrLocalApi<T>(
 
   const method = (options.method || "GET").toUpperCase();
 
-  // Towing Estimate
-  if (endpoint.includes("/towing/estimate")) {
-    const body = options.body ? JSON.parse(options.body as string) : {};
-    const baseDist = Math.max(4, Math.floor(Math.random() * 22) + 6);
-    const vehicleMultipliers: Record<string, number> = {
-      sedan: 1.0,
-      suv: 1.2,
-      luxury: 1.5,
-      commercial: 1.6,
-      motorcycle: 0.8,
-      ev: 1.3,
-    };
-    const mult = vehicleMultipliers[body.vehicleCategory] || 1.0;
-    const baseFare = 899;
-    const distanceFare = Math.round(baseDist * 45 * mult);
-    const categoryCharge = Math.round(baseFare * (mult - 1));
-    const total = baseFare + distanceFare + categoryCharge + 120; // + GST
-
-    const estimateData = {
-      distanceKm: baseDist,
-      baseFare,
-      distanceFare,
-      vehicleCategoryCharge: categoryCharge,
-      totalEstimatedPrice: total,
-      estimatedEtaMinutes: Math.floor(Math.random() * 8) + 12,
-      serviceType: body.serviceType || "flatbed_towing",
-      vehicleCategory: body.vehicleCategory || "sedan",
-      breakdown: {
-        baseRate: baseFare,
-        perKmRate: Math.round(45 * mult),
-        taxes: 120,
-      },
-    };
-    return { data: estimateData as unknown as T, success: true, status: 200 };
-  }
-
   // Booking
   if (endpoint.includes("/towing/book")) {
     const booking = {
@@ -227,19 +192,6 @@ async function handleMockOrLocalApi<T>(
       },
     };
     return { data: mockRefresh as unknown as T, success: true, status: 200 };
-  }
-
-  // Admin Login
-  if (endpoint.includes("/auth/admin/login")) {
-    const body = options.body ? JSON.parse(options.body as string) : {};
-    const mockAdminSession = {
-      id: "adm-001",
-      name: "Head of Operations",
-      email: body.email || "admin@towchain.com",
-      role: "admin",
-      token: "jwt_mock_admin_token_abc123",
-    };
-    return { data: mockAdminSession as unknown as T, success: true, status: 200 };
   }
 
   // Fallback for list endpoints

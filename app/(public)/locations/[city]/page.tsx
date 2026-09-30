@@ -6,7 +6,6 @@ import { constructMetadata } from "@/config/seo";
 import { METRO_LOCATIONS } from "@/lib/constants/locations";
 import { ALL_SERVICES } from "@/lib/constants/services";
 import { siteConfig } from "@/config/site";
-import { EstimateWidget } from "@/components/estimate/estimate-widget";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -79,16 +78,57 @@ export default async function CityLocationPage({ params }: Props) {
                 <PhoneCall className="h-4 w-4" />
                 <span>Call {hub.city} Dispatch: {siteConfig.emergencyPhone}</span>
               </a>
-              <Link href="#estimate">
+              <Link href="/services">
                 <Button variant="outline" size="lg">
-                  Instant Fare Estimate
+                  Explore Services
                 </Button>
               </Link>
             </div>
           </div>
 
-          <div id="estimate" className="lg:col-span-6">
-            <EstimateWidget />
+          <div className="lg:col-span-6">
+            <div className="rounded-3xl border border-slate-200 bg-white p-6 sm:p-8 shadow-xl space-y-6">
+              <div className="flex items-center justify-between border-b border-slate-100 pb-4">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center font-bold">
+                    <Truck className="h-5 w-5" />
+                  </div>
+                  <div>
+                    <h3 className="font-bold text-slate-900">{hub.city} Dispatch Hub</h3>
+                    <p className="text-xs text-slate-500">Live operational command center</p>
+                  </div>
+                </div>
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 text-xs font-semibold">
+                  <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                  Active Units
+                </span>
+              </div>
+
+              <div className="space-y-3">
+                <div className="flex items-center justify-between p-3 rounded-xl bg-slate-50 border border-slate-100">
+                  <span className="text-xs text-slate-500 font-medium">Average Response Time</span>
+                  <span className="text-xs font-bold text-slate-900">{hub.responseTimeMinutes} Minutes</span>
+                </div>
+                <div className="flex items-center justify-between p-3 rounded-xl bg-slate-50 border border-slate-100">
+                  <span className="text-xs text-slate-500 font-medium">Dedicated Fleet Size</span>
+                  <span className="text-xs font-bold text-slate-900">{hub.fleetCount}+ Stationed Trucks</span>
+                </div>
+                <div className="flex items-center justify-between p-3 rounded-xl bg-slate-50 border border-slate-100">
+                  <span className="text-xs text-slate-500 font-medium">Coverage Readiness</span>
+                  <span className="text-xs font-bold text-emerald-600">24/7 Priority Emergency</span>
+                </div>
+              </div>
+
+              <div className="pt-2">
+                <a
+                  href={`tel:${siteConfig.emergencyPhoneRaw}`}
+                  className="w-full flex items-center justify-center gap-2 rounded-xl bg-primary hover:bg-secondary text-white font-bold py-3.5 text-sm shadow-md transition-colors"
+                >
+                  <PhoneCall className="h-4 w-4" />
+                  <span>Call {hub.city} Fleet Dispatch Now</span>
+                </a>
+              </div>
+            </div>
           </div>
         </div>
       </section>

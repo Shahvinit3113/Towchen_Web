@@ -24,13 +24,3 @@ export const dealerNavLinks: NavItem[] = [
   { title: "Payments", href: "/dealer/payments", icon: "CreditCard" },
   { title: "Dealer Profile", href: "/dealer/profile", icon: "Building2" },
 ];
-
-export const adminNavLinks: NavItem[] = [
-  { title: "Admin Overview", href: "/admin/dashboard", icon: "LayoutDashboard" },
-  { title: "Dealers Directory", href: "/admin/dealers", icon: "Users" },
-  { title: "Packages & Tiers", href: "/admin/packages", icon: "Package" },
-  { title: "Purchases Ledger", href: "/admin/purchases", icon: "ShoppingBag" },
-  { title: "Commissions", href: "/admin/commissions", icon: "Percent" },
-  { title: "Payout Approvals", href: "/admin/payments", icon: "Banknote" },
-  { title: "Financial Audits", href: "/admin/transactions", icon: "Scale" },
-];

@@ -77,9 +77,9 @@ export default function ServicesPage() {
                     ₹{srv.basePrice}
                   </span>
                 </div>
-                <Link href="/#estimate-calculator">
+                <Link href="/contact">
                   <Button size="sm" className="font-semibold gap-1">
-                    <span>Book Service</span>
+                    <span>Request Service</span>
                     <ArrowRight className="h-3.5 w-3.5" />
                   </Button>
                 </Link>

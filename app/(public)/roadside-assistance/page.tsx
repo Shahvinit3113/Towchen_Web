@@ -57,10 +57,10 @@ export default function RoadsideAssistancePage() {
               <span>Call Roadside Patrol: {siteConfig.emergencyPhone}</span>
             </a>
             <Link
-              href="/#estimate-calculator"
+              href="/contact"
               className="inline-flex items-center gap-2 rounded-xl border border-slate-300 bg-white hover:bg-slate-50 text-slate-800 font-semibold px-6 py-3.5 text-sm"
             >
-              Get Instant Estimate
+              Request Assistance
             </Link>
           </div>
         </div>

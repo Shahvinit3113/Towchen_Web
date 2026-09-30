@@ -7,4 +7,3 @@ export * from "./packages";
 export * from "./dealer";
 export * from "./wallet";
 export * from "./payments";
-export * from "./admin";

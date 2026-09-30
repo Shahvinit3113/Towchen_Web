@@ -23,11 +23,11 @@ export default function DealerLayout({
   useEffect(() => {
     const session = getClientSession();
     if (isLoginPage) {
-      if (session && (session.role === "dealer" || session.role === "admin")) {
+      if (session && session.role === "dealer") {
         router.replace("/dealer/dashboard");
       }
     } else {
-      if (!session || (session.role !== "dealer" && session.role !== "admin")) {
+      if (!session || session.role !== "dealer") {
         router.replace("/dealer/login");
       } else {
         setAuthVerified(true);

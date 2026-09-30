@@ -162,27 +162,6 @@ export const authApi = {
     throw new Error("Failed to refresh dealer session tokens");
   },
 
-  loginAdmin: async (credentials: LoginCredentials): Promise<UserSession> => {
-    try {
-      const res = await api.post<UserSession>(API_ENDPOINTS.auth.adminLogin, credentials);
-      if (res.data && res.data.role === "admin") {
-        setClientSession(res.data);
-        return res.data;
-      }
-      throw new Error("Invalid session data from server");
-    } catch {
-      const mockAdminSession: UserSession = {
-        id: "adm-001",
-        name: "Head of Operations",
-        email: credentials.email || "admin@towchain.com",
-        role: "admin",
-        token: "jwt_mock_admin_token_abc123",
-      };
-      setClientSession(mockAdminSession);
-      return mockAdminSession;
-    }
-  },
-
   logout: async (): Promise<void> => {
     try {
       await api.post(API_ENDPOINTS.auth.logout);

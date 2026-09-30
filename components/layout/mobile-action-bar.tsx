@@ -3,7 +3,7 @@
 import React from "react";
 import Link from "next/link";
 import { siteConfig } from "@/config/site";
-import { PhoneCall, Calculator } from "lucide-react";
+import { PhoneCall, Truck } from "lucide-react";
 
 export function MobileActionBar() {
   return (
@@ -22,14 +22,14 @@ export function MobileActionBar() {
           <span>CALL NOW</span>
         </a>
 
-        {/* GET ESTIMATE BUTTON */}
+        {/* SERVICES BUTTON */}
         <Link
-          href="/#estimate-calculator"
-          id="btn-mobile-get-estimate"
+          href="/services"
+          id="btn-mobile-services"
           className="flex items-center justify-center gap-2 rounded-xl bg-primary px-3 py-3 text-sm font-bold text-white shadow-md shadow-primary/25 active:scale-95 transition-transform"
         >
-          <Calculator className="h-4 w-4" />
-          <span>GET ESTIMATE</span>
+          <Truck className="h-4 w-4" />
+          <span>OUR SERVICES</span>
         </Link>
       </div>
     </aside>

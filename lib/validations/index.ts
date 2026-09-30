@@ -7,13 +7,6 @@ export const dealerLoginSchema = z.object({
 
 export type DealerLoginFormData = z.infer<typeof dealerLoginSchema>;
 
-export const adminLoginSchema = z.object({
-  email: z.string().email("Please enter your admin email"),
-  password: z.string().min(6, "Password must be at least 6 characters"),
-});
-
-export type AdminLoginFormData = z.infer<typeof adminLoginSchema>;
-
 export const vehicleRegistrationSchema = z.object({
   registrationNumber: z
     .string()
