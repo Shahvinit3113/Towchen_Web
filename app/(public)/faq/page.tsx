@@ -8,7 +8,7 @@ import { PhoneCall } from "lucide-react";
 export const metadata = constructMetadata({
   title: "Roadside Assistance & Towing FAQs | Common Questions Answered",
   description:
-    "Find answers about TowChain towing costs, flatbed safety, EV handling, dealer commissions, and emergency response times.",
+    "Find answers about TowChen towing costs, flatbed safety, EV handling, dealer commissions, and emergency response times.",
   canonicalUrlRelative: "/faq",
 });
 

@@ -6,9 +6,28 @@ export interface UserSession {
   email: string;
   role: UserRole;
   token: string;
+  refreshToken?: string;
   dealerId?: string;
   businessName?: string;
   phone?: string;
+}
+
+export interface DealerAuthUser {
+  id: number | string;
+  formated_id?: string;
+  email: string;
+  role?: string;
+  created_at?: string;
+  updated_at?: string;
+  name?: string;
+  businessName?: string;
+  phone?: string;
+}
+
+export interface DealerLoginResponse {
+  access_token: string;
+  refresh_token?: string;
+  dealer: DealerAuthUser;
 }
 
 export type VehicleCategory =

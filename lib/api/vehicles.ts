@@ -15,7 +15,7 @@ let mockVehicles: VehicleRecord[] = [
     category: "suv",
     status: "verified",
     assignedPackageId: "pkg-pro-shield",
-    packageName: "TowChain Pro Shield Plus",
+    packageName: "TowChen Pro Shield Plus",
     rcDocumentUrl: "/docs/rc-DL03CC4482.pdf",
     registeredAt: "2026-08-15T10:30:00Z",
   },
@@ -30,7 +30,7 @@ let mockVehicles: VehicleRecord[] = [
     category: "suv",
     status: "pending_inspection",
     assignedPackageId: "pkg-essential",
-    packageName: "TowChain Essential RSA",
+    packageName: "TowChen Essential RSA",
     registeredAt: "2026-09-01T14:20:00Z",
   },
   {
@@ -44,7 +44,7 @@ let mockVehicles: VehicleRecord[] = [
     category: "luxury",
     status: "verified",
     assignedPackageId: "pkg-elite-fleet",
-    packageName: "TowChain Elite Fleet & Luxury",
+    packageName: "TowChen Elite Fleet & Luxury",
     registeredAt: "2026-09-12T16:45:00Z",
   },
 ];

@@ -40,3 +40,16 @@ export function getAuthToken(): string | null {
   const session = getClientSession();
   return session ? session.token : null;
 }
+
+export function getRefreshToken(): string | null {
+  const session = getClientSession();
+  return session?.refreshToken || null;
+}
+
+export function updateClientSession(partial: Partial<UserSession>): UserSession | null {
+  const current = getClientSession();
+  if (!current) return null;
+  const updated = { ...current, ...partial };
+  setClientSession(updated);
+  return updated;
+}

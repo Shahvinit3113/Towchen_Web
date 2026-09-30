@@ -20,7 +20,7 @@ import {
 } from "lucide-react";
 
 export const metadata = constructMetadata({
-  title: "SwiftTow — 24/7 Towing Service & Emergency Roadside Assistance",
+  title: "TowChen — 24/7 Towing Service & Emergency Roadside Assistance",
   description:
     "Fast, reliable towing and roadside assistance with upfront pricing and real-time driver tracking. Average 20 minute arrival.",
   canonicalUrlRelative: "",
@@ -364,7 +364,7 @@ export default function HomePage() {
             {/* Left Points */}
             <div className="lg:col-span-7 space-y-5 sm:space-y-6">
               <span className="inline-block px-3.5 py-1 rounded-full bg-primary/10 text-primary text-xs font-bold uppercase tracking-wider">
-                WHY SWIFTTOW
+                WHY TOWCHEN
               </span>
               <h2 className="text-2xl sm:text-3xl lg:text-4xl font-black text-slate-900 tracking-tight leading-tight">
                 The Premium Standard in Roadside Assistance
@@ -396,7 +396,7 @@ export default function HomePage() {
                     <Truck className="h-6 w-6 sm:h-8 sm:w-8" />
                   </div>
                   <h3 className="text-xl sm:text-2xl font-black text-white">
-                    SwiftTow Certified Fleet
+                    TowChen Certified Fleet
                   </h3>
                   <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
                     Heavy-duty hydraulic flatbeds, soft wheel-strapping systems, and GPS telemetry active 24/7.

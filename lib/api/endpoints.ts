@@ -1,9 +1,11 @@
 export const API_ENDPOINTS = {
   auth: {
-    dealerLogin: "/auth/dealer/login",
+    dealerLogin: "/dealer-auth/login",
+    dealerRegister: "/dealer-auth/register",
+    dealerMe: "/dealer-auth/me",
+    dealerRefresh: "/dealer-auth/refresh",
     adminLogin: "/auth/admin/login",
-    dealerRegister: "/auth/dealer/register",
-    me: "/auth/me",
+    me: "/dealer-auth/me",
     logout: "/auth/logout",
   },
   towing: {

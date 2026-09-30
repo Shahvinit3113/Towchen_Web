@@ -52,7 +52,7 @@ export function PublicHeader() {
                 <Truck className="h-4.5 w-4.5 sm:h-5 sm:w-5" />
               </div>
               <span className="text-xl sm:text-2xl font-black tracking-tight text-white">
-                Swift<span className="text-primary">Tow</span>
+                Tow<span className="text-primary">Chen</span>
               </span>
             </Link>
 

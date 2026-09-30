@@ -18,7 +18,7 @@ export class ApiError extends Error {
   }
 }
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "";
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "https://towchen-api-1.onrender.com";
 
 interface RequestOptions extends RequestInit {
   timeoutMs?: number;
@@ -104,6 +104,9 @@ export async function apiClient<T>(
       throw new ApiError(408, "Request timed out. Please try again.");
     }
     if (error instanceof ApiError) {
+      if (error.status === 404 && process.env.NODE_ENV !== "production") {
+        return handleMockOrLocalApi<T>(endpoint, options);
+      }
       throw error;
     }
     // If backend is not running, provide graceful simulation in development
@@ -179,19 +182,51 @@ async function handleMockOrLocalApi<T>(
   }
 
   // Dealer Login
-  if (endpoint.includes("/auth/dealer/login")) {
+  if (endpoint.includes("/dealer-auth/login") || endpoint.includes("/auth/dealer/login")) {
     const body = options.body ? JSON.parse(options.body as string) : {};
     const mockDealerSession = {
-      id: "dlr-9941",
-      name: "Apex Motors Logistics",
-      businessName: "Apex Motors Autocare Pvt Ltd",
-      email: body.email || "partner@apexmotors.com",
-      phone: "+91 98112 33445",
-      role: "dealer",
-      token: "jwt_mock_dealer_token_xyz987",
-      dealerId: "dlr-9941",
+      access_token: "jwt_mock_dealer_token_xyz987",
+      refresh_token: "jwt_mock_dealer_refresh_token_xyz987",
+      dealer: {
+        id: 1,
+        formated_id: "DLR0000001",
+        email: body.email || "dealer@towchen.com",
+        role: "Dealer",
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      },
     };
     return { data: mockDealerSession as unknown as T, success: true, status: 200 };
+  }
+
+  // Dealer Me
+  if (endpoint.includes("/dealer-auth/me") || endpoint.includes("/auth/me")) {
+    const mockDealer = {
+      id: 1,
+      formated_id: "DLR0000001",
+      email: "dealer@towchen.com",
+      role: "Dealer",
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    };
+    return { data: mockDealer as unknown as T, success: true, status: 200 };
+  }
+
+  // Dealer Refresh
+  if (endpoint.includes("/dealer-auth/refresh")) {
+    const mockRefresh = {
+      access_token: "jwt_mock_dealer_token_refreshed_xyz987",
+      refresh_token: "jwt_mock_dealer_refresh_token_xyz987",
+      dealer: {
+        id: 1,
+        formated_id: "DLR0000001",
+        email: "dealer@towchen.com",
+        role: "Dealer",
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      },
+    };
+    return { data: mockRefresh as unknown as T, success: true, status: 200 };
   }
 
   // Admin Login

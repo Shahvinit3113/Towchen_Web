@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { getClientSession } from "@/lib/auth/session";
+import { authApi } from "@/lib/api/auth";
 import { DealerSidebar } from "@/components/layout/dealer-sidebar";
 import { DealerHeader } from "@/components/layout/dealer-header";
 import { X } from "lucide-react";
@@ -30,6 +31,14 @@ export default function DealerLayout({
         router.replace("/dealer/login");
       } else {
         setAuthVerified(true);
+        // Verify and refresh dealer profile with GET /dealer-auth/me
+        if (session.token && session.role === "dealer") {
+          authApi.refreshDealerSession().catch((err: any) => {
+            if (err?.status === 401) {
+              router.replace("/dealer/login");
+            }
+          });
+        }
       }
     }
   }, [pathname, isLoginPage, router]);

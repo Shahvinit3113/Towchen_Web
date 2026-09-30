@@ -61,7 +61,7 @@ export const paymentsApi = {
           date: "2026-09-12T16:50:00Z",
           amount: 5999,
           method: "UPI (HDFC)",
-          purpose: "TowChain Elite Fleet Package",
+          purpose: "TowChen Elite Fleet Package",
           status: "Success",
         },
         {
@@ -69,7 +69,7 @@ export const paymentsApi = {
           date: "2026-08-15T10:35:00Z",
           amount: 3499,
           method: "Corporate NetBanking",
-          purpose: "TowChain Pro Shield Plus",
+          purpose: "TowChen Pro Shield Plus",
           status: "Success",
         },
       ];

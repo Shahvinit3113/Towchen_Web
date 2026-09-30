@@ -15,9 +15,9 @@ import {
 } from "lucide-react";
 
 export const metadata = constructMetadata({
-  title: "About TowChain | Modernizing Roadside Logistics",
+  title: "About TowChen | Modernizing Roadside Logistics",
   description:
-    "Learn about TowChain's mission to eliminate roadside uncertainty through technology, certified operators, and transparent emergency dispatch.",
+    "Learn about TowChen's mission to eliminate roadside uncertainty through technology, certified operators, and transparent emergency dispatch.",
   canonicalUrlRelative: "/about",
 });
 
@@ -33,7 +33,7 @@ export default function AboutPage() {
           </h1>
           <p className="text-slate-600 text-lg leading-relaxed">
             Vehicle breakdowns shouldn&apos;t involve stressful roadside haggling,
-            uncertain wait times, or damaged car suspensions. TowChain connects
+            uncertain wait times, or damaged car suspensions. TowChen connects
             motorists, auto dealerships, and recovery operators through a unified
             high-tech platform.
           </p>
@@ -72,7 +72,7 @@ export default function AboutPage() {
             </div>
             <h2 className="text-xl font-bold text-slate-900">Empowering Dealers</h2>
             <p className="text-sm text-slate-600 leading-relaxed">
-              Automobile dealerships and workshops use TowChain Partner OS for live
+              Automobile dealerships and workshops use TowChen Partner OS for live
               vehicle audits, RC verification, and instant wallet commission payouts.
             </p>
           </div>

@@ -54,9 +54,9 @@ export function DealerSidebar({ onItemClick }: DealerSidebarProps) {
             </div>
             <div>
               <span className="text-xl font-black tracking-tight text-white">
-                Tow<span className="text-primary/70">Chain</span>
+                Tow<span className="text-blue-400">Chen</span>
               </span>
-              <span className="block text-[10px] uppercase font-bold text-primary/70 tracking-wider">
+              <span className="block text-[10px] uppercase font-bold text-blue-400 tracking-wider">
                 Dealer Partner OS
               </span>
             </div>

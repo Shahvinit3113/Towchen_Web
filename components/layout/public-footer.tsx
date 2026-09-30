@@ -14,7 +14,7 @@ export function PublicFooter() {
                 <Truck className="h-5 w-5" />
               </div>
               <span className="text-2xl font-black tracking-tight text-white">
-                Swift<span className="text-primary">Tow</span>
+                Tow<span className="text-primary">Chen</span>
               </span>
             </Link>
 
@@ -156,7 +156,7 @@ export function PublicFooter() {
 
         {/* Bottom Bar */}
         <div className="pt-8 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-500 gap-4">
-          <p>© 2026 SwiftTow LLC. All rights reserved.</p>
+          <p>© 2026 TowChen Technologies. All rights reserved.</p>
           <div className="flex items-center gap-6">
             <Link href="/about" className="hover:text-slate-400 transition-colors">
               Privacy Policy

@@ -44,7 +44,7 @@ export const ALL_SERVICES: ServiceItem[] = [
     category: "towing",
     shortDesc: "Heavy winch-out, rollover uprighting, and off-road embankment retrieval by certified recovery specialists.",
     fullDesc:
-      "When vehicles slide off the road, roll over, or suffer severe collision damage, standard towing is insufficient. TowChain deploys heavy-duty twin-line winches, crane-assisted booms, and certified scene containment specialists 24/7.",
+      "When vehicles slide off the road, roll over, or suffer severe collision damage, standard towing is insufficient. TowChen deploys heavy-duty twin-line winches, crane-assisted booms, and certified scene containment specialists 24/7.",
     iconName: "ShieldAlert",
     basePrice: 2499,
     features: [
@@ -98,7 +98,7 @@ export const ALL_SERVICES: ServiceItem[] = [
     category: "roadside",
     shortDesc: "Spare tire swap, pneumatic torque tightening, and high-pressure tubeless puncture patching.",
     fullDesc:
-      "Whether you need your spare tire bolted on with calibrated torque wrenches or require on-the-spot tubeless puncture sealing, TowChain roadside technicians get you back on the road in minutes without breaking your back.",
+      "Whether you need your spare tire bolted on with calibrated torque wrenches or require on-the-spot tubeless puncture sealing, TowChen roadside technicians get you back on the road in minutes without breaking your back.",
     iconName: "Disc",
     basePrice: 399,
     features: [

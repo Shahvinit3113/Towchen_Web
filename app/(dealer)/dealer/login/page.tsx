@@ -26,8 +26,8 @@ export default function DealerLoginPage() {
   } = useForm<DealerLoginFormData>({
     resolver: zodResolver(dealerLoginSchema),
     defaultValues: {
-      email: "partner@apexmotors.com",
-      password: "password123",
+      email: "dealer@towchen.com",
+      password: "Password@123",
     },
   });
 
@@ -48,6 +48,17 @@ export default function DealerLoginPage() {
   };
 
   const handleQuickDemoLogin = () => {
+    setValue("email", "dealer@towchen.com");
+    setValue("password", "Password@123");
+    handleLogin({
+      email: "dealer@towchen.com",
+      password: "Password@123",
+    });
+  };
+
+  const handleOfflineFallbackLogin = () => {
+    setValue("email", "partner@apexmotors.com");
+    setValue("password", "password123");
     handleLogin({
       email: "partner@apexmotors.com",
       password: "password123",
@@ -64,7 +75,7 @@ export default function DealerLoginPage() {
               <Truck className="h-6 w-6" />
             </div>
             <span className="text-3xl font-black text-slate-900 tracking-tight">
-              Tow<span className="text-primary">Chain</span>
+              Tow<span className="text-primary">Chen</span>
             </span>
           </Link>
           <p className="text-sm font-bold uppercase tracking-wider text-primary">
@@ -114,7 +125,7 @@ export default function DealerLoginPage() {
                   href="#forgot"
                   onClick={(e) => {
                     e.preventDefault();
-                    alert("Please contact your TowChain account manager to reset credentials.");
+                    alert("Please contact your TowChen account manager to reset credentials.");
                   }}
                   className="text-xs text-primary hover:underline"
                 >
@@ -161,7 +172,7 @@ export default function DealerLoginPage() {
             href="/"
             className="text-xs font-semibold text-slate-500 hover:text-slate-800 transition-colors"
           >
-            ← Return to TowChain Public Site
+            ← Return to TowChen Public Site
           </Link>
         </div>
       </div>
