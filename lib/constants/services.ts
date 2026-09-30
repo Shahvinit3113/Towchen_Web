@@ -1,0 +1,148 @@
+import { ServiceItem } from "@/types";
+
+export const ALL_SERVICES: ServiceItem[] = [
+  {
+    id: "flatbed-towing",
+    title: "Flatbed Hydraulic Towing",
+    slug: "flatbed-towing",
+    category: "towing",
+    shortDesc: "Zero-ground contact hydraulic flatbed transport for luxury cars, SUVs, and low-clearance vehicles.",
+    fullDesc:
+      "Our premier flatbed towing service utilizes heavy-duty hydraulic tilting platforms. Your vehicle is safely pulled onto the bed without axle stress or tire wear, making it the safest transport method for all-wheel-drive, low-clearance luxury vehicles, sports cars, and accident recovery.",
+    iconName: "Truck",
+    basePrice: 1499,
+    features: [
+      "Zero ground contact transport",
+      "Ideal for AWD, 4x4, & luxury sedans",
+      "Hydraulic tilt bed & soft nylon straps",
+      "Fully insured transit up to ₹50 Lakhs",
+      "Live GPS tracking for customer",
+    ],
+  },
+  {
+    id: "wheel-lift-towing",
+    title: "Wheel-Lift Quick Clearance",
+    slug: "wheel-lift-towing",
+    category: "towing",
+    shortDesc: "Rapid maneuverable towing for tight underground parking, basements, and congested city lanes.",
+    fullDesc:
+      "Engineered specifically for low-clearance basements, tight residential streets, and busy highway breakdowns. The modern pneumatic wheel-lift cradles the vehicle's tires without touching the bumper or chassis, ensuring swift and safe transit.",
+    iconName: "Car",
+    basePrice: 1099,
+    features: [
+      "Underground basement clearance capable",
+      "Quick 5-minute hookup time",
+      "Equipped with dollies for 4WD towing",
+      "Heavy-duty boom arm",
+      "Ideal for compact cars & sedans",
+    ],
+  },
+  {
+    id: "accident-recovery",
+    title: "Accident & Ditch Recovery",
+    slug: "accident-recovery",
+    category: "towing",
+    shortDesc: "Heavy winch-out, rollover uprighting, and off-road embankment retrieval by certified recovery specialists.",
+    fullDesc:
+      "When vehicles slide off the road, roll over, or suffer severe collision damage, standard towing is insufficient. TowChain deploys heavy-duty twin-line winches, crane-assisted booms, and certified scene containment specialists 24/7.",
+    iconName: "ShieldAlert",
+    basePrice: 2499,
+    features: [
+      "Heavy hydraulic 10-ton winch gear",
+      "Rollover uprighting & stabilizing",
+      "Highway collision scene clearance",
+      "Police & insurance documentation support",
+      "24/7 rapid priority dispatch",
+    ],
+  },
+  {
+    id: "ev-towing",
+    title: "Electric Vehicle (EV) Recovery",
+    slug: "ev-towing",
+    category: "towing",
+    shortDesc: "Specialized OEM-compliant EV flatbed recovery preventing regenerative motor damage and battery risks.",
+    fullDesc:
+      "Electric and hybrid vehicles have unique high-voltage batteries and cannot be pulled on their drive wheels due to permanent magnet motor resistance. We deploy trained technicians with specialized insulated wheel dollies and flatbed rigs compliant with Tesla, Tata EV, BYD, and MG standards.",
+    iconName: "Zap",
+    basePrice: 1799,
+    features: [
+      "OEM EV-compliant towing protocols",
+      "Prevents regenerative braking motor burnout",
+      "High-voltage safety certified personnel",
+      "Thermal inspection cameras on-board",
+      "Direct transit to authorized charging/service hubs",
+    ],
+  },
+  {
+    id: "battery-jumpstart",
+    title: "Rapid Battery Jumpstart",
+    slug: "battery-jumpstart",
+    category: "roadside",
+    shortDesc: "Digital voltage diagnostics, multi-volt boost packs, and on-spot battery health analysis in under 20 mins.",
+    fullDesc:
+      "Dead battery leaving you stranded? Our roadside units carry professional lithium-ion surge-protected jump packs that safeguard sensitive onboard computers and modern ECUs while starting anything from compact cars to diesel commercial vans.",
+    iconName: "BatteryCharging",
+    basePrice: 499,
+    features: [
+      "12V / 24V surge-protected jump packs",
+      "Alternator & charging system health check",
+      "Compatible with all start-stop AGM batteries",
+      "New replacement batteries available on-site",
+      "Average 15-minute response in city hubs",
+    ],
+  },
+  {
+    id: "flat-tire-service",
+    title: "Flat Tire Replacement & Puncture",
+    slug: "flat-tire-service",
+    category: "roadside",
+    shortDesc: "Spare tire swap, pneumatic torque tightening, and high-pressure tubeless puncture patching.",
+    fullDesc:
+      "Whether you need your spare tire bolted on with calibrated torque wrenches or require on-the-spot tubeless puncture sealing, TowChain roadside technicians get you back on the road in minutes without breaking your back.",
+    iconName: "Disc",
+    basePrice: 399,
+    features: [
+      "Spare wheel change & torque calibration",
+      "High-grade tubeless puncture sealing",
+      "Digital air inflation check",
+      "Lug nut extraction for stripped bolts",
+      "All weather roadside assistance",
+    ],
+  },
+  {
+    id: "fuel-delivery",
+    title: "Emergency Fuel Delivery",
+    slug: "fuel-delivery",
+    category: "roadside",
+    shortDesc: "Up to 5 liters of verified Petrol or High-Speed Diesel delivered directly to your breakdown spot.",
+    fullDesc:
+      "Ran out of fuel on the highway or in heavy traffic? We deliver clean, certified fuel in government-approved safety canisters directly to your vehicle, followed by diesel line bleeding if air locked.",
+    iconName: "Fuel",
+    basePrice: 449,
+    features: [
+      "Petrol and Diesel fuel delivery",
+      "Delivered in PESO-approved sealed containers",
+      "Diesel fuel-line priming assistance",
+      "Available across all major highways",
+      "Saves you walking along busy expressways",
+    ],
+  },
+  {
+    id: "lockout-assistance",
+    title: "Vehicle Lockout Assistance",
+    slug: "lockout-assistance",
+    category: "roadside",
+    shortDesc: "Non-destructive inflatable wedge and linkage access to retrieve keys locked inside your vehicle.",
+    fullDesc:
+      "Keys accidentally locked in the trunk or cabin? Our technicians use damage-free pneumatic air wedges and soft-coated precision probes to gently pop the door lock without scratching paint or damaging weather seals.",
+    iconName: "Key",
+    basePrice: 599,
+    features: [
+      "100% scratch-free non-destructive entry",
+      "Air wedge & specialized linkage rods",
+      "Works on luxury & frameless door vehicles",
+      "Identity verification required for security",
+      "Available day or night",
+    ],
+  },
+];

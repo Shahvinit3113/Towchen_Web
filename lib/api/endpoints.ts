@@ -1,0 +1,55 @@
+export const API_ENDPOINTS = {
+  auth: {
+    dealerLogin: "/auth/dealer/login",
+    adminLogin: "/auth/admin/login",
+    dealerRegister: "/auth/dealer/register",
+    me: "/auth/me",
+    logout: "/auth/logout",
+  },
+  towing: {
+    estimate: "/towing/estimate",
+    services: "/towing/services",
+    book: "/towing/book",
+    track: (bookingId: string) => `/towing/track/${bookingId}`,
+  },
+  vehicles: {
+    list: "/vehicles",
+    register: "/vehicles/register",
+    detail: (id: string) => `/vehicles/${id}`,
+    uploadRc: (id: string) => `/vehicles/${id}/rc-document`,
+    uploadInspection: (id: string) => `/vehicles/${id}/inspection`,
+  },
+  packages: {
+    list: "/packages",
+    detail: (id: string) => `/packages/${id}`,
+    purchase: "/packages/purchase",
+    mySubscriptions: "/packages/subscriptions",
+  },
+  dealer: {
+    stats: "/dealer/stats",
+    profile: "/dealer/profile",
+    updateProfile: "/dealer/profile",
+  },
+  wallet: {
+    summary: "/wallet/summary",
+    transactions: "/wallet/transactions",
+    requestPayout: "/wallet/payout-request",
+    payoutHistory: "/wallet/payouts",
+  },
+  payments: {
+    createIntent: "/payments/create-intent",
+    verify: "/payments/verify",
+    history: "/payments/history",
+  },
+  admin: {
+    stats: "/admin/stats",
+    dealers: "/admin/dealers",
+    approveDealer: (id: string) => `/admin/dealers/${id}/approve`,
+    packages: "/admin/packages",
+    purchases: "/admin/purchases",
+    commissions: "/admin/commissions",
+    payouts: "/admin/payouts",
+    resolvePayout: (id: string) => `/admin/payouts/${id}/resolve`,
+    transactions: "/admin/transactions",
+  },
+} as const;
