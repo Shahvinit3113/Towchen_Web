@@ -49,7 +49,39 @@ export type TowingServiceType =
   | "fuel_delivery"
   | "lockout"
   | "winch_out"
-  | "vehicle_recovery";
+  | "vehicle_recovery"
+  | (string & {});
+
+
+export interface TowingEstimateRequest {
+  pickupLocation: string;
+  pickupLat?: number;
+  pickupLng?: number;
+  dropLocation: string;
+  dropLat?: number;
+  dropLng?: number;
+  vehicleCategory?: VehicleCategory;
+  serviceType: TowingServiceType;
+  requiresSpecialFlatbed?: boolean;
+}
+
+export interface TowingEstimateResponse {
+  distanceMiles?: number;
+  distanceKm: number;
+  baseFare: number;
+  distanceFare: number;
+  vehicleCategoryCharge: number;
+  totalEstimatedPrice: number;
+  estimatedEtaMinutes: number;
+  serviceType: TowingServiceType;
+  vehicleCategory: VehicleCategory;
+  isApproximate?: boolean;
+  breakdown: {
+    baseRate: number;
+    perKmRate: number;
+    taxes: number;
+  };
+}
 
 export interface BookingSubmissionRequest {
   customerName: string;

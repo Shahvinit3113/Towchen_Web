@@ -8,6 +8,7 @@ export const API_ENDPOINTS = {
     logout: "/auth/logout",
   },
   towing: {
+    estimate: "/towing/estimate",
     services: "/towing/services",
     book: "/towing/book",
     track: (bookingId: string) => `/towing/track/${bookingId}`,
