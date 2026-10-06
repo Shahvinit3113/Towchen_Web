@@ -40,7 +40,7 @@ export default function DealerDashboardPage() {
         ]);
         setStats(statsData);
         setTransactions(txns);
-        setPackageOrders(pkgs);
+        setPackageOrders(Array.isArray(pkgs) ? pkgs : (pkgs?.data || pkgs?.items || []));
       } catch (err) {
         console.error("Dashboard data load error:", err);
       } finally {
