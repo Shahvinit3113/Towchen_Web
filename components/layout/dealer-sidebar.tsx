@@ -6,12 +6,7 @@ import { usePathname } from "next/navigation";
 import { dealerNavLinks } from "@/config/navigation";
 import {
   LayoutDashboard,
-  CarFront,
   ShieldCheck,
-  Wallet,
-  ReceiptText,
-  CreditCard,
-  Building2,
   LogOut,
   Truck,
   ExternalLink,
@@ -22,12 +17,7 @@ import { cn } from "@/lib/utils";
 
 const ICONS: Record<string, React.ReactNode> = {
   LayoutDashboard: <LayoutDashboard className="h-4 w-4" />,
-  CarFront: <CarFront className="h-4 w-4" />,
   ShieldCheck: <ShieldCheck className="h-4 w-4" />,
-  Wallet: <Wallet className="h-4 w-4" />,
-  ReceiptText: <ReceiptText className="h-4 w-4" />,
-  CreditCard: <CreditCard className="h-4 w-4" />,
-  Building2: <Building2 className="h-4 w-4" />,
 };
 
 interface DealerSidebarProps {

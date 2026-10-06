@@ -21,10 +21,9 @@ export const API_ENDPOINTS = {
     uploadInspection: (id: string) => `/vehicles/${id}/inspection`,
   },
   packages: {
-    list: "/packages",
-    detail: (id: string) => `/packages/${id}`,
-    purchase: "/packages/purchase",
-    mySubscriptions: "/packages/subscriptions",
+    dealerPackagePlan: "/dealer-package-plan",
+    dealerPackageOrder: "/dealer-package-order",
+    dealerPackageOrderDownload: (id: string) => `/dealer-package-order/${id}/download`,
   },
   dealer: {
     stats: "/dealer/stats",

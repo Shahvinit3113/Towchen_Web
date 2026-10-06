@@ -17,10 +17,5 @@ export const publicNavLinks: NavItem[] = [
 
 export const dealerNavLinks: NavItem[] = [
   { title: "Dashboard", href: "/dealer/dashboard", icon: "LayoutDashboard" },
-  { title: "Vehicles & RC", href: "/dealer/vehicles", icon: "CarFront" },
   { title: "RSA Packages", href: "/dealer/packages", icon: "ShieldCheck" },
-  { title: "Wallet & Earnings", href: "/dealer/wallet", icon: "Wallet" },
-  { title: "Transactions", href: "/dealer/transactions", icon: "ReceiptText" },
-  { title: "Payments", href: "/dealer/payments", icon: "CreditCard" },
-  { title: "Dealer Profile", href: "/dealer/profile", icon: "Building2" },
 ];
