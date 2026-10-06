@@ -7,6 +7,7 @@ import { dealerNavLinks } from "@/config/navigation";
 import {
   LayoutDashboard,
   ShieldCheck,
+  History,
   LogOut,
   Truck,
   ExternalLink,
@@ -18,6 +19,7 @@ import { cn } from "@/lib/utils";
 const ICONS: Record<string, React.ReactNode> = {
   LayoutDashboard: <LayoutDashboard className="h-4 w-4" />,
   ShieldCheck: <ShieldCheck className="h-4 w-4" />,
+  History: <History className="h-4 w-4" />,
 };
 
 interface DealerSidebarProps {

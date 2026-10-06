@@ -6,7 +6,7 @@ export function PublicFooter() {
   return (
     <footer className="bg-[#070f26] text-slate-300 pt-16 pb-12 border-t border-white/10">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-10 pb-12 border-b border-white/10">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 pb-12 border-b border-white/10">
           {/* Brand Info */}
           <div className="lg:col-span-2 space-y-4">
             <Link href="/" className="flex items-center gap-2.5">
@@ -109,45 +109,6 @@ export function PublicFooter() {
               <li>
                 <Link href="/dealer/login" className="hover:text-white transition-colors">
                   Dealer & Fleet Accounts
-                </Link>
-              </li>
-              <li>
-                <Link href="/about" className="hover:text-white transition-colors">
-                  Press & Media
-                </Link>
-              </li>
-            </ul>
-          </div>
-
-          {/* Support */}
-          <div>
-            <h3 className="text-xs font-bold uppercase tracking-wider text-white mb-4">
-              Support
-            </h3>
-            <ul className="space-y-2.5 text-sm text-slate-400">
-              <li>
-                <Link href="/faq" className="hover:text-white transition-colors">
-                  FAQ
-                </Link>
-              </li>
-              <li>
-                <Link href="/contact" className="hover:text-white transition-colors">
-                  Track My Tow
-                </Link>
-              </li>
-              <li>
-                <Link href="/contact" className="hover:text-white transition-colors">
-                  Request Invoice
-                </Link>
-              </li>
-              <li>
-                <Link href="/contact" className="hover:text-white transition-colors">
-                  Insurance Claims
-                </Link>
-              </li>
-              <li>
-                <Link href="/contact" className="hover:text-white transition-colors">
-                  Contact Us
                 </Link>
               </li>
             </ul>
