@@ -135,6 +135,8 @@ export function EstimateWidget() {
   const [calcError, setCalcError] = useState<string | null>(null);
   const [isDetectingLocation, setIsDetectingLocation] = useState(false);
   const [isAppModalOpen, setIsAppModalOpen] = useState(false);
+  const [pickupPlaceId, setPickupPlaceId] = useState<string | null>(null);
+  const [dropPlaceId, setDropPlaceId] = useState<string | null>(null);
 
   const handleCheckOnApp = () => {
     if (typeof window === "undefined") return;
@@ -238,6 +240,9 @@ export function EstimateWidget() {
           const data = await res.json();
           if (data && data.address) {
             setValue("pickupLocation", data.address, { shouldValidate: true });
+            if (data.place_id) {
+              setPickupPlaceId(data.place_id);
+            }
           } else {
             setValue(
               "pickupLocation",
@@ -322,6 +327,9 @@ export function EstimateWidget() {
       const result = await towingApi.getEstimate({
         pickupLocation: pickupValue,
         dropLocation: dropValue,
+        breakdown_place_id: pickupPlaceId || undefined,
+        dropoff_place_id: dropPlaceId || undefined,
+        sub_service_id: selectedOption?.sub_service_id,
         vehicleCategory: "suv",
         serviceType: selectedService,
         requiresSpecialFlatbed: selectedService.includes("flatbed"),
@@ -477,6 +485,9 @@ export function EstimateWidget() {
                 onChange={(val) => {
                   setValue("pickupLocation", val, { shouldValidate: true });
                 }}
+                onSelectPrediction={(prediction) => {
+                  setPickupPlaceId(prediction.place_id);
+                }}
                 placeholder="Enter pickup address or intersection"
                 leftIcon={
                   <span className="w-3.5 h-3.5 rounded-full bg-blue-600 shrink-0 shadow-xs block" />
@@ -517,6 +528,9 @@ export function EstimateWidget() {
                 value={dropValue || ""}
                 onChange={(val) => {
                   setValue("dropLocation", val, { shouldValidate: true });
+                }}
+                onSelectPrediction={(prediction) => {
+                  setDropPlaceId(prediction.place_id);
                 }}
                 placeholder="Mechanic, dealership, or any address"
                 leftIcon={<MapPin className="w-4 h-4 text-blue-600 shrink-0" />}
@@ -692,9 +706,10 @@ export function EstimateWidget() {
               {/* Distance */}
               <div className="rounded-2xl border border-slate-200 bg-white p-3 text-center">
                 <p className="text-xl sm:text-2xl font-black text-blue-600">
-                  {typeof estimate.distanceMiles === "number" && !isNaN(estimate.distanceMiles)
-                    ? `${estimate.distanceMiles}mi`
-                    : `${estimate.distanceKm || 5.1}km`}
+                  {estimate.distanceFormatted ||
+                    (typeof estimate.distanceMiles === "number" && !isNaN(estimate.distanceMiles)
+                      ? `${estimate.distanceMiles}mi`
+                      : `${estimate.distanceKm || 5.1}km`)}
                 </p>
                 <p className="text-[10px] sm:text-[11px] font-bold text-slate-400 uppercase tracking-wider mt-1">
                   Distance
@@ -704,7 +719,7 @@ export function EstimateWidget() {
               {/* Approx Price Card (Featured Blue) */}
               <div className="rounded-2xl bg-blue-600 text-white p-3 text-center shadow-lg shadow-blue-600/30">
                 <p className="text-xl sm:text-2xl font-black tracking-tight text-white">
-                  ~${estimate.totalEstimatedPrice ?? 89}
+                  {estimate.totalEstimatedPriceFormatted || `~$${estimate.totalEstimatedPrice ?? 89}`}
                 </p>
                 <p className="text-[10px] sm:text-[11px] font-bold text-blue-100 uppercase tracking-wider mt-1">
                   Approx. Price
@@ -714,7 +729,7 @@ export function EstimateWidget() {
               {/* ETA */}
               <div className="rounded-2xl border border-slate-200 bg-white p-3 text-center">
                 <p className="text-xl sm:text-2xl font-black text-blue-600">
-                  {estimate.estimatedEtaMinutes ?? 22}m
+                  {estimate.durationFormatted || `${estimate.estimatedEtaMinutes ?? 22}m`}
                 </p>
                 <p className="text-[10px] sm:text-[11px] font-bold text-slate-400 uppercase tracking-wider mt-1">
                   ETA

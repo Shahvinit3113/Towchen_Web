@@ -10,6 +10,34 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ predictions: [] });
   }
 
+  const rawBaseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+  const baseUrl = rawBaseUrl.replace(/\/+$/, "");
+
+  try {
+    // 1. Try existing Towchen_API backend endpoint
+    const backendRes = await fetch(
+      `${baseUrl}/location/search-address?input=${encodeURIComponent(input)}`,
+      { headers: { Accept: "application/json" } }
+    ).catch(() => null);
+
+    if (backendRes && backendRes.ok) {
+      const json = await backendRes.json();
+      const list = Array.isArray(json) ? json : (json?.data || []);
+      if (Array.isArray(list) && list.length > 0) {
+        return NextResponse.json({
+          predictions: list.map((p: any) => ({
+            place_id: p.place_id,
+            description: p.description,
+            main_text: p.main_text || p.description,
+            secondary_text: p.secondary_text || "",
+          })),
+        });
+      }
+    }
+  } catch (err) {
+    console.warn("Backend /location/search-address failed, falling back to Google Places:", err);
+  }
+
   const apiKey = process.env.GOOGLE_MAPS_API_KEY || DEFAULT_API_KEY;
 
   try {

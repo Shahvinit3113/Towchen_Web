@@ -63,19 +63,27 @@ export interface TowingEstimateRequest {
   vehicleCategory?: VehicleCategory;
   serviceType: TowingServiceType;
   requiresSpecialFlatbed?: boolean;
+  breakdown_place_id?: string;
+  dropoff_place_id?: string;
+  sub_service_id?: number;
 }
 
 export interface TowingEstimateResponse {
   distanceMiles?: number;
   distanceKm: number;
+  distanceFormatted?: string;
+  durationFormatted?: string;
   baseFare: number;
   distanceFare: number;
   vehicleCategoryCharge: number;
   totalEstimatedPrice: number;
+  totalEstimatedPriceFormatted?: string;
   estimatedEtaMinutes: number;
   serviceType: TowingServiceType;
   vehicleCategory: VehicleCategory;
   isApproximate?: boolean;
+  sub_services?: any[];
+  rawEstimate?: any;
   breakdown: {
     baseRate: number;
     perKmRate: number;

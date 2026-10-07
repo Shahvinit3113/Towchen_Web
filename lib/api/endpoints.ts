@@ -7,9 +7,15 @@ export const API_ENDPOINTS = {
     me: "/dealer-auth/me",
     logout: "/auth/logout",
   },
+  location: {
+    searchAddress: "/location/search-address",
+    resolveAddress: "/location/resolve-address",
+    reverseGeocode: "/location/reverse-geocode",
+    estimate: "/location/estimate",
+  },
   towing: {
-    estimate: "/towing/estimate",
-    services: "/towing/services",
+    estimate: "/location/estimate",
+    services: "/service",
     book: "/towing/book",
     track: (bookingId: string) => `/towing/track/${bookingId}`,
   },

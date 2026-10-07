@@ -49,6 +49,14 @@ export default function DealerDashboardPage() {
     }
     loadData();
   }, []);
+  if (loading) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[50vh] text-slate-400">
+        <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-primary mb-4"></div>
+        <p className="text-sm font-medium animate-pulse">Loading dashboard...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-8">
@@ -64,6 +72,12 @@ export default function DealerDashboardPage() {
         </div>
 
         <div className="flex items-center gap-3">
+          <Link href="/dealer/packages">
+            <Button size="sm" className="font-bold gap-1.5 shadow-sm">
+              <Plus className="h-4 w-4" />
+              <span>Purchase Package</span>
+            </Button>
+          </Link>
           <Link href="/dealer/wallet">
             <Button variant="outline" size="sm" className="font-bold gap-1.5">
               <Wallet className="h-4 w-4 text-primary" />
