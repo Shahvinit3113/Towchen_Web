@@ -35,30 +35,30 @@ export default function RoadsideAssistancePage() {
   const roadsideServices = ALL_SERVICES.filter((s) => s.category === "roadside");
 
   return (
-    <div className="py-12 md:py-16 space-y-16">
+    <div className="py-8 sm:py-12 md:py-16 space-y-10 sm:space-y-16">
       {/* Header */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="max-w-3xl space-y-4">
+        <div className="max-w-3xl space-y-3 sm:space-y-4">
           <Badge variant="primary">On-The-Spot Breakdown Solutions</Badge>
-          <h1 className="text-4xl sm:text-5xl font-black text-slate-900 tracking-tight">
+          <h1 className="text-2xl sm:text-4xl md:text-5xl font-black text-slate-900 tracking-tight leading-tight">
             Rapid 24/7 Roadside Assistance (RSA)
           </h1>
-          <p className="text-slate-600 text-lg leading-relaxed">
+          <p className="text-slate-600 text-sm sm:text-base md:text-lg leading-relaxed">
             Dead battery? Puncture on the expressway? Keys locked inside? Our mobile
             assistance patrol vans are stocked with high-power booster packs,
             hydraulic jacks, and approved fuel canisters to fix your car on the spot.
           </p>
-          <div className="flex flex-wrap gap-4 pt-2">
+          <div className="flex flex-col sm:flex-row gap-3 pt-2">
             <a
               href={`tel:${siteConfig.emergencyPhoneRaw}`}
-              className="inline-flex items-center gap-2 rounded-xl bg-red-600 hover:bg-red-700 text-white font-bold px-6 py-3.5 text-sm shadow-md"
+              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-xl bg-red-600 hover:bg-red-700 active:bg-red-800 text-white font-bold px-6 py-3.5 text-sm shadow-md transition-all active:scale-95"
             >
-              <PhoneCall className="h-5 w-5 animate-bounce" />
-              <span>Call Roadside Patrol: {siteConfig.emergencyPhone}</span>
+              <PhoneCall className="h-4 w-4 animate-bounce" />
+              <span>Call Patrol: {siteConfig.emergencyPhone}</span>
             </a>
             <Link
               href="/contact"
-              className="inline-flex items-center gap-2 rounded-xl border border-slate-300 bg-white hover:bg-slate-50 text-slate-800 font-semibold px-6 py-3.5 text-sm"
+              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-xl border border-slate-300 bg-white hover:bg-slate-50 text-slate-800 font-semibold px-6 py-3.5 text-sm transition-all active:scale-95"
             >
               Request Assistance
             </Link>
@@ -68,7 +68,7 @@ export default function RoadsideAssistancePage() {
 
       {/* Services Grid */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
           {roadsideServices.map((srv) => (
             <div
               key={srv.id}

@@ -15,14 +15,14 @@ export const metadata = constructMetadata({
 
 export default function ServicesPage() {
   return (
-    <div className="py-12 md:py-16 space-y-12">
+    <div className="py-8 sm:py-12 md:py-16 space-y-8 sm:space-y-12">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="max-w-3xl space-y-4">
+        <div className="max-w-3xl space-y-3 sm:space-y-4">
           <Badge variant="primary">Fleet & Service Directory</Badge>
-          <h1 className="text-4xl font-black text-slate-900 tracking-tight">
+          <h1 className="text-2xl sm:text-4xl font-black text-slate-900 tracking-tight leading-tight">
             All Roadside Assistance & Recovery Services
           </h1>
-          <p className="text-slate-600 text-base leading-relaxed">
+          <p className="text-slate-600 text-xs sm:text-sm md:text-base leading-relaxed">
             Every vehicle breakdown is unique. Discover our specialized transport
             and roadside repair capabilities below.
           </p>
@@ -30,12 +30,12 @@ export default function ServicesPage() {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
           {ALL_SERVICES.map((srv) => (
             <div
               key={srv.id}
               id={srv.slug}
-              className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm hover:border-primary/30 transition-all flex flex-col justify-between"
+              className="rounded-2xl border border-slate-200 bg-white p-5 sm:p-6 shadow-sm hover:border-primary/30 transition-all flex flex-col justify-between"
             >
               <div className="space-y-3">
                 <div className="flex items-center justify-between">

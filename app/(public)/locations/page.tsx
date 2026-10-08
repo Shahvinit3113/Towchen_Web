@@ -15,14 +15,14 @@ export const metadata = constructMetadata({
 
 export default function LocationsPage() {
   return (
-    <div className="py-12 md:py-16 space-y-12">
+    <div className="py-8 sm:py-12 md:py-16 space-y-8 sm:space-y-12">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="max-w-3xl space-y-4">
+        <div className="max-w-3xl space-y-3 sm:space-y-4">
           <Badge variant="primary">Pan-India Fleet Coverage</Badge>
-          <h1 className="text-4xl font-black text-slate-900 tracking-tight">
+          <h1 className="text-2xl sm:text-4xl md:text-5xl font-black text-slate-900 tracking-tight leading-tight">
             Metropolitan Service Hubs & Highway Corridors
           </h1>
-          <p className="text-slate-600 text-base leading-relaxed">
+          <p className="text-slate-600 text-xs sm:text-sm md:text-base leading-relaxed">
             Our high-density network places certified hydraulic flatbeds and patrol
             motorcycles within 5 to 10 kilometers of every major arterial road and
             expressway.
@@ -31,11 +31,11 @@ export default function LocationsPage() {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
           {METRO_LOCATIONS.map((loc) => (
             <div
               key={loc.slug}
-              className="rounded-3xl border border-slate-200 bg-white p-7 shadow-sm hover:border-primary/30 transition-all space-y-5"
+              className="rounded-2xl sm:rounded-3xl border border-slate-200 bg-white p-5 sm:p-7 shadow-sm hover:border-primary/30 transition-all space-y-4 sm:space-y-5"
             >
               <div className="flex items-start justify-between">
                 <div>

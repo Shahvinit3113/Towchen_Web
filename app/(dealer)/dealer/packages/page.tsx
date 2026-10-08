@@ -229,12 +229,12 @@ export default function DealerPackagesPage() {
       </div>
 
       {/* Segment Tabs */}
-      <div className="flex items-center gap-2 bg-slate-100 p-1.5 rounded-2xl w-fit">
+      <div className="flex items-center gap-1.5 sm:gap-2 bg-slate-100 p-1.5 rounded-2xl w-full sm:w-fit overflow-x-auto">
         {["Basic", "Standard", "Premium"].map(seg => (
           <button
             key={seg}
             onClick={() => setSegment(seg)}
-            className={`px-5 py-2.5 rounded-xl text-sm font-bold transition-all cursor-pointer ${
+            className={`flex-1 sm:flex-initial text-center px-3 sm:px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer ${
               segment === seg ? "bg-white text-slate-900 shadow-sm" : "text-slate-500 hover:text-slate-700"
             }`}
           >

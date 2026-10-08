@@ -22,31 +22,31 @@ export default function FaqPage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
       />
 
-      <div className="py-12 md:py-16 space-y-12">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-4">
+      <div className="py-8 sm:py-12 md:py-16 space-y-8 sm:space-y-12">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-3 sm:space-y-4">
           <Badge variant="primary">Help & Knowledge Base</Badge>
-          <h1 className="text-4xl font-black text-slate-900 tracking-tight">
+          <h1 className="text-2xl sm:text-4xl font-black text-slate-900 tracking-tight leading-tight">
             Frequently Asked Questions
           </h1>
-          <p className="text-slate-600 text-base max-w-xl mx-auto">
+          <p className="text-slate-600 text-xs sm:text-sm md:text-base max-w-xl mx-auto leading-relaxed">
             Clear, transparent answers about our towing fleet standards, pricing,
             and dealership integrations.
           </p>
         </div>
 
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-4">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-3 sm:space-y-4">
           {FAQS.map((faq, idx) => (
             <div
               key={idx}
-              className="rounded-2xl border border-slate-200 bg-white p-6 shadow-xs space-y-2.5"
+              className="rounded-2xl border border-slate-200 bg-white p-4 sm:p-6 shadow-xs space-y-2.5"
             >
               <div className="flex items-center gap-2">
                 <Badge variant="secondary" className="capitalize text-[10px]">
                   {faq.category}
                 </Badge>
               </div>
-              <h2 className="text-lg font-bold text-slate-900">{faq.question}</h2>
-              <p className="text-sm text-slate-600 leading-relaxed pt-1 border-t border-slate-100">
+              <h2 className="text-base sm:text-lg font-bold text-slate-900 leading-snug">{faq.question}</h2>
+              <p className="text-xs sm:text-sm text-slate-600 leading-relaxed pt-2 border-t border-slate-100">
                 {faq.answer}
               </p>
             </div>
@@ -54,16 +54,16 @@ export default function FaqPage() {
         </div>
 
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <div className="p-8 rounded-3xl bg-primary/5 border border-primary/20 space-y-3">
-            <h3 className="text-xl font-bold text-slate-950">
+          <div className="p-5 sm:p-8 rounded-2xl sm:rounded-3xl bg-primary/5 border border-primary/20 space-y-3">
+            <h3 className="text-lg sm:text-xl font-bold text-slate-950">
               Still have an urgent breakdown question?
             </h3>
-            <p className="text-sm text-primary">
+            <p className="text-xs sm:text-sm text-slate-600">
               Our 24/7 hotline is staffed by experienced fleet controllers ready to help.
             </p>
             <a
               href={`tel:${siteConfig.emergencyPhoneRaw}`}
-              className="inline-flex items-center gap-2 rounded-xl bg-red-600 hover:bg-red-700 text-white font-bold px-6 py-3 text-sm shadow-md mt-2"
+              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-xl bg-red-600 hover:bg-red-700 active:bg-red-800 text-white font-bold px-6 py-3.5 text-sm shadow-md mt-2 transition-all active:scale-95"
             >
               <PhoneCall className="h-4 w-4" />
               <span>Call {siteConfig.emergencyPhone}</span>
