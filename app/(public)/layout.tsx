@@ -1,7 +1,7 @@
 import React from "react";
 import { PublicHeader } from "@/components/layout/public-header";
 import { PublicFooter } from "@/components/layout/public-footer";
-import { MobileActionBar } from "@/components/layout/mobile-action-bar";
+import { FloatingCallButton } from "@/components/layout/floating-call-button";
 
 export default function PublicLayout({
   children,
@@ -13,6 +13,7 @@ export default function PublicLayout({
       <PublicHeader />
       <main className="flex-1">{children}</main>
       <PublicFooter />
+      <FloatingCallButton />
     </div>
   );
 }

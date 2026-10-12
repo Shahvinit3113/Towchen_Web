@@ -33,19 +33,19 @@ export function PublicHeader() {
     <>
       <header
         className={cn(
-          "sticky top-0 z-50 w-full transition-all duration-300",
+          "sticky top-0 z-50 w-full h-20 transition-all duration-300",
           isHome && "-mb-20",
           isScrolled
             ? "bg-[#070f26]/95 backdrop-blur-md border-b border-white/10 shadow-lg shadow-black/20 text-white"
             : isHome
             ? mobileMenuOpen
               ? "bg-[#070f26] border-b border-white/10 text-white"
-              : "bg-transparent border-b border-transparent shadow-none text-white"
+              : "bg-transparent border-b-0 border-transparent shadow-none text-white"
             : "bg-[#070f26] border-b border-white/10 text-white"
         )}
       >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-20">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-full">
+          <div className="flex items-center justify-between h-full">
             {/* Logo */}
             <Link href="/" className="flex items-center gap-2 group shrink-0">
               <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-primary flex items-center justify-center text-white shadow-md shadow-primary/30 group-hover:scale-105 transition-transform">
@@ -57,7 +57,7 @@ export function PublicHeader() {
             </Link>
 
             {/* Desktop Navigation Links */}
-            <nav className="hidden md:flex items-center gap-6 lg:gap-8">
+            <nav className="hidden lg:flex items-center gap-4 xl:gap-7">
               {navLinks.map((link) => {
                 const isDealer = link.title === "Dealer Portal";
                 return (
@@ -66,7 +66,7 @@ export function PublicHeader() {
                     href={link.href}
                     className={`text-sm font-medium transition-colors ${
                       isDealer
-                        ? "text-primary/90 hover:text-white flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-primary/10 border border-primary/20"
+                        ? "text-primary/90 hover:text-white flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-primary/10 border border-primary/20 shrink-0"
                         : "text-slate-300 hover:text-white"
                     }`}
                   >
@@ -77,26 +77,20 @@ export function PublicHeader() {
               })}
             </nav>
 
-            {/* Desktop Right: Phone & Call Now CTA */}
-            <div className="hidden md:flex items-center gap-5">
+            {/* Desktop Right: Phone Link */}
+            <div className="hidden lg:flex items-center gap-3 xl:gap-5 shrink-0">
               <a
                 href="tel:8005551234"
-                className="flex items-center gap-2 text-sm font-bold text-slate-200 hover:text-white transition-colors"
+                className="flex items-center gap-1.5 xl:gap-2 text-sm font-bold text-slate-200 hover:text-white transition-colors"
+                title="Call 24/7 Dispatch"
               >
-                <Phone className="h-4 w-4 text-primary" />
+                <Phone className="h-4 w-4 text-primary shrink-0" />
                 <span>(800) 555-1234</span>
-              </a>
-
-              <a
-                href="tel:8005551234"
-                className="inline-flex items-center justify-center rounded-full bg-primary hover:bg-secondary text-white font-bold px-6 py-2.5 text-sm shadow-md shadow-primary/25 transition-all hover:scale-105"
-              >
-                CALL NOW
               </a>
             </div>
 
-            {/* Mobile Right Controls: Hamburger */}
-            <div className="flex md:hidden items-center">
+            {/* Mobile / Tablet Right Controls: Hamburger */}
+            <div className="flex lg:hidden items-center">
               <button
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
                 className="p-2 -mr-1 rounded-lg text-slate-200 hover:text-white hover:bg-white/10"
@@ -108,16 +102,16 @@ export function PublicHeader() {
           </div>
         </div>
 
-        {/* Mobile Drawer */}
+        {/* Mobile / Tablet Drawer */}
         {mobileMenuOpen && (
-          <div className="md:hidden border-b border-white/10 bg-[#070f26] px-4 pt-2 pb-6 space-y-3">
+          <div className="lg:hidden border-b border-white/10 bg-[#070f26] px-4 pt-2 pb-6 space-y-3">
             <nav className="flex flex-col space-y-2">
               {navLinks.map((link) => (
                 <Link
                   key={link.href}
                   href={link.href}
                   onClick={() => setMobileMenuOpen(false)}
-                  className="flex items-center justify-between px-3 py-2.5 rounded-lg text-sm font-medium text-slate-200 hover:bg-white/10 hover:text-white"
+                  className="flex items-center justify-between px-3.5 py-3 rounded-xl text-sm font-semibold text-slate-200 hover:bg-white/10 hover:text-white active:bg-white/15"
                 >
                   <span>{link.title}</span>
                   <ChevronRight className="h-4 w-4 text-slate-400" />
@@ -127,28 +121,15 @@ export function PublicHeader() {
             <div className="pt-2 border-t border-white/10 flex flex-col gap-2">
               <a
                 href="tel:8005551234"
-                className="w-full inline-flex items-center justify-center gap-2 py-3 rounded-full bg-primary text-white font-bold text-sm shadow-md"
+                className="w-full inline-flex items-center justify-center gap-2 py-3.5 rounded-xl bg-primary active:bg-primary-hover text-white font-black text-sm shadow-md shadow-primary/25"
               >
                 <Phone className="h-4 w-4" />
-                <span>Call (800) 555-1234</span>
+                <span>Emergency Dispatch: (800) 555-1234</span>
               </a>
             </div>
           </div>
         )}
       </header>
-
-      {/* Floating CALL NOW button while scrolling on mobile */}
-      {isScrolled && (
-        <aside className="fixed bottom-5 right-4 z-50 md:hidden animate-in fade-in slide-in-from-bottom-4 duration-300">
-          <a
-            href="tel:8005551234"
-            className="flex items-center gap-2 rounded-full bg-primary hover:bg-secondary text-white font-extrabold px-4 py-3 shadow-2xl shadow-primary/60 border-2 border-white/20 active:scale-95 text-xs tracking-wider"
-          >
-            <Phone className="h-4 w-4 animate-pulse" />
-            <span>CALL NOW</span>
-          </a>
-        </aside>
-      )}
     </>
   );
 }

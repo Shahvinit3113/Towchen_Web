@@ -26,30 +26,30 @@ export default function TowingPage() {
   const towingServices = ALL_SERVICES.filter((s) => s.category === "towing");
 
   return (
-    <div className="py-12 md:py-16 space-y-16">
+    <div className="py-8 sm:py-12 md:py-16 space-y-10 sm:space-y-16">
       {/* Page Header */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="max-w-3xl space-y-4">
+        <div className="max-w-3xl space-y-3 sm:space-y-4">
           <Badge variant="primary">24/7 Heavy & Flatbed Fleet</Badge>
-          <h1 className="text-4xl sm:text-5xl font-black text-slate-900 tracking-tight">
+          <h1 className="text-2xl sm:text-4xl md:text-5xl font-black text-slate-900 tracking-tight leading-tight">
             Commercial & Passenger Vehicle Towing Services
           </h1>
-          <p className="text-slate-600 text-lg leading-relaxed">
+          <p className="text-slate-600 text-sm sm:text-base md:text-lg leading-relaxed">
             From low-clearance basement extraction to high-speed expressway
             rollovers, TowChen deploys hydraulic tilt flatbeds, wheel-lift booms,
             and heavy winches certified for all major automobile brands.
           </p>
-          <div className="flex flex-wrap gap-4 pt-2">
+          <div className="flex flex-col sm:flex-row gap-3 pt-2">
             <a
               href={`tel:${siteConfig.emergencyPhoneRaw}`}
-              className="inline-flex items-center gap-2 rounded-xl bg-red-600 hover:bg-red-700 text-white font-bold px-6 py-3 text-sm shadow-md"
+              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-xl bg-red-600 hover:bg-red-700 active:bg-red-800 text-white font-bold px-6 py-3.5 text-sm shadow-md transition-all active:scale-95"
             >
               <PhoneCall className="h-4 w-4" />
-              <span>Call Towing Hotline: {siteConfig.emergencyPhone}</span>
+              <span>Call Hotline: {siteConfig.emergencyPhone}</span>
             </a>
             <Link
               href="/contact"
-              className="inline-flex items-center gap-2 rounded-xl border border-slate-300 bg-white hover:bg-slate-50 text-slate-800 font-semibold px-6 py-3 text-sm"
+              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-xl border border-slate-300 bg-white hover:bg-slate-50 text-slate-800 font-semibold px-6 py-3.5 text-sm transition-all active:scale-95"
             >
               Request Emergency Tow
             </Link>
@@ -59,11 +59,11 @@ export default function TowingPage() {
 
       {/* Towing Services Deep-Dive */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
           {towingServices.map((srv) => (
             <div
               key={srv.id}
-              className="rounded-3xl border border-slate-200 bg-white p-8 shadow-sm hover:border-primary/30 transition-all space-y-4"
+              className="rounded-2xl sm:rounded-3xl border border-slate-200 bg-white p-5 sm:p-8 shadow-sm hover:border-primary/30 transition-all space-y-4"
             >
               <div className="flex items-center justify-between">
                 <div className="w-12 h-12 rounded-2xl bg-primary/5 text-primary flex items-center justify-center">
