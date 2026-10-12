@@ -22,7 +22,7 @@ import {
   Phone,
   Loader2,
   AlertCircle,
-  Crosshair,
+  LocateFixed,
   Info,
   Smartphone,
   X,
@@ -187,7 +187,12 @@ export function EstimateWidget() {
           setCategories(["All", ...uniqueCats]);
         }
 
-        if (mapped.length > 0 && !mapped.some((m) => m.id === selectedService)) {
+        const urlParams = typeof window !== "undefined" ? new URLSearchParams(window.location.search) : null;
+        const requestedService = urlParams?.get("service");
+
+        if (requestedService && mapped.some((m) => m.id === requestedService)) {
+          setSelectedService(requestedService);
+        } else if (mapped.length > 0 && !mapped.some((m) => m.id === selectedService)) {
           setSelectedService(mapped[0].id);
         }
       })
@@ -490,22 +495,29 @@ export function EstimateWidget() {
                 }}
                 placeholder="Enter pickup address or intersection"
                 leftIcon={
-                  <span className="w-3.5 h-3.5 rounded-full bg-blue-600 shrink-0 shadow-xs block" />
+                  <div className="w-6 h-6 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0 shadow-2xs">
+                    <MapPin className="w-3.5 h-3.5" />
+                  </div>
                 }
                 rightAction={
                   <button
                     type="button"
                     onClick={handleCurrentLocation}
                     disabled={isDetectingLocation}
-                    title="Detect current location"
-                    className="text-blue-500 hover:text-blue-700 p-1 rounded-lg transition-colors shrink-0 disabled:opacity-50"
+                    title="Use my current GPS location"
+                    className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-blue-50 hover:bg-blue-100 active:bg-blue-200 text-blue-600 hover:text-blue-700 transition-all shrink-0 disabled:opacity-50 border border-blue-200/60 text-xs font-semibold cursor-pointer shadow-2xs group"
                   >
-                    <Crosshair
-                      className={cn(
-                        "h-4 w-4",
-                        isDetectingLocation && "animate-spin text-blue-600"
-                      )}
-                    />
+                    {isDetectingLocation ? (
+                      <Loader2 className="h-3.5 w-3.5 animate-spin text-blue-600 shrink-0" />
+                    ) : (
+                      <LocateFixed className="h-3.5 w-3.5 text-blue-600 shrink-0 group-hover:scale-110 transition-transform" />
+                    )}
+                    <span className="text-[11px] font-semibold text-blue-700 hidden sm:inline">
+                      {isDetectingLocation ? "Locating..." : "Use GPS"}
+                    </span>
+                    <span className="text-[11px] font-semibold text-blue-700 sm:hidden">
+                      {isDetectingLocation ? "..." : "GPS"}
+                    </span>
                   </button>
                 }
                 hasError={!!errors.pickupLocation}
@@ -533,7 +545,11 @@ export function EstimateWidget() {
                   setDropPlaceId(prediction.place_id);
                 }}
                 placeholder="Mechanic, dealership, or any address"
-                leftIcon={<MapPin className="w-4 h-4 text-blue-600 shrink-0" />}
+                leftIcon={
+                  <div className="w-6 h-6 rounded-lg bg-rose-50 text-rose-600 flex items-center justify-center shrink-0 shadow-2xs">
+                    <MapPin className="w-3.5 h-3.5" />
+                  </div>
+                }
                 hasError={!!errors.dropLocation}
               />
               {errors.dropLocation && (
@@ -741,10 +757,12 @@ export function EstimateWidget() {
             <div className="rounded-2xl border border-slate-200/90 bg-white p-3 space-y-2">
               {/* From */}
               <div className="flex items-start gap-2.5">
-                <span className="w-2 h-2 rounded-full bg-blue-600 shrink-0 mt-1 shadow-xs" />
+                <div className="w-5 h-5 rounded-md bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0 mt-0.5">
+                  <MapPin className="w-3 h-3" />
+                </div>
                 <div className="min-w-0 flex-1">
-                  <p className="text-[10px] font-bold uppercase tracking-wider text-blue-600">
-                    From
+                  <p className="text-[10px] font-bold uppercase tracking-wider text-emerald-600">
+                    Pickup (From)
                   </p>
                   <p className="text-xs font-semibold text-slate-800 leading-snug truncate mt-0.5" title={pickupValue}>
                     {pickupValue || "Pickup Location"}
@@ -753,14 +771,16 @@ export function EstimateWidget() {
               </div>
 
               {/* Divider connector */}
-              <div className="ml-1 pl-2.5 border-l-2 border-slate-200 h-1.5 -my-1" />
+              <div className="ml-2.5 pl-2.5 border-l-2 border-dashed border-slate-200 h-2 -my-0.5" />
 
               {/* To */}
               <div className="flex items-start gap-2.5">
-                <MapPin className="w-3 h-3 text-blue-600 shrink-0 mt-0.5" />
+                <div className="w-5 h-5 rounded-md bg-rose-50 text-rose-600 flex items-center justify-center shrink-0 mt-0.5">
+                  <MapPin className="w-3 h-3" />
+                </div>
                 <div className="min-w-0 flex-1">
-                  <p className="text-[10px] font-bold uppercase tracking-wider text-blue-600">
-                    To
+                  <p className="text-[10px] font-bold uppercase tracking-wider text-rose-600">
+                    Drop-Off (To)
                   </p>
                   <p className="text-xs font-semibold text-slate-800 leading-snug truncate mt-0.5" title={dropValue}>
                     {dropValue || "Drop Destination"}

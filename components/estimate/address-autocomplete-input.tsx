@@ -156,7 +156,7 @@ export function AddressAutocompleteInput({
   };
 
   return (
-    <div ref={containerRef} className={cn("relative w-full", className)}>
+    <div ref={containerRef} className={cn("relative w-full", isOpen ? "z-30" : "z-10", className)}>
       <div
         className={cn(
           "relative flex items-center rounded-2xl border px-3.5 py-3.5 bg-white transition-all focus-within:ring-2 focus-within:ring-blue-500/20 focus-within:border-blue-500",
@@ -194,8 +194,8 @@ export function AddressAutocompleteInput({
 
       {/* Autocomplete Dropdown */}
       {isOpen && predictions.length > 0 && (
-        <div className="absolute left-0 right-0 top-full mt-1.5 z-50 overflow-hidden rounded-2xl border border-slate-100 bg-white/95 backdrop-blur-md shadow-2xl transition-all animate-in fade-in slide-in-from-top-1 duration-150">
-          <ul className="max-h-64 overflow-y-auto py-1.5 divide-y divide-slate-50 text-left">
+        <div className="absolute left-0 right-0 top-full mt-1.5 z-50 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl ring-1 ring-slate-900/10 transition-all animate-in fade-in slide-in-from-top-1 duration-150">
+          <ul className="max-h-60 overflow-y-auto py-1 divide-y divide-slate-100 text-left">
             {predictions.map((pred, index) => {
               const isHighlighted = highlightedIndex === index;
               return (
@@ -226,9 +226,9 @@ export function AddressAutocompleteInput({
             })}
           </ul>
 
-          <div className="flex items-center justify-between px-3.5 py-1.5 bg-slate-50/80 border-t border-slate-100 text-[10px] text-slate-400 font-medium">
+          <div className="flex items-center justify-between px-3.5 py-2 bg-slate-50 border-t border-slate-100 text-[10px] text-slate-500 font-medium">
             <span className="flex items-center gap-1">
-              <Navigation className="w-2.5 h-2.5 text-blue-500" />
+              <Navigation className="w-3 h-3 text-blue-500" />
               Real-time Google Maps suggestions
             </span>
             <span>Select to fill</span>
