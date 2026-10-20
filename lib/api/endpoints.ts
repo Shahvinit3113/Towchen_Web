@@ -47,4 +47,9 @@ export const API_ENDPOINTS = {
     verify: "/payments/verify",
     history: "/payments/history",
   },
+  contact: {
+    submit: "/contact",
+    list: "/contact",
+    detail: (id: string | number) => `/contact/${id}`,
+  },
 } as const;

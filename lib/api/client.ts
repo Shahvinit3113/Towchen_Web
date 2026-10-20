@@ -30,7 +30,8 @@ export async function apiClient<T>(
   endpoint: string,
   options: RequestOptions = {}
 ): Promise<ApiResponse<T>> {
-  const { timeoutMs = 12000, params, headers, ...restOptions } = options;
+  const defaultTimeout = Number(process.env.NEXT_PUBLIC_API_TIMEOUT_MS) || 60000;
+  const { timeoutMs = defaultTimeout, params, headers, ...restOptions } = options;
 
   let url = API_BASE_URL ? `${API_BASE_URL}${endpoint}` : endpoint;
 

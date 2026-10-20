@@ -8,6 +8,7 @@ import {
   LayoutDashboard,
   ShieldCheck,
   History,
+  MessageSquare,
   LogOut,
   Truck,
   ExternalLink,
@@ -20,6 +21,7 @@ const ICONS: Record<string, React.ReactNode> = {
   LayoutDashboard: <LayoutDashboard className="h-4 w-4" />,
   ShieldCheck: <ShieldCheck className="h-4 w-4" />,
   History: <History className="h-4 w-4" />,
+  MessageSquare: <MessageSquare className="h-4 w-4" />,
 };
 
 interface DealerSidebarProps {
