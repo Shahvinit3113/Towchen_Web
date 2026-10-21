@@ -216,26 +216,26 @@ export default function DealerPackagesPage() {
 
 
   return (
-    <div className="space-y-10">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
+    <div className="space-y-4 sm:space-y-8">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-6">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
+          <h1 className="text-xl sm:text-2xl md:text-3xl font-black text-slate-900 tracking-tight">
             Dealer Packages
           </h1>
-          <p className="text-sm text-slate-500 mt-1">
+          <p className="text-xs sm:text-sm text-slate-500 mt-0.5 sm:mt-1">
             Choose from our roadside assistance plans and activate coverage for your customers.
           </p>
         </div>
       </div>
 
       {/* Segment Tabs */}
-      <div className="flex items-center gap-1.5 sm:gap-2 bg-slate-100 p-1.5 rounded-2xl w-full sm:w-fit overflow-x-auto">
+      <div className="flex items-center gap-1 sm:gap-2 bg-slate-100 p-1 sm:p-1.5 rounded-xl sm:rounded-2xl w-full sm:w-fit overflow-x-auto">
         {["Basic", "Standard", "Premium"].map(seg => (
           <button
             key={seg}
             onClick={() => setSegment(seg)}
-            className={`flex-1 sm:flex-initial text-center px-3 sm:px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer ${
-              segment === seg ? "bg-white text-slate-900 shadow-sm" : "text-slate-500 hover:text-slate-700"
+            className={`flex-1 sm:flex-initial text-center px-3 sm:px-5 py-1.5 sm:py-2.5 rounded-lg sm:rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer ${
+              segment === seg ? "bg-white text-slate-900 shadow-2xs" : "text-slate-500 hover:text-slate-700"
             }`}
           >
             {seg}
@@ -245,31 +245,31 @@ export default function DealerPackagesPage() {
 
       {/* Plans Grid */}
       {isLoadingPlans ? (
-        <div className="flex items-center justify-center py-20 text-slate-400">
+        <div className="flex items-center justify-center py-16 text-slate-400">
           <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-primary mr-3"></div>
           <span className="text-sm font-medium">Loading plans...</span>
         </div>
       ) : plans.length === 0 ? (
-        <div className="text-center py-16 text-slate-400">
-          <p className="text-lg font-semibold">No plans available for this segment.</p>
+        <div className="text-center py-12 text-slate-400">
+          <p className="text-base font-semibold">No plans available for this segment.</p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3.5 sm:gap-6">
           {plans.map((plan) => (
-            <div key={plan.id} className="group relative rounded-2xl border border-slate-200 hover:border-primary/40 bg-white flex flex-col justify-between transition-all duration-300 hover:shadow-xl hover:shadow-primary/10 overflow-hidden">
+            <div key={plan.id} className="group relative rounded-xl sm:rounded-2xl border border-slate-200/90 hover:border-primary/40 bg-white flex flex-col justify-between transition-all duration-300 hover:shadow-xl hover:shadow-primary/10 overflow-hidden shadow-2xs">
               {/* Top Accent */}
-              <div className="h-1.5 bg-gradient-to-r from-primary via-blue-500 to-indigo-500" />
+              <div className="h-1 sm:h-1.5 bg-gradient-to-r from-primary via-blue-500 to-indigo-500" />
 
-              <div className="p-6 flex-1 flex flex-col">
+              <div className="p-3.5 sm:p-6 flex-1 flex flex-col">
                 {/* Header */}
-                <div className="flex items-start justify-between mb-4">
-                  <div className="flex items-center gap-3">
-                    <div className="p-2.5 rounded-xl bg-primary/10 text-primary">
-                      <Shield className="h-5 w-5" />
+                <div className="flex items-start justify-between mb-3 sm:mb-4">
+                  <div className="flex items-center gap-2.5 sm:gap-3">
+                    <div className="p-2 sm:p-2.5 rounded-lg sm:rounded-xl bg-primary/10 text-primary">
+                      <Shield className="h-4 w-4 sm:h-5 sm:w-5" />
                     </div>
                     <div>
-                      <h3 className="text-lg font-bold text-slate-900 leading-tight">{plan.name}</h3>
-                      <p className="text-xs text-slate-500 mt-0.5 flex items-center gap-1">
+                      <h3 className="text-base sm:text-lg font-bold text-slate-900 leading-tight">{plan.name}</h3>
+                      <p className="text-[11px] sm:text-xs text-slate-500 mt-0.5 flex items-center gap-1">
                         <Clock className="h-3 w-3" />
                         {plan.plan_period_months ? `${plan.plan_period_months} Months` : "12 Months"} Coverage
                       </p>
@@ -279,39 +279,39 @@ export default function DealerPackagesPage() {
                 </div>
 
                 {/* Price */}
-                <div className="mb-5">
-                  <span className="text-3xl font-black text-slate-900">{formatCurrency(plan.resolved_price || plan.base_price || 0)}</span>
+                <div className="mb-3.5 sm:mb-5">
+                  <span className="text-2xl sm:text-3xl font-black text-slate-900">{formatCurrency(plan.resolved_price || plan.base_price || 0)}</span>
                   {plan.base_price && plan.resolved_price && plan.base_price !== plan.resolved_price && (
-                    <span className="text-sm text-slate-400 line-through ml-2">{formatCurrency(plan.base_price)}</span>
+                    <span className="text-xs sm:text-sm text-slate-400 line-through ml-2">{formatCurrency(plan.base_price)}</span>
                   )}
-                  <p className="text-[11px] text-slate-400 mt-0.5">One-time payment</p>
+                  <p className="text-[10px] sm:text-[11px] text-slate-400 mt-0.5">One-time payment</p>
                 </div>
 
                 {/* Features Grid */}
-                <div className="grid grid-cols-2 gap-3 mb-5">
-                  <div className="flex items-center gap-2.5 bg-slate-50 rounded-xl px-3 py-2.5">
-                    <Car className="h-4 w-4 text-primary shrink-0" />
+                <div className="grid grid-cols-2 gap-2 sm:gap-3 mb-3.5 sm:mb-5">
+                  <div className="flex items-center gap-2 sm:gap-2.5 bg-slate-50 rounded-lg sm:rounded-xl px-2.5 py-1.5 sm:px-3 sm:py-2.5">
+                    <Car className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-primary shrink-0" />
                     <div>
                       <p className="text-xs font-bold text-slate-900">{plan.incidents || "Unlimited"}</p>
                       <p className="text-[10px] text-slate-500">Incidents</p>
                     </div>
                   </div>
-                  <div className="flex items-center gap-2.5 bg-slate-50 rounded-xl px-3 py-2.5">
-                    <Navigation className="h-4 w-4 text-primary shrink-0" />
+                  <div className="flex items-center gap-2 sm:gap-2.5 bg-slate-50 rounded-lg sm:rounded-xl px-2.5 py-1.5 sm:px-3 sm:py-2.5">
+                    <Navigation className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-primary shrink-0" />
                     <div>
                       <p className="text-xs font-bold text-slate-900">{plan.distance_km ? `${plan.distance_km} km` : "50 km"}</p>
                       <p className="text-[10px] text-slate-500">Tow Distance</p>
                     </div>
                   </div>
-                  <div className="flex items-center gap-2.5 bg-slate-50 rounded-xl px-3 py-2.5">
-                    <Hotel className="h-4 w-4 text-primary shrink-0" />
+                  <div className="flex items-center gap-2 sm:gap-2.5 bg-slate-50 rounded-lg sm:rounded-xl px-2.5 py-1.5 sm:px-3 sm:py-2.5">
+                    <Hotel className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-primary shrink-0" />
                     <div>
                       <p className="text-xs font-bold text-slate-900">{plan.hotel_accommodation || 0} Nights</p>
                       <p className="text-[10px] text-slate-500">Hotel Stay</p>
                     </div>
                   </div>
-                  <div className="flex items-center gap-2.5 bg-slate-50 rounded-xl px-3 py-2.5">
-                    <CheckCircle2 className="h-4 w-4 text-emerald-500 shrink-0" />
+                  <div className="flex items-center gap-2 sm:gap-2.5 bg-slate-50 rounded-lg sm:rounded-xl px-2.5 py-1.5 sm:px-3 sm:py-2.5">
+                    <CheckCircle2 className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-emerald-500 shrink-0" />
                     <div>
                       <p className="text-xs font-bold text-slate-900">{plan.cab_service || 0} Rides</p>
                       <p className="text-[10px] text-slate-500">Cab Service</p>
@@ -321,10 +321,10 @@ export default function DealerPackagesPage() {
 
                 {/* Extra Features List */}
                 {plan.features && Array.isArray(plan.features) && plan.features.length > 0 && (
-                  <ul className="space-y-2 mb-5">
+                  <ul className="space-y-1.5 sm:space-y-2 mb-3.5 sm:mb-5">
                     {plan.features.map((f: string, i: number) => (
-                      <li key={i} className="text-sm text-slate-600 flex items-start gap-2">
-                        <CheckCircle2 className="h-4 w-4 text-emerald-500 mt-0.5 shrink-0" />
+                      <li key={i} className="text-xs sm:text-sm text-slate-600 flex items-start gap-2">
+                        <CheckCircle2 className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-emerald-500 mt-0.5 shrink-0" />
                         <span>{f}</span>
                       </li>
                     ))}
@@ -333,9 +333,9 @@ export default function DealerPackagesPage() {
               </div>
 
               {/* CTA */}
-              <div className="px-6 pb-6">
-                <Button className="w-full font-bold gap-2 h-11 group-hover:bg-secondary transition-colors" onClick={() => { setSelectedPlan(plan); setCurrentStep(1); setErrors({}); }}>
-                  Activate Plan <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+              <div className="px-3.5 pb-3.5 sm:px-6 sm:pb-6">
+                <Button className="w-full font-bold gap-2 h-9 sm:h-11 text-xs sm:text-sm rounded-xl group-hover:bg-secondary transition-colors" onClick={() => { setSelectedPlan(plan); setCurrentStep(1); setErrors({}); }}>
+                  Activate Plan <ArrowRight className="h-3.5 w-3.5 sm:h-4 sm:w-4 transition-transform group-hover:translate-x-0.5" />
                 </Button>
               </div>
             </div>

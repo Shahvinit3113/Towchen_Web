@@ -1,6 +1,8 @@
 import { api } from "./client";
 import { API_ENDPOINTS } from "./endpoints";
-import { DealerProfile } from "@/types";
+import { DealerProfile, DealerAuthUser } from "@/types";
+import { authApi } from "./auth";
+import { getClientSession } from "@/lib/auth/session";
 
 let mockDealerProfile: DealerProfile = {
   id: "dlr-9941",
@@ -22,6 +24,41 @@ let mockDealerProfile: DealerProfile = {
 };
 
 export const dealerApi = {
+  getAccountDetails: async (): Promise<DealerAuthUser> => {
+    try {
+      const me = await authApi.getDealerMe();
+      if (me && (me.email || me.name || me.formated_id)) {
+        return me;
+      }
+    } catch (err) {
+      console.warn("Could not fetch /dealer-auth/me, falling back to session/mock details:", err);
+    }
+
+    const session = getClientSession();
+    return {
+      id: session?.id || "1",
+      formated_id: session?.dealerId || "DLR0000001",
+      name: session?.name || "Apex Motors Autocare",
+      businessName: session?.businessName || "Apex Motors Autocare Pvt Ltd",
+      email: session?.email || "partner@apexmotors.com",
+      phone: session?.phone || "+91 98112 33445",
+      number: session?.phone || "+91 98112 33445",
+      alternative_number: "+91 98112 33446",
+      residential_address: "Plot 42, Sector 18, Udyog Vihar, Gurugram, Haryana 122015",
+      bank_name: "HDFC Bank Ltd",
+      ifsc_code: "HDFC0001234",
+      account_number: "918020038891234",
+      account_holder_name: session?.businessName || "Apex Motors Autocare Pvt Ltd",
+      role: "Dealer",
+      dealer_image: null,
+      aadhar_image: "https://images.unsplash.com/photo-1557804506-669a67965ba0?w=800&auto=format&fit=crop&q=80",
+      pan_image: "https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?w=800&auto=format&fit=crop&q=80",
+      bankdetails_image: "https://images.unsplash.com/photo-1554224154-26032ffc0d07?w=800&auto=format&fit=crop&q=80",
+      created_at: "2026-01-15T09:30:00.000Z",
+      updated_at: "2026-03-20T11:45:00.000Z",
+    };
+  },
+
   getProfile: async (): Promise<DealerProfile> => {
     try {
       const res = await api.get<DealerProfile>(API_ENDPOINTS.dealer.profile);

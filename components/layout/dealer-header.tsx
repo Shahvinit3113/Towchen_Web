@@ -25,7 +25,7 @@ export function DealerHeader({ onOpenMobileSidebar }: DealerHeaderProps) {
           <Menu className="h-5 w-5" />
         </button>
 
-        <div className="min-w-0 flex-1">
+        {/* <div className="min-w-0 flex-1">
           <h1 className="text-sm sm:text-base font-bold text-slate-900 leading-tight truncate">
             {session?.businessName || "Apex Motors Autocare"}
           </h1>
@@ -40,7 +40,7 @@ export function DealerHeader({ onOpenMobileSidebar }: DealerHeaderProps) {
               {session?.dealerId || "DLR-9941"}
             </span>
           </div>
-        </div>
+        </div> */}
       </div>
 
       {/* Right: Wallet Balance & Profile Avatar */}

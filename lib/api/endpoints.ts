@@ -29,7 +29,8 @@ export const API_ENDPOINTS = {
   packages: {
     dealerPackagePlan: "/dealer-package-plan",
     dealerPackageOrder: "/dealer-package-order",
-    dealerPackageOrderDownload: (id: string) => `/dealer-package-order/${id}/download`,
+    dealerPackageOrderDetail: (id: string | number) => `/dealer-package-order/${id}`,
+    dealerPackageOrderDownload: (id: string | number) => `/dealer-package-order/${id}/download`,
   },
   dealer: {
     stats: "/dealer/stats",

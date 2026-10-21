@@ -59,27 +59,27 @@ export default function DealerDashboardPage() {
   }
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-5 sm:space-y-8">
       {/* Top Banner / Welcome */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
+          <h1 className="text-xl sm:text-2xl md:text-3xl font-black text-slate-900 tracking-tight">
             Dealership Earnings Overview
           </h1>
-          <p className="text-sm text-slate-500 mt-1">
+          <p className="text-xs sm:text-sm text-slate-500 mt-0.5 sm:mt-1">
             Real-time status of your roadside package sales and wallet credits.
           </p>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 sm:gap-3 flex-wrap">
           <Link href="/dealer/packages">
-            <Button size="sm" className="font-bold gap-1.5 shadow-sm">
+            <Button size="sm" className="font-bold gap-1.5 shadow-sm text-xs sm:text-sm">
               <Plus className="h-4 w-4" />
               <span>Purchase Package</span>
             </Button>
           </Link>
           <Link href="/dealer/wallet">
-            <Button variant="outline" size="sm" className="font-bold gap-1.5">
+            <Button variant="outline" size="sm" className="font-bold gap-1.5 text-xs sm:text-sm">
               <Wallet className="h-4 w-4 text-primary" />
               <span>Payouts</span>
             </Button>
@@ -88,14 +88,14 @@ export default function DealerDashboardPage() {
       </div>
 
       {/* KPI Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        {/* Available Wallet Balance */}
-        <Card className="border border-primary/20 bg-gradient-to-br from-white to-primary/5 p-5 space-y-3">
+      <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
+        {/* Available Wallet Balance - Full width on mobile for prominence */}
+        <Card className="col-span-2 lg:col-span-1 border border-primary/20 bg-gradient-to-br from-white to-primary/5 p-4 sm:p-5 space-y-2 sm:space-y-3">
           <div className="flex items-center justify-between">
-            <span className="text-xs uppercase font-bold text-primary tracking-wider">
+            <span className="text-[11px] sm:text-xs uppercase font-bold text-primary tracking-wider">
               Available Wallet
             </span>
-            <div className="p-2 rounded-xl bg-primary/15 text-primary">
+            <div className="p-1.5 sm:p-2 rounded-lg sm:rounded-xl bg-primary/15 text-primary">
               <Wallet className="h-4 w-4" />
             </div>
           </div>
@@ -103,8 +103,8 @@ export default function DealerDashboardPage() {
             <span className="text-2xl sm:text-3xl font-black text-slate-900">
               {formatCurrency(stats?.availableBalance || 24500)}
             </span>
-            <p className="text-xs text-slate-500 mt-1 flex items-center gap-1">
-              <TrendingUp className="h-3 w-3 text-emerald-600" />
+            <p className="text-[11px] sm:text-xs text-slate-500 mt-0.5 sm:mt-1 flex items-center gap-1">
+              <TrendingUp className="h-3 w-3 text-emerald-600 shrink-0" />
               <span className="text-emerald-600 font-semibold">+₹14,200</span>
               <span>this month</span>
             </p>
@@ -112,41 +112,41 @@ export default function DealerDashboardPage() {
         </Card>
 
         {/* Active Subscriptions */}
-        <Card className="border border-slate-200/80 p-5 space-y-3">
+        <Card className="col-span-1 border border-slate-200/80 p-3.5 sm:p-5 space-y-2 sm:space-y-3">
           <div className="flex items-center justify-between">
-            <span className="text-xs uppercase font-bold text-slate-500 tracking-wider">
-              RSA Packages Sold
+            <span className="text-[11px] sm:text-xs uppercase font-bold text-slate-500 tracking-wider truncate">
+              RSA Packages
             </span>
-            <div className="p-2 rounded-xl bg-slate-100 text-slate-700">
-              <ShieldCheck className="h-4 w-4 text-emerald-600" />
+            <div className="p-1.5 sm:p-2 rounded-lg sm:rounded-xl bg-slate-100 text-slate-700 shrink-0">
+              <ShieldCheck className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-emerald-600" />
             </div>
           </div>
           <div>
-            <span className="text-2xl sm:text-3xl font-black text-slate-900">
+            <span className="text-xl sm:text-2xl lg:text-3xl font-black text-slate-900">
               {stats?.activePackages || 39}
             </span>
-            <p className="text-xs text-slate-500 mt-1">
-              92% renewal retention rate
+            <p className="text-[11px] sm:text-xs text-slate-500 mt-0.5 sm:mt-1 truncate">
+              92% renewal retention
             </p>
           </div>
         </Card>
 
         {/* Lifetime Commission */}
-        <Card className="border border-slate-200/80 p-5 space-y-3">
+        <Card className="col-span-1 border border-slate-200/80 p-3.5 sm:p-5 space-y-2 sm:space-y-3">
           <div className="flex items-center justify-between">
-            <span className="text-xs uppercase font-bold text-slate-500 tracking-wider">
+            <span className="text-[11px] sm:text-xs uppercase font-bold text-slate-500 tracking-wider truncate">
               Lifetime Earned
             </span>
-            <div className="p-2 rounded-xl bg-emerald-50 text-emerald-600">
-              <ArrowUpRight className="h-4 w-4" />
+            <div className="p-1.5 sm:p-2 rounded-lg sm:rounded-xl bg-emerald-50 text-emerald-600 shrink-0">
+              <ArrowUpRight className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
             </div>
           </div>
           <div>
-            <span className="text-2xl sm:text-3xl font-black text-emerald-600">
+            <span className="text-xl sm:text-2xl lg:text-3xl font-black text-emerald-600 truncate block">
               {formatCurrency(stats?.lifetimeEarned || 118400)}
             </span>
-            <p className="text-xs text-slate-500 mt-1">
-              ₹88,900 withdrawn to HDFC A/C
+            <p className="text-[11px] sm:text-xs text-slate-500 mt-0.5 sm:mt-1 truncate">
+              ₹88,900 withdrawn
             </p>
           </div>
         </Card>
@@ -206,19 +206,27 @@ export default function DealerDashboardPage() {
               </table>
             </div>
 
-            <div className="sm:hidden space-y-3">
+            <div className="sm:hidden space-y-2">
               {packageOrders.slice(0, 4).map((order) => (
-                <div key={order.id} className="rounded-2xl border border-slate-200 bg-white p-4 space-y-3 shadow-xs">
-                  <div className="flex items-start justify-between">
-                    <div>
-                      <h3 className="text-base font-black text-slate-900 font-mono">{order.order_number}</h3>
-                      <p className="text-xs text-slate-500 font-medium">{order.plan_name}</p>
-                    </div>
-                    <Badge variant="success">{order.status}</Badge>
+                <div
+                  key={order.id}
+                  className="rounded-xl border border-slate-200/90 bg-white p-2.5 space-y-1 shadow-2xs hover:border-primary/40 transition-colors"
+                >
+                  <div className="flex items-center justify-between">
+                    <span className="font-mono font-bold text-xs text-slate-800 bg-slate-100 px-1.5 py-0.5 rounded border border-slate-200/80">
+                      #{order.order_number}
+                    </span>
+                    <Badge variant="success" className="text-[10px] py-0 px-2">
+                      {order.status}
+                    </Badge>
                   </div>
-                  <div className="text-xs text-slate-600 flex justify-between border-t border-slate-100 pt-2">
-                    <span>Customer:</span>
-                    <strong className="text-slate-900">{order.customer?.customer_name}</strong>
+                  <div className="flex items-center justify-between text-xs pt-0.5">
+                    <span className="font-semibold text-slate-900 truncate">
+                      {order.plan_name}
+                    </span>
+                    <span className="text-slate-500 truncate text-[11px]">
+                      {order.customer?.customer_name}
+                    </span>
                   </div>
                 </div>
               ))}

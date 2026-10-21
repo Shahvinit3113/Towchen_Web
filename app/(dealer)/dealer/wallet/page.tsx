@@ -113,21 +113,21 @@ export default function WalletPage() {
   }
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-4 sm:space-y-8">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
+          <h1 className="text-xl sm:text-2xl md:text-3xl font-black text-slate-900 tracking-tight">
             Wallet & Payouts
           </h1>
-          <p className="text-sm text-slate-500 mt-1">
+          <p className="text-xs sm:text-sm text-slate-500 mt-0.5 sm:mt-1">
             Manage your package sales commissions and withdraw funds to your bank account.
           </p>
         </div>
 
         <Button 
           onClick={() => setIsPayoutModalOpen(true)}
-          className="font-bold gap-2 bg-primary hover:bg-secondary"
+          className="self-start sm:self-auto font-bold gap-1.5 bg-primary hover:bg-secondary text-xs sm:text-sm h-9 px-3.5 rounded-xl"
         >
           <Building className="h-4 w-4" />
           <span>Request Payout</span>
@@ -135,15 +135,15 @@ export default function WalletPage() {
       </div>
 
       {/* KPI Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-4">
         {/* Available Wallet Balance */}
-        <Card className="border border-primary/20 bg-gradient-to-br from-white to-primary/5 p-5 space-y-3">
+        <Card className="col-span-2 sm:col-span-1 border border-primary/20 bg-gradient-to-br from-white to-primary/5 p-3.5 sm:p-5 rounded-xl sm:rounded-2xl space-y-1.5 sm:space-y-3">
           <div className="flex items-center justify-between">
-            <span className="text-xs uppercase font-bold text-primary tracking-wider">
+            <span className="text-[11px] sm:text-xs uppercase font-bold text-primary tracking-wider">
               Available Balance
             </span>
-            <div className="p-2 rounded-xl bg-primary/15 text-primary">
-              <Wallet className="h-4 w-4" />
+            <div className="p-1.5 sm:p-2 rounded-lg sm:rounded-xl bg-primary/15 text-primary shrink-0">
+              <Wallet className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
             </div>
           </div>
           <div>
@@ -154,51 +154,51 @@ export default function WalletPage() {
         </Card>
 
         {/* Pending Payouts */}
-        <Card className="border border-amber-200/50 bg-gradient-to-br from-white to-amber-50/50 p-5 space-y-3">
+        <Card className="col-span-1 border border-amber-200/50 bg-gradient-to-br from-white to-amber-50/50 p-3.5 sm:p-5 rounded-xl sm:rounded-2xl space-y-1.5 sm:space-y-3">
           <div className="flex items-center justify-between">
-            <span className="text-xs uppercase font-bold text-amber-600 tracking-wider">
+            <span className="text-[11px] sm:text-xs uppercase font-bold text-amber-600 tracking-wider truncate">
               Pending Payouts
             </span>
-            <div className="p-2 rounded-xl bg-amber-100 text-amber-600">
-              <Clock className="h-4 w-4" />
+            <div className="p-1.5 sm:p-2 rounded-lg sm:rounded-xl bg-amber-100 text-amber-600 shrink-0">
+              <Clock className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
             </div>
           </div>
           <div>
-            <span className="text-2xl sm:text-3xl font-black text-slate-900">
+            <span className="text-lg sm:text-2xl lg:text-3xl font-black text-slate-900 truncate block">
               {formatCurrency(summary?.pendingPayouts || 0)}
             </span>
           </div>
         </Card>
 
         {/* Total Withdrawn */}
-        <Card className="border border-slate-200/80 p-5 space-y-3">
+        <Card className="col-span-1 border border-slate-200/80 p-3.5 sm:p-5 rounded-xl sm:rounded-2xl space-y-1.5 sm:space-y-3">
           <div className="flex items-center justify-between">
-            <span className="text-xs uppercase font-bold text-slate-500 tracking-wider">
+            <span className="text-[11px] sm:text-xs uppercase font-bold text-slate-500 tracking-wider truncate">
               Total Withdrawn
             </span>
-            <div className="p-2 rounded-xl bg-slate-100 text-slate-700">
-              <CheckCircle2 className="h-4 w-4" />
+            <div className="p-1.5 sm:p-2 rounded-lg sm:rounded-xl bg-slate-100 text-slate-700 shrink-0">
+              <CheckCircle2 className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
             </div>
           </div>
           <div>
-            <span className="text-2xl sm:text-3xl font-black text-slate-900">
+            <span className="text-lg sm:text-2xl lg:text-3xl font-black text-slate-900 truncate block">
               {formatCurrency(summary?.totalWithdrawn || 0)}
             </span>
           </div>
         </Card>
 
         {/* Lifetime Earnings */}
-        <Card className="border border-slate-200/80 p-5 space-y-3">
+        <Card className="col-span-2 sm:col-span-1 border border-slate-200/80 p-3.5 sm:p-5 rounded-xl sm:rounded-2xl space-y-1.5 sm:space-y-3">
           <div className="flex items-center justify-between">
-            <span className="text-xs uppercase font-bold text-slate-500 tracking-wider">
+            <span className="text-[11px] sm:text-xs uppercase font-bold text-slate-500 tracking-wider truncate">
               Lifetime Earned
             </span>
-            <div className="p-2 rounded-xl bg-emerald-50 text-emerald-600">
-              <TrendingUp className="h-4 w-4" />
+            <div className="p-1.5 sm:p-2 rounded-lg sm:rounded-xl bg-emerald-50 text-emerald-600 shrink-0">
+              <TrendingUp className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
             </div>
           </div>
           <div>
-            <span className="text-2xl sm:text-3xl font-black text-emerald-600">
+            <span className="text-xl sm:text-2xl lg:text-3xl font-black text-emerald-600 truncate block">
               {formatCurrency(summary?.lifetimeEarnings || 0)}
             </span>
           </div>

@@ -12,6 +12,7 @@ import {
   LogOut,
   Truck,
   ExternalLink,
+  User,
 } from "lucide-react";
 import { authApi } from "@/lib/api/auth";
 import { useRouter } from "next/navigation";
@@ -22,6 +23,7 @@ const ICONS: Record<string, React.ReactNode> = {
   ShieldCheck: <ShieldCheck className="h-4 w-4" />,
   History: <History className="h-4 w-4" />,
   MessageSquare: <MessageSquare className="h-4 w-4" />,
+  User: <User className="h-4 w-4" />,
 };
 
 interface DealerSidebarProps {

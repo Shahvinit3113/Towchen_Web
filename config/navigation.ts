@@ -20,3 +20,4 @@ export const dealerNavLinks: NavItem[] = [
   { title: "RSA Packages", href: "/dealer/packages", icon: "ShieldCheck" },
   { title: "Package History", href: "/dealer/package-history", icon: "History" },
 ];
+

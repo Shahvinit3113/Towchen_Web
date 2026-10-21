@@ -22,6 +22,17 @@ export interface DealerAuthUser {
   name?: string;
   businessName?: string;
   phone?: string;
+  number?: string;
+  alternative_number?: string | null;
+  residential_address?: string | null;
+  bank_name?: string | null;
+  ifsc_code?: string;
+  account_number?: string;
+  account_holder_name?: string;
+  dealer_image?: string | null;
+  aadhar_image?: string | null;
+  pan_image?: string | null;
+  bankdetails_image?: string | null;
 }
 
 export interface DealerLoginResponse {
