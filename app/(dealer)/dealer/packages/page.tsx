@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { packagesApi } from "@/lib/api/packages";
-import { formatCurrency, formatDate } from "@/lib/utils";
+import { formatCurrency, formatDate, cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
@@ -17,6 +17,17 @@ import {
   Car,
   Hotel,
   Navigation,
+  ChevronDown,
+  Eye,
+  Maximize2,
+  Wrench,
+  Zap,
+  Disc,
+  Fuel,
+  KeyRound,
+  Headphones,
+  FileCheck,
+  Sparkles,
 } from "lucide-react";
 
 export default function DealerPackagesPage() {
@@ -24,6 +35,15 @@ export default function DealerPackagesPage() {
   const [isLoadingPlans, setIsLoadingPlans] = useState(false);
   
   const [segment, setSegment] = useState<string>("Basic");
+
+  // Single card accordion state (only 1 card open at a time)
+  const [expandedPlanId, setExpandedPlanId] = useState<number | string | null>(null);
+  // Big screen full details modal state
+  const [viewingDetailPlan, setViewingDetailPlan] = useState<any | null>(null);
+
+  const toggleExpand = (id: number | string) => {
+    setExpandedPlanId((prev) => (prev === id ? null : id));
+  };
 
   // Checkout modal state
   const [selectedPlan, setSelectedPlan] = useState<any | null>(null);
@@ -254,95 +274,478 @@ export default function DealerPackagesPage() {
           <p className="text-base font-semibold">No plans available for this segment.</p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3.5 sm:gap-6">
-          {plans.map((plan) => (
-            <div key={plan.id} className="group relative rounded-xl sm:rounded-2xl border border-slate-200/90 hover:border-primary/40 bg-white flex flex-col justify-between transition-all duration-300 hover:shadow-xl hover:shadow-primary/10 overflow-hidden shadow-2xs">
-              {/* Top Accent */}
-              <div className="h-1 sm:h-1.5 bg-gradient-to-r from-primary via-blue-500 to-indigo-500" />
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3.5 sm:gap-6 items-start">
+          {plans.map((plan) => {
+            const isExpanded = expandedPlanId === plan.id;
 
-              <div className="p-3.5 sm:p-6 flex-1 flex flex-col">
-                {/* Header */}
-                <div className="flex items-start justify-between mb-3 sm:mb-4">
-                  <div className="flex items-center gap-2.5 sm:gap-3">
-                    <div className="p-2 sm:p-2.5 rounded-lg sm:rounded-xl bg-primary/10 text-primary">
-                      <Shield className="h-4 w-4 sm:h-5 sm:w-5" />
-                    </div>
-                    <div>
-                      <h3 className="text-base sm:text-lg font-bold text-slate-900 leading-tight">{plan.name}</h3>
-                      <p className="text-[11px] sm:text-xs text-slate-500 mt-0.5 flex items-center gap-1">
-                        <Clock className="h-3 w-3" />
-                        {plan.plan_period_months ? `${plan.plan_period_months} Months` : "12 Months"} Coverage
-                      </p>
-                    </div>
-                  </div>
-                  <Badge variant="secondary" className="text-[10px] shrink-0">{segment}</Badge>
-                </div>
-
-                {/* Price */}
-                <div className="mb-3.5 sm:mb-5">
-                  <span className="text-2xl sm:text-3xl font-black text-slate-900">{formatCurrency(plan.resolved_price || plan.base_price || 0)}</span>
-                  {plan.base_price && plan.resolved_price && plan.base_price !== plan.resolved_price && (
-                    <span className="text-xs sm:text-sm text-slate-400 line-through ml-2">{formatCurrency(plan.base_price)}</span>
-                  )}
-                  <p className="text-[10px] sm:text-[11px] text-slate-400 mt-0.5">One-time payment</p>
-                </div>
-
-                {/* Features Grid */}
-                <div className="grid grid-cols-2 gap-2 sm:gap-3 mb-3.5 sm:mb-5">
-                  <div className="flex items-center gap-2 sm:gap-2.5 bg-slate-50 rounded-lg sm:rounded-xl px-2.5 py-1.5 sm:px-3 sm:py-2.5">
-                    <Car className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-primary shrink-0" />
-                    <div>
-                      <p className="text-xs font-bold text-slate-900">{plan.incidents || "Unlimited"}</p>
-                      <p className="text-[10px] text-slate-500">Incidents</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-2 sm:gap-2.5 bg-slate-50 rounded-lg sm:rounded-xl px-2.5 py-1.5 sm:px-3 sm:py-2.5">
-                    <Navigation className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-primary shrink-0" />
-                    <div>
-                      <p className="text-xs font-bold text-slate-900">{plan.distance_km ? `${plan.distance_km} km` : "50 km"}</p>
-                      <p className="text-[10px] text-slate-500">Tow Distance</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-2 sm:gap-2.5 bg-slate-50 rounded-lg sm:rounded-xl px-2.5 py-1.5 sm:px-3 sm:py-2.5">
-                    <Hotel className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-primary shrink-0" />
-                    <div>
-                      <p className="text-xs font-bold text-slate-900">{plan.hotel_accommodation || 0} Nights</p>
-                      <p className="text-[10px] text-slate-500">Hotel Stay</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-2 sm:gap-2.5 bg-slate-50 rounded-lg sm:rounded-xl px-2.5 py-1.5 sm:px-3 sm:py-2.5">
-                    <CheckCircle2 className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-emerald-500 shrink-0" />
-                    <div>
-                      <p className="text-xs font-bold text-slate-900">{plan.cab_service || 0} Rides</p>
-                      <p className="text-[10px] text-slate-500">Cab Service</p>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Extra Features List */}
-                {plan.features && Array.isArray(plan.features) && plan.features.length > 0 && (
-                  <ul className="space-y-1.5 sm:space-y-2 mb-3.5 sm:mb-5">
-                    {plan.features.map((f: string, i: number) => (
-                      <li key={i} className="text-xs sm:text-sm text-slate-600 flex items-start gap-2">
-                        <CheckCircle2 className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-emerald-500 mt-0.5 shrink-0" />
-                        <span>{f}</span>
-                      </li>
-                    ))}
-                  </ul>
+            return (
+              <div
+                key={plan.id}
+                className={cn(
+                  "group relative rounded-xl sm:rounded-2xl border bg-white flex flex-col justify-between transition-all duration-300 overflow-hidden shadow-2xs",
+                  isExpanded
+                    ? "border-primary/60 ring-2 ring-primary/10 shadow-lg shadow-primary/10"
+                    : "border-slate-200/90 hover:border-primary/40 hover:shadow-xl hover:shadow-primary/10"
                 )}
-              </div>
+              >
+                {/* Top Accent */}
+                <div className="h-1 sm:h-1.5 bg-gradient-to-r from-primary via-blue-500 to-indigo-500" />
 
-              {/* CTA */}
-              <div className="px-3.5 pb-3.5 sm:px-6 sm:pb-6">
-                <Button className="w-full font-bold gap-2 h-9 sm:h-11 text-xs sm:text-sm rounded-xl group-hover:bg-secondary transition-colors" onClick={() => { setSelectedPlan(plan); setCurrentStep(1); setErrors({}); }}>
-                  Activate Plan <ArrowRight className="h-3.5 w-3.5 sm:h-4 sm:w-4 transition-transform group-hover:translate-x-0.5" />
-                </Button>
+                <div className="p-3.5 sm:p-6 flex-1 flex flex-col">
+                  {/* Header */}
+                  <div className="flex items-start justify-between mb-3 sm:mb-4">
+                    <div className="flex items-center gap-2.5 sm:gap-3">
+                      <div className="p-2 sm:p-2.5 rounded-lg sm:rounded-xl bg-primary/10 text-primary">
+                        <Shield className="h-4 w-4 sm:h-5 sm:w-5" />
+                      </div>
+                      <div>
+                        <h3 className="text-base sm:text-lg font-bold text-slate-900 leading-tight">
+                          {plan.name}
+                        </h3>
+                        <p className="text-[11px] sm:text-xs text-slate-500 mt-0.5 flex items-center gap-1">
+                          <Clock className="h-3 w-3" />
+                          {plan.plan_period_months
+                            ? `${plan.plan_period_months} Months`
+                            : "12 Months"}{" "}
+                          Coverage
+                        </p>
+                      </div>
+                    </div>
+                    <Badge variant="secondary" className="text-[10px] shrink-0">
+                      {segment}
+                    </Badge>
+                  </div>
+
+                  {/* Price */}
+                  <div className="mb-3.5 sm:mb-5">
+                    <span className="text-2xl sm:text-3xl font-black text-slate-900">
+                      {formatCurrency(plan.resolved_price || plan.base_price || 0)}
+                    </span>
+                    {plan.base_price &&
+                      plan.resolved_price &&
+                      plan.base_price !== plan.resolved_price && (
+                        <span className="text-xs sm:text-sm text-slate-400 line-through ml-2">
+                          {formatCurrency(plan.base_price)}
+                        </span>
+                      )}
+                    <p className="text-[10px] sm:text-[11px] text-slate-400 mt-0.5">
+                      One-time payment
+                    </p>
+                  </div>
+
+                  {/* Features Grid */}
+                  <div className="grid grid-cols-2 gap-2 sm:gap-3 mb-3.5 sm:mb-5">
+                    <div className="flex items-center gap-2 sm:gap-2.5 bg-slate-50 rounded-lg sm:rounded-xl px-2.5 py-1.5 sm:px-3 sm:py-2.5">
+                      <Car className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-primary shrink-0" />
+                      <div>
+                        <p className="text-xs font-bold text-slate-900">
+                          {plan.incidents || "Unlimited"}
+                        </p>
+                        <p className="text-[10px] text-slate-500">Incidents</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2 sm:gap-2.5 bg-slate-50 rounded-lg sm:rounded-xl px-2.5 py-1.5 sm:px-3 sm:py-2.5">
+                      <Navigation className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-primary shrink-0" />
+                      <div>
+                        <p className="text-xs font-bold text-slate-900">
+                          {plan.distance_km ? `${plan.distance_km} km` : "50 km"}
+                        </p>
+                        <p className="text-[10px] text-slate-500">Tow Distance</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2 sm:gap-2.5 bg-slate-50 rounded-lg sm:rounded-xl px-2.5 py-1.5 sm:px-3 sm:py-2.5">
+                      <Hotel className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-primary shrink-0" />
+                      <div>
+                        <p className="text-xs font-bold text-slate-900">
+                          {plan.hotel_accommodation || 0} Nights
+                        </p>
+                        <p className="text-[10px] text-slate-500">Hotel Stay</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2 sm:gap-2.5 bg-slate-50 rounded-lg sm:rounded-xl px-2.5 py-1.5 sm:px-3 sm:py-2.5">
+                      <CheckCircle2 className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-emerald-500 shrink-0" />
+                      <div>
+                        <p className="text-xs font-bold text-slate-900">
+                          {plan.cab_service || 0} Rides
+                        </p>
+                        <p className="text-[10px] text-slate-500">Cab Service</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Extra Features List (if available from API) */}
+                  {plan.features &&
+                    Array.isArray(plan.features) &&
+                    plan.features.length > 0 && (
+                      <ul className="space-y-1.5 sm:space-y-2 mb-3.5 sm:mb-5">
+                        {plan.features.map((f: string, i: number) => (
+                          <li
+                            key={i}
+                            className="text-xs sm:text-sm text-slate-600 flex items-start gap-2"
+                          >
+                            <CheckCircle2 className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-emerald-500 mt-0.5 shrink-0" />
+                            <span>{f}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+
+                  {/* Actions Row: View Details Toggle + Big Screen Modal + Activate CTA */}
+                  <div className="pt-2 border-t border-slate-100 space-y-2">
+                    <div className="flex items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={() => toggleExpand(plan.id)}
+                        className={cn(
+                          "flex-1 inline-flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl border text-xs font-bold transition-all cursor-pointer active:scale-95",
+                          isExpanded
+                            ? "bg-primary/10 border-primary/30 text-primary shadow-2xs"
+                            : "bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100 hover:border-slate-300"
+                        )}
+                      >
+                        <Eye className="h-3.5 w-3.5" />
+                        <span>{isExpanded ? "Hide Details" : "View Details"}</span>
+                        <ChevronDown
+                          className={cn(
+                            "h-3.5 w-3.5 transition-transform duration-200",
+                            isExpanded && "rotate-180"
+                          )}
+                        />
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => setViewingDetailPlan(plan)}
+                        className="p-2 rounded-xl border border-slate-200 bg-slate-50 hover:bg-primary/10 hover:border-primary/30 hover:text-primary text-slate-600 transition-all cursor-pointer active:scale-95 shrink-0"
+                        title="Open full details in Big Screen Modal"
+                      >
+                        <Maximize2 className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                      </button>
+                    </div>
+
+                    <Button
+                      className="w-full font-bold gap-2 h-9 sm:h-11 text-xs sm:text-sm rounded-xl group-hover:bg-secondary transition-colors"
+                      onClick={() => {
+                        setSelectedPlan(plan);
+                        setCurrentStep(1);
+                        setErrors({});
+                      }}
+                    >
+                      Activate Plan{" "}
+                      <ArrowRight className="h-3.5 w-3.5 sm:h-4 sm:w-4 transition-transform group-hover:translate-x-0.5" />
+                    </Button>
+                  </div>
+
+                  {/* Accordion Expanded Details (Placed below action buttons so toggle never gets pushed down) */}
+                  {isExpanded && (
+                    <div className="pt-3.5 mt-3 border-t border-slate-200/90 space-y-3.5 animate-in fade-in slide-in-from-top-2 duration-200">
+                      {/* Coverage Specs Summary Banner */}
+                      <div className="rounded-xl bg-gradient-to-br from-primary/5 via-blue-50/60 to-indigo-50/40 border border-primary/20 p-3 space-y-2">
+                        <div className="flex items-center justify-between">
+                          <span className="text-[11px] font-bold text-primary uppercase tracking-wider flex items-center gap-1">
+                            <Sparkles className="h-3.5 w-3.5" /> Full Plan Inclusions
+                          </span>
+                          <button
+                            type="button"
+                            onClick={() => setViewingDetailPlan(plan)}
+                            className="text-[10px] font-bold text-primary hover:underline inline-flex items-center gap-1 cursor-pointer"
+                          >
+                            Big Screen <Maximize2 className="h-2.5 w-2.5" />
+                          </button>
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-2 text-[11px]">
+                          <div className="bg-white/90 rounded-lg p-2 border border-slate-200/70 shadow-2xs">
+                            <span className="text-slate-400 block text-[10px]">Validity</span>
+                            <strong className="text-slate-800 font-bold">
+                              {plan.plan_period_months ? `${plan.plan_period_months} Months` : "12 Months"}
+                            </strong>
+                          </div>
+                          <div className="bg-white/90 rounded-lg p-2 border border-slate-200/70 shadow-2xs">
+                            <span className="text-slate-400 block text-[10px]">Incident Limit</span>
+                            <strong className="text-slate-800 font-bold">
+                              {plan.incidents || "Unlimited"} Allowed
+                            </strong>
+                          </div>
+                          <div className="bg-white/90 rounded-lg p-2 border border-slate-200/70 shadow-2xs">
+                            <span className="text-slate-400 block text-[10px]">Free Towing</span>
+                            <strong className="text-slate-800 font-bold">
+                              {plan.distance_km ? `${plan.distance_km} km` : "50 km"} / incident
+                            </strong>
+                          </div>
+                          <div className="bg-white/90 rounded-lg p-2 border border-slate-200/70 shadow-2xs">
+                            <span className="text-slate-400 block text-[10px]">Hotel & Cab</span>
+                            <strong className="text-slate-800 font-bold">
+                              {plan.hotel_accommodation || 0}N / {plan.cab_service || 0} Rides
+                            </strong>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Included Roadside Services (All Open) */}
+                      <div className="space-y-1.5">
+                        <p className="text-[11px] font-bold text-slate-700 uppercase tracking-wider">
+                          All Included Services
+                        </p>
+                        <div className="space-y-1.5 max-h-56 overflow-y-auto pr-1">
+                          {[
+                            {
+                              title: "24x7 Breakdown Towing",
+                              desc: `Up to ${plan.distance_km || 50} km to nearest workshop`,
+                              icon: Navigation,
+                            },
+                            {
+                              title: "Battery Jumpstart",
+                              desc: "Quick on-site jumpstart assistance",
+                              icon: Zap,
+                            },
+                            {
+                              title: "Flat Tyre Wheel Swap",
+                              desc: "On-site replacement with spare tyre",
+                              icon: Disc,
+                            },
+                            {
+                              title: "Emergency Fuel Assistance",
+                              desc: "Up to 5L delivered directly to vehicle",
+                              icon: Fuel,
+                            },
+                            {
+                              title: "Locked Key Retrieval",
+                              desc: "Safe retrieval of keys locked inside",
+                              icon: KeyRound,
+                            },
+                            {
+                              title: "Minor Mechanical Fix",
+                              desc: "On-site minor electrical/mechanical repairs",
+                              icon: Wrench,
+                            },
+                            {
+                              title: "Hotel Stay Allowance",
+                              desc: `${plan.hotel_accommodation || 0} nights if stranded away from city`,
+                              icon: Hotel,
+                            },
+                            {
+                              title: "Alternative Cab Facility",
+                              desc: `${plan.cab_service || 0} rides for passenger onward travel`,
+                              icon: Car,
+                            },
+                            {
+                              title: "24/7 Helpline & Claims",
+                              desc: "Dedicated toll-free priority claim desk",
+                              icon: Headphones,
+                            },
+                          ].map((item, idx) => (
+                            <div
+                              key={idx}
+                              className="flex items-start gap-2 p-2 rounded-lg bg-slate-50 border border-slate-200/70 text-xs"
+                            >
+                              <item.icon className="h-3.5 w-3.5 text-primary mt-0.5 shrink-0" />
+                              <div className="min-w-0">
+                                <span className="font-bold text-slate-900 block text-[11px]">
+                                  {item.title}
+                                </span>
+                                <span className="text-slate-500 text-[10px] block leading-tight">
+                                  {item.desc}
+                                </span>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Bottom Collapse Button so user doesn't need to scroll up if at the bottom */}
+                      <button
+                        type="button"
+                        onClick={() => toggleExpand(plan.id)}
+                        className="w-full py-2 px-3 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-600 hover:text-slate-900 text-xs font-bold inline-flex items-center justify-center gap-1.5 transition-all cursor-pointer active:scale-95"
+                      >
+                        <span>Hide Details</span>
+                        <ChevronDown className="h-3.5 w-3.5 rotate-180" />
+                      </button>
+                    </div>
+                  )}
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
 
+      {/* ── Package Details Big Screen Modal ── */}
+      <Modal
+        isOpen={Boolean(viewingDetailPlan)}
+        onClose={() => setViewingDetailPlan(null)}
+        title={viewingDetailPlan ? viewingDetailPlan.name : "Package Details"}
+        description={`${segment} Segment • RSA Specifications`}
+        maxWidth="2xl"
+      >
+        {viewingDetailPlan && (
+          <div className="space-y-3 pt-0.5">
+            {/* Header Mini Strip: Badges + Price */}
+            <div className="flex items-center justify-between gap-2 p-2.5 rounded-xl bg-slate-50 border border-slate-200/80">
+              <div className="flex items-center gap-1.5 flex-wrap">
+                <Badge variant="secondary" className="text-[10px] py-0 px-2 font-bold">
+                  {segment} Segment
+                </Badge>
+                <span className="text-[11px] font-medium text-slate-500 flex items-center gap-1">
+                  <Clock className="h-3 w-3 text-primary" />
+                  {viewingDetailPlan.plan_period_months
+                    ? `${viewingDetailPlan.plan_period_months} Months`
+                    : "12 Months"}{" "}
+                  Coverage
+                </span>
+              </div>
+
+              <div className="text-right">
+                <span className="text-base sm:text-lg font-black text-slate-900">
+                  {formatCurrency(
+                    viewingDetailPlan.resolved_price || viewingDetailPlan.base_price || 0
+                  )}
+                </span>
+              </div>
+            </div>
+
+            {/* 4 Stats Compact Strip */}
+            <div className="grid grid-cols-4 gap-1.5 text-center">
+              <div className="p-1.5 rounded-lg bg-slate-50 border border-slate-200/70">
+                <span className="text-[9px] uppercase tracking-wider text-slate-400 font-bold block">
+                  Incidents
+                </span>
+                <strong className="text-xs sm:text-sm font-bold text-slate-900 block truncate">
+                  {viewingDetailPlan.incidents || "Unlimited"}
+                </strong>
+              </div>
+
+              <div className="p-1.5 rounded-lg bg-slate-50 border border-slate-200/70">
+                <span className="text-[9px] uppercase tracking-wider text-slate-400 font-bold block">
+                  Towing
+                </span>
+                <strong className="text-xs sm:text-sm font-bold text-slate-900 block truncate">
+                  {viewingDetailPlan.distance_km ? `${viewingDetailPlan.distance_km} km` : "50 km"}
+                </strong>
+              </div>
+
+              <div className="p-1.5 rounded-lg bg-slate-50 border border-slate-200/70">
+                <span className="text-[9px] uppercase tracking-wider text-slate-400 font-bold block">
+                  Hotel
+                </span>
+                <strong className="text-xs sm:text-sm font-bold text-slate-900 block truncate">
+                  {viewingDetailPlan.hotel_accommodation || 0}N
+                </strong>
+              </div>
+
+              <div className="p-1.5 rounded-lg bg-slate-50 border border-slate-200/70">
+                <span className="text-[9px] uppercase tracking-wider text-slate-400 font-bold block">
+                  Cab
+                </span>
+                <strong className="text-xs sm:text-sm font-bold text-slate-900 block truncate">
+                  {viewingDetailPlan.cab_service || 0} Rides
+                </strong>
+              </div>
+            </div>
+
+            {/* Roadside Inclusions Compact Grid */}
+            <div className="rounded-xl border border-slate-200/80 p-2 sm:p-2.5 space-y-1.5">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 block">
+                Included Roadside Services
+              </span>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5 max-h-48 sm:max-h-56 overflow-y-auto pr-0.5">
+                {[
+                  {
+                    title: "Breakdown Towing",
+                    desc: `Up to ${viewingDetailPlan.distance_km || 50} km free`,
+                    icon: Navigation,
+                  },
+                  {
+                    title: "Battery Jumpstart",
+                    desc: "On-site battery boost",
+                    icon: Zap,
+                  },
+                  {
+                    title: "Flat Tyre Puncture",
+                    desc: "Spare wheel replacement",
+                    icon: Disc,
+                  },
+                  {
+                    title: "Emergency Fuel",
+                    desc: "Up to 5L delivered",
+                    icon: Fuel,
+                  },
+                  {
+                    title: "Key Lockout",
+                    desc: "Locked vehicle key retrieval",
+                    icon: KeyRound,
+                  },
+                  {
+                    title: "Minor Mechanical Fix",
+                    desc: "On-site troubleshooting",
+                    icon: Wrench,
+                  },
+                  {
+                    title: "Hotel Stay Allowance",
+                    desc: `${viewingDetailPlan.hotel_accommodation || 0}N if stranded away`,
+                    icon: Hotel,
+                  },
+                  {
+                    title: "Alternative Cab",
+                    desc: `${viewingDetailPlan.cab_service || 0} rides for travel`,
+                    icon: Car,
+                  },
+                  {
+                    title: "Nationwide Coverage",
+                    desc: "Highways & cities pan-India",
+                    icon: MapPin,
+                  },
+                  {
+                    title: "24/7 Helpline",
+                    desc: "Priority dealer claim desk",
+                    icon: Headphones,
+                  },
+                ].map((item, idx) => (
+                  <div
+                    key={idx}
+                    className="flex items-center gap-2 py-1 px-2 rounded-lg bg-slate-50/80 border border-slate-200/60 text-xs"
+                  >
+                    <item.icon className="h-3 w-3 text-primary shrink-0" />
+                    <span className="font-semibold text-slate-800 text-[11px] truncate">
+                      {item.title}
+                    </span>
+                    <span className="text-[10px] text-slate-400 ml-auto shrink-0 truncate">
+                      {item.desc}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Actions Bar */}
+            <div className="pt-2 flex items-center justify-end gap-2 border-t border-slate-100">
+              <Button
+                variant="outline"
+                size="sm"
+                type="button"
+                onClick={() => setViewingDetailPlan(null)}
+                className="h-8 text-xs font-bold px-3 cursor-pointer"
+              >
+                Close
+              </Button>
+              <Button
+                size="sm"
+                type="button"
+                onClick={() => {
+                  setSelectedPlan(viewingDetailPlan);
+                  setViewingDetailPlan(null);
+                  setCurrentStep(1);
+                  setErrors({});
+                }}
+                className="h-8 font-bold gap-1 text-xs px-3.5 rounded-xl cursor-pointer"
+              >
+                Activate Plan <ArrowRight className="h-3 w-3" />
+              </Button>
+            </div>
+          </div>
+        )}
+      </Modal>
 
       {/* ── Checkout Modal ── */}
       <Modal

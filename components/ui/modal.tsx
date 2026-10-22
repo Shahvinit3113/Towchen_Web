@@ -48,7 +48,7 @@ export function Modal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 overflow-y-auto">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-2.5 sm:p-6 overflow-y-auto">
       {/* Backdrop */}
       <div
         className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs transition-opacity animate-in fade-in duration-200"
@@ -61,31 +61,33 @@ export function Modal({
         role="dialog"
         aria-modal="true"
         className={cn(
-          "relative w-full rounded-2xl bg-white shadow-2xl border border-slate-100 p-6 z-10 transition-all duration-200 animate-in zoom-in-95 my-8",
+          "relative w-full rounded-2xl bg-white shadow-2xl border border-slate-100 p-3.5 sm:p-6 z-10 transition-all duration-200 animate-in zoom-in-95 my-2 sm:my-8",
           maxWidths[maxWidth]
         )}
       >
-        <div className="flex items-start justify-between pb-3">
-          <div>
-            {title && (
-              <h3 className="text-xl font-bold tracking-tight text-slate-900">
-                {title}
-              </h3>
-            )}
-            {description && (
-              <p className="mt-1 text-sm text-slate-500">{description}</p>
-            )}
+        {(title || description) && (
+          <div className="flex items-start justify-between pb-2.5 sm:pb-3 border-b border-slate-100 mb-2">
+            <div>
+              {title && (
+                <h3 className="text-base sm:text-xl font-bold tracking-tight text-slate-900 leading-snug">
+                  {title}
+                </h3>
+              )}
+              {description && (
+                <p className="mt-0.5 text-xs sm:text-sm text-slate-500">{description}</p>
+              )}
+            </div>
+            <button
+              onClick={onClose}
+              className="rounded-lg p-1 text-slate-400 hover:bg-slate-100 hover:text-slate-600 transition-colors cursor-pointer shrink-0 ml-2"
+              aria-label="Close modal"
+            >
+              <X className="h-4 w-4 sm:h-5 sm:w-5" />
+            </button>
           </div>
-          <button
-            onClick={onClose}
-            className="rounded-lg p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-600 transition-colors cursor-pointer"
-            aria-label="Close modal"
-          >
-            <X className="h-5 w-5" />
-          </button>
-        </div>
+        )}
 
-        <div className="mt-2">{children}</div>
+        <div>{children}</div>
       </div>
     </div>
   );

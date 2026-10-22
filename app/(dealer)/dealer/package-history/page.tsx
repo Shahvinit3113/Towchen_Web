@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { packagesApi } from "@/lib/api/packages";
 import { Button } from "@/components/ui/button";
 import {
@@ -15,14 +15,14 @@ import {
   FileText,
   ChevronLeft,
   ChevronRight,
-  Eye,
 } from "lucide-react";
 
 export default function DealerPackageHistoryPage() {
+  const router = useRouter();
   const [orders, setOrders] = useState<any[]>([]);
   const [isLoadingOrders, setIsLoadingOrders] = useState(false);
   const [search, setSearch] = useState("");
-  const [statusFilter, setStatusFilter] = useState<"all" | "active">("all");
+  const [statusFilter, setStatusFilter] = useState<"all" | "active" | "expired">("all");
   const [downloadingId, setDownloadingId] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 8;
@@ -73,11 +73,25 @@ export default function DealerPackageHistoryPage() {
     }
   };
 
+  const isOrderExpired = (order: any) => {
+    const s = String(order.status || "").toLowerCase();
+    if (s === "expired") return true;
+    if (order.expiry_date && new Date(order.expiry_date).getTime() < Date.now()) return true;
+    return false;
+  };
+
+  const isOrderActive = (order: any) => {
+    if (isOrderExpired(order)) return false;
+    const s = String(order.status || "").toLowerCase();
+    return s === "active" || s === "success" || !s;
+  };
+
   // Filter orders by active status tab
   const filteredOrders = orders.filter((order) => {
     if (statusFilter === "all") return true;
-    const s = String(order.status || "").toLowerCase();
-    return s === "active" || s === "success";
+    if (statusFilter === "active") return isOrderActive(order);
+    if (statusFilter === "expired") return isOrderExpired(order);
+    return true;
   });
 
   const totalPages = Math.max(1, Math.ceil(filteredOrders.length / pageSize));
@@ -86,10 +100,8 @@ export default function DealerPackageHistoryPage() {
     currentPage * pageSize
   );
 
-  const activeCount = orders.filter((o) => {
-    const s = String(o.status || "").toLowerCase();
-    return s === "active" || s === "success";
-  }).length;
+  const activeCount = orders.filter(isOrderActive).length;
+  const expiredCount = orders.filter(isOrderExpired).length;
 
   return (
     <div className="space-y-3 sm:space-y-5 max-w-full">
@@ -144,10 +156,10 @@ export default function DealerPackageHistoryPage() {
         </div>
 
         {/* Quick Filter Tabs */}
-        <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-xl self-start sm:self-auto">
+        <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-xl self-start sm:self-auto overflow-x-auto max-w-full">
           <button
             onClick={() => setStatusFilter("all")}
-            className={`px-3 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+            className={`px-3 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer shrink-0 ${
               statusFilter === "all"
                 ? "bg-white text-slate-900 shadow-2xs"
                 : "text-slate-600 hover:text-slate-900"
@@ -157,13 +169,23 @@ export default function DealerPackageHistoryPage() {
           </button>
           <button
             onClick={() => setStatusFilter("active")}
-            className={`px-3 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+            className={`px-3 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer shrink-0 ${
               statusFilter === "active"
                 ? "bg-white text-slate-900 shadow-2xs"
                 : "text-slate-600 hover:text-slate-900"
             }`}
           >
             Active ({activeCount})
+          </button>
+          <button
+            onClick={() => setStatusFilter("expired")}
+            className={`px-3 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer shrink-0 ${
+              statusFilter === "expired"
+                ? "bg-white text-slate-900 shadow-2xs"
+                : "text-slate-600 hover:text-slate-900"
+            }`}
+          >
+            Expired ({expiredCount})
           </button>
         </div>
       </div>
@@ -209,16 +231,17 @@ export default function DealerPackageHistoryPage() {
         ) : (
           // Mobile Compact Feed
           paginatedOrders.map((order) => {
-            const isActive =
-              String(order.status || "").toLowerCase() === "active" ||
-              String(order.status || "").toLowerCase() === "success";
+            const isExpired = isOrderExpired(order);
+            const isActive = isOrderActive(order);
+            const displayStatus = isExpired ? "Expired" : (order.status || "Active");
 
             return (
               <div
                 key={order.id}
-                className="rounded-xl border border-slate-200/90 bg-white p-3 shadow-2xs space-y-2 hover:border-primary/40 transition-colors"
+                onClick={() => router.push(`/dealer/package-history/${order.id}`)}
+                className="rounded-xl border border-slate-200/90 bg-white p-3 shadow-2xs space-y-2 hover:border-primary/40 hover:shadow-xs transition-all cursor-pointer active:scale-[0.99]"
               >
-                {/* Row 1: Order Ref + Status Badge + Quick View Link */}
+                {/* Row 1: Order Ref + Status Badge */}
                 <div className="flex items-center justify-between gap-2">
                   <div className="flex items-center gap-1.5 min-w-0">
                     <span className="font-mono font-bold text-[11px] text-slate-700 bg-slate-100 px-2 py-0.5 rounded border border-slate-200/80">
@@ -229,29 +252,26 @@ export default function DealerPackageHistoryPage() {
                     </span>
                   </div>
 
-                  <div className="flex items-center gap-1.5 shrink-0">
-                    <Link
-                      href={`/dealer/package-history/${order.id}`}
-                      className="p-1 rounded-md text-slate-400 hover:text-primary hover:bg-primary/10 transition-colors cursor-pointer"
-                      title="View Details"
-                    >
-                      <Eye className="h-3.5 w-3.5" />
-                    </Link>
+                  <span
+                    className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold shrink-0 ${
+                      isExpired
+                        ? "bg-rose-50 text-rose-700 border border-rose-200"
+                        : isActive
+                        ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
+                        : "bg-slate-100 text-slate-600 border border-slate-200"
+                    }`}
+                  >
                     <span
-                      className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold shrink-0 ${
-                        isActive
-                          ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
-                          : "bg-slate-100 text-slate-600 border border-slate-200"
+                      className={`w-1.5 h-1.5 rounded-full ${
+                        isExpired
+                          ? "bg-rose-500"
+                          : isActive
+                          ? "bg-emerald-500"
+                          : "bg-slate-400"
                       }`}
-                    >
-                      <span
-                        className={`w-1.5 h-1.5 rounded-full ${
-                          isActive ? "bg-emerald-500" : "bg-slate-400"
-                        }`}
-                      />
-                      <span>{order.status || "Active"}</span>
-                    </span>
-                  </div>
+                    />
+                    <span>{displayStatus}</span>
+                  </span>
                 </div>
 
                 {/* Row 2: Customer & Vehicle Registration */}
@@ -262,6 +282,7 @@ export default function DealerPackageHistoryPage() {
                     {order.customer?.customer_number && (
                       <a
                         href={`tel:${order.customer.customer_number}`}
+                        onClick={(e) => e.stopPropagation()}
                         className="text-primary hover:text-primary/80 shrink-0 inline-flex items-center gap-0.5 font-mono text-[10px]"
                         title="Call Customer"
                       >
@@ -275,33 +296,26 @@ export default function DealerPackageHistoryPage() {
                   </div>
                 </div>
 
-                {/* Row 3: Action Buttons (View Details Link + Download Certificate) */}
+                {/* Row 3: Action Buttons (Download Certificate) */}
                 <div className="pt-2 border-t border-slate-100 flex items-center justify-between gap-2">
                   <span className="text-[10px] text-slate-400">
                     {order.created_at ? new Date(order.created_at).toLocaleDateString() : ""}
                   </span>
-                  <div className="flex items-center gap-1.5 shrink-0">
-                    <Link
-                      href={`/dealer/package-history/${order.id}`}
-                      className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg border border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-700 text-[11px] font-bold transition-all cursor-pointer active:scale-95"
-                      title="View Details"
-                    >
-                      <Eye className="h-3 w-3 text-slate-500" />
-                      <span>View</span>
-                    </Link>
-                    <button
-                      onClick={() => handleDownload(order.id)}
-                      disabled={downloadingId === order.id}
-                      className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-primary/10 hover:bg-primary/15 text-primary text-[11px] font-bold transition-all disabled:opacity-50 cursor-pointer active:scale-95"
-                    >
-                      <Download className="h-3 w-3" />
-                      <span>
-                        {downloadingId === order.id
-                          ? "Opening..."
-                          : "Download Certificate"}
-                      </span>
-                    </button>
-                  </div>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleDownload(order.id);
+                    }}
+                    disabled={downloadingId === order.id}
+                    className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-primary/10 hover:bg-primary/15 text-primary text-[11px] font-bold transition-all disabled:opacity-50 cursor-pointer active:scale-95 shrink-0"
+                  >
+                    <Download className="h-3 w-3" />
+                    <span>
+                      {downloadingId === order.id
+                        ? "Opening..."
+                        : "Download Certificate"}
+                    </span>
+                  </button>
                 </div>
               </div>
             );
@@ -360,12 +374,16 @@ export default function DealerPackageHistoryPage() {
                 </tr>
               ) : (
                 paginatedOrders.map((order) => {
-                  const isActive =
-                    String(order.status || "").toLowerCase() === "active" ||
-                    String(order.status || "").toLowerCase() === "success";
+                  const isExpired = isOrderExpired(order);
+                  const isActive = isOrderActive(order);
+                  const displayStatus = isExpired ? "Expired" : (order.status || "Active");
 
                   return (
-                    <tr key={order.id} className="hover:bg-slate-50/60 transition-colors">
+                    <tr
+                      key={order.id}
+                      onClick={() => router.push(`/dealer/package-history/${order.id}`)}
+                      className="hover:bg-slate-50/70 transition-colors cursor-pointer"
+                    >
                       <td className="py-3.5 px-4 font-mono font-bold text-slate-900">
                         <span className="bg-slate-100 px-2 py-0.5 rounded border border-slate-200">
                           {order.order_number}
@@ -391,41 +409,40 @@ export default function DealerPackageHistoryPage() {
                       <td className="py-3.5 px-4">
                         <span
                           className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold ${
-                            isActive
+                            isExpired
+                              ? "bg-rose-50 text-rose-700 border border-rose-200"
+                              : isActive
                               ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
                               : "bg-slate-100 text-slate-600 border border-slate-200"
                           }`}
                         >
                           <span
                             className={`w-1.5 h-1.5 rounded-full ${
-                              isActive ? "bg-emerald-500" : "bg-slate-400"
+                              isExpired
+                                ? "bg-rose-500"
+                                : isActive
+                                ? "bg-emerald-500"
+                                : "bg-slate-400"
                             }`}
                           />
-                          <span>{order.status || "Active"}</span>
+                          <span>{displayStatus}</span>
                         </span>
                       </td>
                       <td className="py-3.5 px-4 text-right">
-                        <div className="flex items-center justify-end gap-1.5">
-                          <Link
-                            href={`/dealer/package-history/${order.id}`}
-                            className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 hover:border-primary hover:text-primary text-slate-700 text-xs font-semibold transition-colors shadow-2xs"
-                            title="View Full Details"
-                          >
-                            <Eye className="h-3.5 w-3.5" />
-                            <span>View</span>
-                          </Link>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => handleDownload(order.id)}
-                            disabled={downloadingId === order.id}
-                            className="hover:border-primary hover:text-primary transition-colors text-xs inline-flex items-center gap-1"
-                            title="Download Certificate"
-                          >
-                            <Download className="h-3.5 w-3.5" />
-                            <span>{downloadingId === order.id ? "Opening..." : "PDF"}</span>
-                          </Button>
-                        </div>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleDownload(order.id);
+                          }}
+                          disabled={downloadingId === order.id}
+                          className="hover:border-primary hover:text-primary transition-colors text-xs inline-flex items-center gap-1"
+                          title="Download Certificate"
+                        >
+                          <Download className="h-3.5 w-3.5" />
+                          <span>{downloadingId === order.id ? "Opening..." : "PDF"}</span>
+                        </Button>
                       </td>
                     </tr>
                   );

@@ -121,9 +121,15 @@ export default function DealerPackageDetailPage() {
     );
   }
 
+  const isExpired =
+    String(order.status || "").toLowerCase() === "expired" ||
+    (Boolean(order.expiry_date) && new Date(order.expiry_date).getTime() < Date.now());
+
   const isActive =
-    String(order.status || "").toLowerCase() === "active" ||
-    String(order.status || "").toLowerCase() === "success";
+    !isExpired &&
+    (String(order.status || "").toLowerCase() === "active" ||
+      String(order.status || "").toLowerCase() === "success" ||
+      !order.status);
 
   const customerAddress = [
     order.customer?.building,
@@ -199,13 +205,23 @@ export default function DealerPackageDetailPage() {
 
               <span
                 className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold ${
-                  isActive
+                  isExpired
+                    ? "bg-rose-500/20 text-rose-300 border border-rose-500/30"
+                    : isActive
                     ? "bg-emerald-500/20 text-emerald-300 border border-emerald-500/30"
                     : "bg-slate-700 text-slate-300 border border-slate-600"
                 }`}
               >
-                <span className="w-2 h-2 rounded-full bg-emerald-400" />
-                <span>{order.status || "Active"}</span>
+                <span
+                  className={`w-2 h-2 rounded-full ${
+                    isExpired
+                      ? "bg-rose-400"
+                      : isActive
+                      ? "bg-emerald-400"
+                      : "bg-slate-400"
+                  }`}
+                />
+                <span>{isExpired ? "Expired" : (order.status || "Active")}</span>
               </span>
 
               {order.payment_status && (
