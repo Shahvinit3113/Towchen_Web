@@ -1,0 +1,30 @@
+name: Auto Deploy to Hostinger VPS
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    name: Deploy to Live Server
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Executing remote SSH commands to deploy
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USERNAME }}
+          password: ${{ secrets.VPS_PASSWORD }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          port: 22
+          script: |
+            cd ~/Towchen_Web || cd /root/Towchen_Web
+            echo "Pulling latest changes from main branch..."
+            git pull origin main
+            echo "Rebuilding and restarting docker container..."
+            docker compose up -d --build
+            echo "Cleaning up dangling images..."
+            docker image prune -f
+            echo "Deployment successfully finished!"
