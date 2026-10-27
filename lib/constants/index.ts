@@ -16,7 +16,7 @@ export const VEHICLE_CATEGORY_LABELS: Record<string, { label: string; multiplier
 export const DEFAULT_PACKAGES: RsaPackage[] = [
   {
     id: "pkg-essential",
-    title: "TowChen Essential RSA",
+    title: "NextTow Essential RSA",
     slug: "essential-rsa",
     tier: "essential",
     validityDays: 365,
@@ -36,7 +36,7 @@ export const DEFAULT_PACKAGES: RsaPackage[] = [
   },
   {
     id: "pkg-pro-shield",
-    title: "TowChen Pro Shield Plus",
+    title: "NextTow Pro Shield Plus",
     slug: "pro-shield-plus",
     tier: "pro_shield",
     validityDays: 365,
@@ -57,7 +57,7 @@ export const DEFAULT_PACKAGES: RsaPackage[] = [
   },
   {
     id: "pkg-elite-fleet",
-    title: "TowChen Elite Fleet & Luxury",
+    title: "NextTow Elite Fleet & Luxury",
     slug: "elite-fleet-luxury",
     tier: "elite_fleet",
     validityDays: 365,

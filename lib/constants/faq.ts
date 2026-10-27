@@ -3,7 +3,7 @@ import { FaqItem } from "@/types";
 export const FAQS: FaqItem[] = [
   {
     category: "general",
-    question: "How fast can a TowChen tow truck reach my location?",
+    question: "How fast can a NextTow tow truck reach my location?",
     answer:
       "Our average metropolitan arrival time is 15 minutes. We use an automated AI dispatch engine that matches your exact GPS coordinates with the nearest certified tow truck in our 700+ vehicle network.",
   },
@@ -11,7 +11,7 @@ export const FAQS: FaqItem[] = [
     category: "towing",
     question: "Is flatbed towing safe for all-wheel-drive (AWD) and low-chassis cars?",
     answer:
-      "Yes, 100%. All-wheel-drive, four-wheel-drive, and luxury sports cars should NEVER be towed with drive wheels dragging. TowChen deploys hydraulic flatbed platforms with soft nylon wheel straps and zero-ground contact to protect your drivetrain and suspension.",
+      "Yes, 100%. All-wheel-drive, four-wheel-drive, and luxury sports cars should NEVER be towed with drive wheels dragging. NextTow deploys hydraulic flatbed platforms with soft nylon wheel straps and zero-ground contact to protect your drivetrain and suspension.",
   },
   {
     category: "pricing",
@@ -33,7 +33,7 @@ export const FAQS: FaqItem[] = [
   },
   {
     category: "dealer",
-    question: "How do automobile dealers partner with TowChen?",
+    question: "How do automobile dealers partner with NextTow?",
     answer:
       "Dealers can sign up via our Dealer Portal. Dealers get wholesale RSA roadside package subscriptions, live 7-point vehicle inspection with camera capture, RC registration verification, and earn generous commissions credited directly to an in-app wallet.",
   },

@@ -2,6 +2,7 @@
 
 import React from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { dealerNavLinks } from "@/config/navigation";
 import {
@@ -10,7 +11,6 @@ import {
   History,
   MessageSquare,
   LogOut,
-  Truck,
   ExternalLink,
   User,
 } from "lucide-react";
@@ -44,18 +44,19 @@ export function DealerSidebar({ onItemClick }: DealerSidebarProps) {
       <div>
         {/* Dealer Portal Branding */}
         <div className="p-6 border-b border-slate-800/80">
-          <Link href="/dealer/dashboard" className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-xl blue-gradient flex items-center justify-center text-white shadow-md">
-              <Truck className="h-5 w-5" />
-            </div>
-            <div>
-              <span className="text-xl font-black tracking-tight text-white">
-                Tow<span className="text-blue-400">Chen</span>
-              </span>
-              <span className="block text-[10px] uppercase font-bold text-blue-400 tracking-wider">
-                Dealer Partner OS
-              </span>
-            </div>
+          <Link href="/dealer/dashboard" className="block space-y-2 group">
+            <Image
+              src="/NEXPOW.png"
+              alt="NextTow"
+              width={140}
+              height={30}
+              priority
+              unoptimized
+              className="h-7 w-auto object-contain transition-transform group-hover:scale-105"
+            />
+            <span className="inline-block text-[10px] uppercase font-bold text-blue-400 tracking-wider px-2 py-0.5 rounded bg-blue-500/10 border border-blue-500/20">
+              Dealer Partner OS
+            </span>
           </Link>
         </div>
 

@@ -156,7 +156,7 @@ async function handleMockOrLocalApi<T>(
       dealer: {
         id: 1,
         formated_id: "DLR0000001",
-        email: body.email || "dealer@towchen.com",
+        email: body.email || "dealer@nexttow.com",
         role: "Dealer",
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
@@ -170,7 +170,7 @@ async function handleMockOrLocalApi<T>(
     const mockDealer = {
       id: 1,
       formated_id: "DLR0000001",
-      email: "dealer@towchen.com",
+      email: "dealer@nexttow.com",
       role: "Dealer",
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
@@ -186,7 +186,7 @@ async function handleMockOrLocalApi<T>(
       dealer: {
         id: 1,
         formated_id: "DLR0000001",
-        email: "dealer@towchen.com",
+        email: "dealer@nexttow.com",
         role: "Dealer",
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),

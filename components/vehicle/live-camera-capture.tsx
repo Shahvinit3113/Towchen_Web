@@ -182,7 +182,7 @@ export function LiveVehicleCameraCapture({
     ctx.font = "bold 16px monospace";
     ctx.fillStyle = "#38bdf8";
     ctx.fillText(
-      `TowChen Live Audit | ${registrationNumber} | ${currentAngle.title.toUpperCase()}`,
+      `NextTow Live Audit | ${registrationNumber} | ${currentAngle.title.toUpperCase()}`,
       16,
       canvas.height - 24
     );

@@ -1,6 +1,7 @@
 import React from "react";
 import Link from "next/link";
 import { constructMetadata, generateLocalBusinessSchema } from "@/config/seo";
+import { siteConfig } from "@/config/site";
 import { EstimateWidget } from "@/components/estimate/estimate-widget";
 import {
   Truck,
@@ -20,7 +21,7 @@ import {
 } from "lucide-react";
 
 export const metadata = constructMetadata({
-  title: "TowChen — 24/7 Towing Service & Emergency Roadside Assistance",
+  title: "NextTow — 24/7 Towing Service & Emergency Roadside Assistance",
   description:
     "Fast, reliable towing and roadside assistance with upfront pricing and real-time driver tracking. Average 20 minute arrival.",
   canonicalUrlRelative: "",
@@ -173,11 +174,11 @@ export default function HomePage() {
               {/* Action Buttons */}
               <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-center lg:justify-start gap-3 sm:gap-4 pt-1 sm:pt-2">
                 <a
-                  href="tel:8005551234"
+                  href={`tel:${siteConfig.emergencyPhoneRaw}`}
                   className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 rounded-2xl bg-primary hover:bg-secondary text-white font-bold py-3.5 px-6 sm:py-4 sm:px-8 text-sm sm:text-base shadow-lg shadow-primary/30 transition-all active:scale-95"
                 >
                   <Phone className="h-4.5 w-4.5 sm:h-5 sm:w-5" />
-                  <span>CALL NOW</span>
+                  <span>CALL NOW — {siteConfig.emergencyPhone}</span>
                 </a>
 
                 <a
@@ -342,14 +343,14 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* 5. WHY TOWCHEN (PREMIUM STANDARD) */}
+      {/* 5. WHY NEXTTOW (PREMIUM STANDARD) */}
       <section className="py-10 sm:py-16 lg:py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
             {/* Left Points */}
             <div className="lg:col-span-7 space-y-4 sm:space-y-6">
               <span className="inline-block px-3.5 py-1 rounded-full bg-primary/10 text-primary text-xs font-bold uppercase tracking-wider">
-                WHY TOWCHEN
+                WHY NEXTTOW
               </span>
               <h2 className="text-2xl sm:text-3xl lg:text-4xl font-black text-slate-900 tracking-tight leading-tight">
                 The Premium Standard in Roadside Assistance
@@ -381,7 +382,7 @@ export default function HomePage() {
                     <Truck className="h-6 w-6 sm:h-8 sm:w-8" />
                   </div>
                   <h3 className="text-xl sm:text-2xl font-black text-white">
-                    TowChen Certified Fleet
+                    NextTow Certified Fleet
                   </h3>
                   <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
                     Heavy-duty hydraulic flatbeds, soft wheel-strapping systems, and GPS telemetry active 24/7.
@@ -496,11 +497,11 @@ export default function HomePage() {
 
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-3 sm:gap-4 pt-1 sm:pt-2">
             <a
-              href="tel:8005551234"
+              href={`tel:${siteConfig.emergencyPhoneRaw}`}
               className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-full bg-white hover:bg-slate-100 text-primary font-black px-7 py-3.5 sm:px-8 sm:py-4 text-sm sm:text-base shadow-xl transition-all active:scale-95"
             >
               <Phone className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
-              <span>CALL NOW — (800) 555-1234</span>
+              <span>CALL NOW — {siteConfig.emergencyPhone}</span>
             </a>
 
             <a

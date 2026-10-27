@@ -67,7 +67,7 @@ export default function DealerProfilePage() {
   const businessName = profile?.businessName || profile?.name || "Dealership Partner";
   const contactPerson = profile?.name || "Authorized Dealer";
   const primaryPhone = profile?.number || profile?.phone || "Not specified";
-  const email = profile?.email || "dealer@towchen.com";
+  const email = profile?.email || "dealer@nexttow.com";
   const address = profile?.residential_address || "Not specified";
   const registeredDate = profile?.created_at ? formatDate(String(profile.created_at)) : null;
 
@@ -262,12 +262,12 @@ export default function DealerProfilePage() {
           <span className="leading-snug">
             Need changes? Contact{" "}
             <a
-              href={`mailto:partners@towchen.com?subject=Profile%20Update%20Request%20-%20${encodeURIComponent(
+              href={`mailto:partners@nexttow.com?subject=Profile%20Update%20Request%20-%20${encodeURIComponent(
                 dealerId
               )}`}
               className="text-primary font-bold hover:underline break-all"
             >
-              partners@towchen.com
+              partners@nexttow.com
             </a>
           </span>
         </div>

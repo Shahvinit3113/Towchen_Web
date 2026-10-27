@@ -794,7 +794,7 @@ export function EstimateWidget() {
             <div className="rounded-xl bg-blue-50/70 border border-blue-100 p-2.5 text-[11px] text-slate-600 flex items-start gap-2">
               <Info className="h-4 w-4 text-blue-600 shrink-0 mt-0.5" />
               <span className="leading-tight">
-                <strong>Instant Booking:</strong> Confirm this estimate, track your tow driver in real time, and pay securely on the TowChen App.
+                <strong>Instant Booking:</strong> Confirm this estimate, track your tow driver in real time, and pay securely on the NextTow App.
               </span>
             </div>
 
@@ -866,7 +866,7 @@ export function EstimateWidget() {
 
             <div className="space-y-1">
               <h3 className="text-lg font-bold text-slate-900">
-                TowChen Mobile App
+                NextTow Mobile App
               </h3>
               <p className="text-xs text-slate-500 leading-relaxed">
                 Track your driver live on GPS, confirm this estimate, and manage roadside assistance 24/7.

@@ -1,6 +1,8 @@
 import React from "react";
 import Link from "next/link";
-import { Truck, Phone, ShieldCheck } from "lucide-react";
+import Image from "next/image";
+import { Phone, ShieldCheck } from "lucide-react";
+import { siteConfig } from "@/config/site";
 
 export function PublicFooter() {
   return (
@@ -9,13 +11,15 @@ export function PublicFooter() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 pb-12 border-b border-white/10">
           {/* Brand Info */}
           <div className="lg:col-span-2 space-y-4">
-            <Link href="/" className="flex items-center gap-2.5">
-              <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center text-white shadow-md shadow-primary/30">
-                <Truck className="h-5 w-5" />
-              </div>
-              <span className="text-2xl font-black tracking-tight text-white">
-                Tow<span className="text-primary">Chen</span>
-              </span>
+            <Link href="/" className="inline-flex items-center group">
+              <Image
+                src="/NEXPOW.png"
+                alt="NextTow"
+                width={170}
+                height={36}
+                unoptimized
+                className="h-8 sm:h-9 w-auto object-contain transition-opacity group-hover:opacity-90"
+              />
             </Link>
 
             <p className="text-sm text-slate-400 leading-relaxed max-w-sm">
@@ -27,11 +31,11 @@ export function PublicFooter() {
                 24/7 Emergency Dispatch
               </p>
               <a
-                href="tel:8005551234"
+                href={`tel:${siteConfig.emergencyPhoneRaw}`}
                 className="text-xl font-black text-white hover:text-primary transition-colors flex items-center gap-2 mt-1"
               >
                 <Phone className="h-5 w-5 text-primary" />
-                <span>(800) 555-1234</span>
+                <span>{siteConfig.emergencyPhone}</span>
               </a>
             </div>
 
@@ -117,7 +121,7 @@ export function PublicFooter() {
 
         {/* Bottom Bar */}
         <div className="pt-8 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-500 gap-4">
-          <p>© 2026 TowChen Technologies. All rights reserved.</p>
+          <p>© 2026 NextTow Technologies. All rights reserved.</p>
           <div className="flex items-center gap-6">
             <Link href="/about" className="hover:text-slate-400 transition-colors">
               Privacy Policy

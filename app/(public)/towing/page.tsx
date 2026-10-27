@@ -36,7 +36,7 @@ export default function TowingPage() {
           </h1>
           <p className="text-slate-600 text-sm sm:text-base md:text-lg leading-relaxed">
             From low-clearance basement extraction to high-speed expressway
-            rollovers, TowChen deploys hydraulic tilt flatbeds, wheel-lift booms,
+            rollovers, NextTow deploys hydraulic tilt flatbeds, wheel-lift booms,
             and heavy winches certified for all major automobile brands.
           </p>
           <div className="flex flex-col sm:flex-row gap-3 pt-2">

@@ -18,7 +18,7 @@ export const METRO_LOCATIONS: LocationHub[] = [
       "Ghaziabad",
       "IGI Airport Corridor",
     ],
-    helpline: "1800-890-8697",
+    helpline: "+91 90166 16324",
   },
   {
     city: "Mumbai Metropolitan Region",
@@ -36,7 +36,7 @@ export const METRO_LOCATIONS: LocationHub[] = [
       "South Bombay Nariman Point",
       "Atal Setu Trans Harbour Link",
     ],
-    helpline: "1800-890-8697",
+    helpline: "+91 90166 16324",
   },
   {
     city: "Bengaluru",
@@ -54,7 +54,7 @@ export const METRO_LOCATIONS: LocationHub[] = [
       "Hebbal Flyover Corridor",
       "Bengaluru Airport Tollway",
     ],
-    helpline: "1800-890-8697",
+    helpline: "+91 90166 16324",
   },
   {
     city: "Hyderabad",
@@ -71,7 +71,7 @@ export const METRO_LOCATIONS: LocationHub[] = [
       "Secunderabad",
       "Shamshabad Airport Expressway",
     ],
-    helpline: "1800-890-8697",
+    helpline: "+91 90166 16324",
   },
   {
     city: "Pune",
@@ -88,7 +88,7 @@ export const METRO_LOCATIONS: LocationHub[] = [
       "Kothrud",
       "Wakad Bypass",
     ],
-    helpline: "1800-890-8697",
+    helpline: "+91 90166 16324",
   },
   {
     city: "Chennai",
@@ -105,6 +105,6 @@ export const METRO_LOCATIONS: LocationHub[] = [
       "Anna Nagar",
       "Porur Toll Plaza",
     ],
-    helpline: "1800-890-8697",
+    helpline: "+91 90166 16324",
   },
 ];

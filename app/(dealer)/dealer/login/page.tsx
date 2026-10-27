@@ -10,8 +10,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Truck, ShieldCheck, ArrowRight, Lock, Mail, AlertCircle } from "lucide-react";
+import { ShieldCheck, ArrowRight, Lock, Mail, AlertCircle } from "lucide-react";
 import Link from "next/link";
+import Image from "next/image";
 
 export default function DealerLoginPage() {
   const router = useRouter();
@@ -26,7 +27,7 @@ export default function DealerLoginPage() {
   } = useForm<DealerLoginFormData>({
     resolver: zodResolver(dealerLoginSchema),
     defaultValues: {
-      email: "dealer@towchen.com",
+      email: "dealer@nexttow.com",
       password: "Password@123",
     },
   });
@@ -48,10 +49,10 @@ export default function DealerLoginPage() {
   };
 
   const handleQuickDemoLogin = () => {
-    setValue("email", "dealer@towchen.com");
+    setValue("email", "dealer@nexttow.com");
     setValue("password", "Password@123");
     handleLogin({
-      email: "dealer@towchen.com",
+      email: "dealer@nexttow.com",
       password: "Password@123",
     });
   };
@@ -69,16 +70,22 @@ export default function DealerLoginPage() {
     <div className="min-h-screen flex flex-col justify-center items-center p-4 sm:p-6 bg-gradient-to-b from-primary/5 via-slate-50 to-white">
       <div className="w-full max-w-md space-y-6">
         {/* Brand Header */}
-        <div className="text-center space-y-2">
-          <Link href="/" className="inline-flex items-center gap-2.5">
-            <div className="w-12 h-12 rounded-2xl blue-gradient flex items-center justify-center text-white shadow-lg shadow-primary/20">
-              <Truck className="h-6 w-6" />
-            </div>
-            <span className="text-3xl font-black text-slate-900 tracking-tight">
-              Tow<span className="text-primary">Chen</span>
-            </span>
+        <div className="text-center space-y-3">
+          <Link
+            href="/"
+            className="inline-flex items-center justify-center px-6 py-3.5 rounded-2xl bg-[#070f26] border border-slate-800 shadow-xl shadow-slate-900/10 group transition-all hover:scale-105"
+          >
+            <Image
+              src="/NEXPOW.png"
+              alt="NextTow"
+              width={160}
+              height={34}
+              priority
+              unoptimized
+              className="h-8 sm:h-9 w-auto object-contain"
+            />
           </Link>
-          <p className="text-sm font-bold uppercase tracking-wider text-primary">
+          <p className="text-xs sm:text-sm font-bold uppercase tracking-wider text-primary">
             Authorized Dealer Partner Portal
           </p>
         </div>
@@ -125,7 +132,7 @@ export default function DealerLoginPage() {
                   href="#forgot"
                   onClick={(e) => {
                     e.preventDefault();
-                    alert("Please contact your TowChen account manager to reset credentials.");
+                    alert("Please contact your NextTow account manager to reset credentials.");
                   }}
                   className="text-xs text-primary hover:underline"
                 >
@@ -172,7 +179,7 @@ export default function DealerLoginPage() {
             href="/"
             className="text-xs font-semibold text-slate-500 hover:text-slate-800 transition-colors"
           >
-            ← Return to TowChen Public Site
+            ← Return to NextTow Public Site
           </Link>
         </div>
       </div>

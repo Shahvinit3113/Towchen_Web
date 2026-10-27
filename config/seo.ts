@@ -43,6 +43,14 @@ export function constructMetadata({
     alternates: {
       canonical: canonicalUrl,
     },
+    icons: {
+      icon: [
+        { url: "/favicon.ico" },
+        { url: "/favicon.ico", sizes: "32x32" },
+      ],
+      shortcut: "/favicon.ico",
+      apple: "/favicon.ico",
+    },
     openGraph: {
       title: fullTitle,
       description,
@@ -64,7 +72,7 @@ export function constructMetadata({
       title: fullTitle,
       description,
       images: [ogImage],
-      creator: "@towchain",
+      creator: "@nexttow",
     },
     robots: {
       index: !noIndex,

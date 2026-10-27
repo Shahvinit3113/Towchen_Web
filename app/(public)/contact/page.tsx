@@ -10,7 +10,7 @@ import { ContactForm } from "@/components/forms/contact-form";
 export const metadata = constructMetadata({
   title: "24/7 Roadside Assistance Support & Emergency Contact",
   description:
-    "Get in touch with TowChen central dispatch room, customer support, or dealership partnership coordinators.",
+    "Get in touch with NextTow central dispatch room, customer support, or dealership partnership coordinators.",
   canonicalUrlRelative: "/contact",
 });
 
@@ -21,7 +21,7 @@ export default function ContactPage() {
         <div className="max-w-3xl space-y-3 sm:space-y-4">
           <Badge variant="primary">24/7 Live Assistance</Badge>
           <h1 className="text-2xl sm:text-4xl md:text-5xl font-black text-slate-900 tracking-tight leading-tight">
-            Contact TowChen Dispatch & Support
+            Contact NextTow Dispatch & Support
           </h1>
           <p className="text-slate-600 text-sm sm:text-base md:text-lg leading-relaxed">
             Need an emergency tow right now? Call our priority hotline directly. For

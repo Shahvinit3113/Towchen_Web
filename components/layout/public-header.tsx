@@ -2,9 +2,11 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
-import { Phone, Menu, X, Truck, ShieldCheck, ChevronRight } from "lucide-react";
+import { Phone, Menu, X, ShieldCheck, ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { siteConfig } from "@/config/site";
 
 export function PublicHeader() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -47,13 +49,16 @@ export function PublicHeader() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-full">
           <div className="flex items-center justify-between h-full">
             {/* Logo */}
-            <Link href="/" className="flex items-center gap-2 group shrink-0">
-              <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-primary flex items-center justify-center text-white shadow-md shadow-primary/30 group-hover:scale-105 transition-transform">
-                <Truck className="h-4.5 w-4.5 sm:h-5 sm:w-5" />
-              </div>
-              <span className="text-xl sm:text-2xl font-black tracking-tight text-white">
-                Tow<span className="text-primary">Chen</span>
-              </span>
+            <Link href="/" className="flex items-center group shrink-0">
+              <Image
+                src="/NEXPOW.png"
+                alt="NextTow"
+                width={160}
+                height={34}
+                priority
+                unoptimized
+                className="h-8 sm:h-9 w-auto object-contain transition-transform group-hover:scale-105"
+              />
             </Link>
 
             {/* Desktop Navigation Links */}
@@ -80,12 +85,12 @@ export function PublicHeader() {
             {/* Desktop Right: Phone Link */}
             <div className="hidden lg:flex items-center gap-3 xl:gap-5 shrink-0">
               <a
-                href="tel:8005551234"
+                href={`tel:${siteConfig.emergencyPhoneRaw}`}
                 className="flex items-center gap-1.5 xl:gap-2 text-sm font-bold text-slate-200 hover:text-white transition-colors"
                 title="Call 24/7 Dispatch"
               >
                 <Phone className="h-4 w-4 text-primary shrink-0" />
-                <span>(800) 555-1234</span>
+                <span>{siteConfig.emergencyPhone}</span>
               </a>
             </div>
 
@@ -120,11 +125,11 @@ export function PublicHeader() {
             </nav>
             <div className="pt-2 border-t border-white/10 flex flex-col gap-2">
               <a
-                href="tel:8005551234"
+                href={`tel:${siteConfig.emergencyPhoneRaw}`}
                 className="w-full inline-flex items-center justify-center gap-2 py-3.5 rounded-xl bg-primary active:bg-primary-hover text-white font-black text-sm shadow-md shadow-primary/25"
               >
                 <Phone className="h-4 w-4" />
-                <span>Emergency Dispatch: (800) 555-1234</span>
+                <span>Emergency Dispatch: {siteConfig.emergencyPhone}</span>
               </a>
             </div>
           </div>

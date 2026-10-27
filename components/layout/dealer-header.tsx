@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import { getClientSession } from "@/lib/auth/session";
 import { Wallet, Menu, ShieldCheck, Bell } from "lucide-react";
 import Link from "next/link";
+import Image from "next/image";
 import { Badge } from "@/components/ui/badge";
 
 interface DealerHeaderProps {
@@ -24,6 +25,21 @@ export function DealerHeader({ onOpenMobileSidebar }: DealerHeaderProps) {
         >
           <Menu className="h-5 w-5" />
         </button>
+
+        <Link
+          href="/dealer/dashboard"
+          className="lg:hidden flex items-center px-2 py-1 rounded-lg bg-[#070f26] shrink-0"
+        >
+          <Image
+            src="/NEXPOW.png"
+            alt="NextTow"
+            width={90}
+            height={20}
+            priority
+            unoptimized
+            className="h-4.5 w-auto object-contain"
+          />
+        </Link>
 
         {/* <div className="min-w-0 flex-1">
           <h1 className="text-sm sm:text-base font-bold text-slate-900 leading-tight truncate">
