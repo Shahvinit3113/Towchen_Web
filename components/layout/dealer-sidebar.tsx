@@ -46,7 +46,7 @@ export function DealerSidebar({ onItemClick }: DealerSidebarProps) {
         <div className="p-6 border-b border-slate-800/80">
           <Link href="/dealer/dashboard" className="block space-y-2 group">
             <Image
-              src="/NEXPOW.png"
+              src="/NEXPOW1.png"
               alt="NextTow"
               width={140}
               height={30}

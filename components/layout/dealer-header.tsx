@@ -31,7 +31,7 @@ export function DealerHeader({ onOpenMobileSidebar }: DealerHeaderProps) {
           className="lg:hidden flex items-center px-2 py-1 rounded-lg bg-[#070f26] shrink-0"
         >
           <Image
-            src="/NEXPOW.png"
+            src="/NEXPOW1.png"
             alt="NextTow"
             width={90}
             height={20}

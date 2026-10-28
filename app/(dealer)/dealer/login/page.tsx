@@ -76,7 +76,7 @@ export default function DealerLoginPage() {
             className="inline-flex items-center justify-center px-6 py-3.5 rounded-2xl bg-[#070f26] border border-slate-800 shadow-xl shadow-slate-900/10 group transition-all hover:scale-105"
           >
             <Image
-              src="/NEXPOW.png"
+              src="/NEXPOW1.png"
               alt="NextTow"
               width={160}
               height={34}

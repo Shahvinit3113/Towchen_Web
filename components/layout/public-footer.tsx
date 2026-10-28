@@ -13,7 +13,7 @@ export function PublicFooter() {
           <div className="lg:col-span-2 space-y-4">
             <Link href="/" className="inline-flex items-center group">
               <Image
-                src="/NEXPOW.png"
+                src="/NEXPOW1.png"
                 alt="NextTow"
                 width={170}
                 height={36}

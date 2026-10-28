@@ -38,12 +38,12 @@ export function PublicHeader() {
           "sticky top-0 z-50 w-full h-20 transition-all duration-300",
           isHome && "-mb-20",
           isScrolled
-            ? "bg-[#070f26]/95 backdrop-blur-md border-b border-white/10 shadow-lg shadow-black/20 text-white"
+            ? "bg-[#003EF9]/95 backdrop-blur-md border-b border-white/20 shadow-lg shadow-[#003EF9]/25 text-white"
             : isHome
             ? mobileMenuOpen
-              ? "bg-[#070f26] border-b border-white/10 text-white"
+              ? "bg-[#003EF9] border-b border-white/20 text-white"
               : "bg-transparent border-b-0 border-transparent shadow-none text-white"
-            : "bg-[#070f26] border-b border-white/10 text-white"
+            : "bg-[#003EF9] border-b border-white/20 text-white"
         )}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-full">
@@ -51,7 +51,7 @@ export function PublicHeader() {
             {/* Logo */}
             <Link href="/" className="flex items-center group shrink-0">
               <Image
-                src="/NEXPOW.png"
+                src="/NEXPOW1.png"
                 alt="NextTow"
                 width={160}
                 height={34}
@@ -69,13 +69,13 @@ export function PublicHeader() {
                   <Link
                     key={link.href}
                     href={link.href}
-                    className={`text-sm font-medium transition-colors ${
+                    className={`text-sm font-semibold transition-colors ${
                       isDealer
-                        ? "text-primary/90 hover:text-white flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-primary/10 border border-primary/20 shrink-0"
-                        : "text-slate-300 hover:text-white"
+                        ? "text-white hover:text-white flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/15 hover:bg-white/25 border border-white/30 shrink-0 backdrop-blur-xs"
+                        : "text-white/90 hover:text-white"
                     }`}
                   >
-                    {isDealer && <ShieldCheck className="h-3.5 w-3.5" />}
+                    {isDealer && <ShieldCheck className="h-3.5 w-3.5 text-white" />}
                     <span>{link.title}</span>
                   </Link>
                 );
@@ -86,10 +86,10 @@ export function PublicHeader() {
             <div className="hidden lg:flex items-center gap-3 xl:gap-5 shrink-0">
               <a
                 href={`tel:${siteConfig.emergencyPhoneRaw}`}
-                className="flex items-center gap-1.5 xl:gap-2 text-sm font-bold text-slate-200 hover:text-white transition-colors"
+                className="flex items-center gap-1.5 xl:gap-2 text-sm font-bold text-white hover:text-white/90 transition-colors bg-white/10 hover:bg-white/20 px-3.5 py-2 rounded-xl border border-white/20 backdrop-blur-xs"
                 title="Call 24/7 Dispatch"
               >
-                <Phone className="h-4 w-4 text-primary shrink-0" />
+                <Phone className="h-4 w-4 text-white shrink-0" />
                 <span>{siteConfig.emergencyPhone}</span>
               </a>
             </div>
@@ -98,7 +98,7 @@ export function PublicHeader() {
             <div className="flex lg:hidden items-center">
               <button
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                className="p-2 -mr-1 rounded-lg text-slate-200 hover:text-white hover:bg-white/10"
+                className="p-2 -mr-1 rounded-lg text-white hover:bg-white/15 transition-colors"
                 aria-label="Toggle mobile menu"
               >
                 {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
@@ -109,26 +109,26 @@ export function PublicHeader() {
 
         {/* Mobile / Tablet Drawer */}
         {mobileMenuOpen && (
-          <div className="lg:hidden border-b border-white/10 bg-[#070f26] px-4 pt-2 pb-6 space-y-3">
+          <div className="lg:hidden border-b border-white/20 bg-[#003EF9] px-4 pt-2 pb-6 space-y-3 shadow-2xl">
             <nav className="flex flex-col space-y-2">
               {navLinks.map((link) => (
                 <Link
                   key={link.href}
                   href={link.href}
                   onClick={() => setMobileMenuOpen(false)}
-                  className="flex items-center justify-between px-3.5 py-3 rounded-xl text-sm font-semibold text-slate-200 hover:bg-white/10 hover:text-white active:bg-white/15"
+                  className="flex items-center justify-between px-3.5 py-3 rounded-xl text-sm font-semibold text-white hover:bg-white/15 active:bg-white/20 transition-colors"
                 >
                   <span>{link.title}</span>
-                  <ChevronRight className="h-4 w-4 text-slate-400" />
+                  <ChevronRight className="h-4 w-4 text-white/70" />
                 </Link>
               ))}
             </nav>
-            <div className="pt-2 border-t border-white/10 flex flex-col gap-2">
+            <div className="pt-2 border-t border-white/20 flex flex-col gap-2">
               <a
                 href={`tel:${siteConfig.emergencyPhoneRaw}`}
-                className="w-full inline-flex items-center justify-center gap-2 py-3.5 rounded-xl bg-primary active:bg-primary-hover text-white font-black text-sm shadow-md shadow-primary/25"
+                className="w-full inline-flex items-center justify-center gap-2 py-3.5 rounded-xl bg-white hover:bg-slate-50 text-[#003EF9] font-black text-sm shadow-md active:scale-[0.99] transition-all"
               >
-                <Phone className="h-4 w-4" />
+                <Phone className="h-4 w-4 text-[#003EF9]" />
                 <span>Emergency Dispatch: {siteConfig.emergencyPhone}</span>
               </a>
             </div>

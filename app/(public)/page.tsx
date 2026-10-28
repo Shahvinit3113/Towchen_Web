@@ -138,11 +138,11 @@ export default function HomePage() {
       />
 
       {/* 1. HERO SECTION - Desktop 2-column & Compact Mobile Hero */}
-      <section className="relative overflow-visible z-20 bg-gradient-to-b from-[#0b193c] via-[#0d2154] to-[#071330] text-white pt-24 pb-16 sm:pt-28 sm:pb-20 lg:pt-40 lg:pb-28 lg:min-h-[760px] xl:min-h-[820px] lg:flex lg:items-center border-b border-white/10">
+      <section className="relative overflow-visible z-20 bg-[linear-gradient(180deg,#003EF9_0%,#0031c7_15%,#081d52_55%,#071330_100%)] text-white pt-24 pb-16 sm:pt-28 sm:pb-20 lg:pt-40 lg:pb-28 lg:min-h-[760px] xl:min-h-[820px] lg:flex lg:items-center border-b border-white/10">
         {/* Subtle background glow & radial gradient */}
         <div className="absolute inset-0 pointer-events-none overflow-hidden opacity-30">
-          <div className="absolute -top-40 -left-40 w-96 h-96 bg-primary rounded-full blur-[140px]" />
-          <div className="absolute top-1/2 -right-40 w-96 h-96 bg-secondary rounded-full blur-[160px]" />
+          <div className="absolute -top-40 -left-40 w-96 h-96 bg-[#003EF9] rounded-full blur-[140px]" />
+          <div className="absolute top-1/2 -right-40 w-96 h-96 bg-primary rounded-full blur-[160px]" />
         </div>
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 w-full">
