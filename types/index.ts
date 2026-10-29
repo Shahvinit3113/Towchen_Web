@@ -33,6 +33,7 @@ export interface DealerAuthUser {
   aadhar_image?: string | null;
   pan_image?: string | null;
   bankdetails_image?: string | null;
+  payout_percentage?: number;
 }
 
 export interface DealerLoginResponse {
@@ -209,6 +210,8 @@ export interface PackagePurchase {
   customerPhone: string;
   amountPaid: number;
   commissionEarned: number;
+  payout_percentage?: number;
+  payout_amount?: number;
   status: "active" | "expired" | "cancelled";
   purchasedAt: string;
   expiresAt: string;
@@ -262,6 +265,7 @@ export interface DealerProfile {
   gstinOrTaxId: string;
   isVerified: boolean;
   commissionTier: "standard" | "gold" | "platinum";
+  payout_percentage?: number;
   bankDetails: {
     accountHolderName: string;
     accountNumber: string;

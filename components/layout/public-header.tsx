@@ -35,8 +35,8 @@ export function PublicHeader() {
     <>
       <header
         className={cn(
-          "sticky top-0 z-50 w-full h-20 transition-all duration-300",
-          isHome && "-mb-20",
+          "sticky top-0 z-50 w-full h-14 sm:h-16 lg:h-20 transition-all duration-300",
+          isHome && "-mb-14 sm:-mb-16 lg:-mb-20",
           isScrolled
             ? "bg-[#003EF9]/95 backdrop-blur-md border-b border-white/20 shadow-lg shadow-[#003EF9]/25 text-white"
             : isHome
@@ -57,7 +57,7 @@ export function PublicHeader() {
                 height={34}
                 priority
                 unoptimized
-                className="h-8 sm:h-9 w-auto object-contain transition-transform group-hover:scale-105"
+                className="h-6 sm:h-7 md:h-8 lg:h-9 w-auto object-contain transition-transform group-hover:scale-105"
               />
             </Link>
 

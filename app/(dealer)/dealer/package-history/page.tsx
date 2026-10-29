@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { packagesApi } from "@/lib/api/packages";
 import { Button } from "@/components/ui/button";
+import { formatCurrency } from "@/lib/utils";
 import {
   Search,
   Download,
@@ -296,11 +297,18 @@ export default function DealerPackageHistoryPage() {
                   </div>
                 </div>
 
-                {/* Row 3: Action Buttons (Download Certificate) */}
+                {/* Row 3: Action Buttons (Download Certificate) & Payout */}
                 <div className="pt-2 border-t border-slate-100 flex items-center justify-between gap-2">
-                  <span className="text-[10px] text-slate-400">
-                    {order.created_at ? new Date(order.created_at).toLocaleDateString() : ""}
-                  </span>
+                  <div className="flex items-center gap-1.5 flex-wrap">
+                    <span className="text-[10px] text-slate-400">
+                      {order.created_at ? new Date(order.created_at).toLocaleDateString() : ""}
+                    </span>
+                    {order.payout_amount !== undefined && (
+                      <span className="inline-flex items-center text-[10px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200/80 px-1.5 py-0.2 rounded">
+                        Payout: {formatCurrency(order.payout_amount)}
+                      </span>
+                    )}
+                  </div>
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
@@ -333,6 +341,7 @@ export default function DealerPackageHistoryPage() {
                 <th className="py-3 px-4">Plan Name</th>
                 <th className="py-3 px-4">Customer</th>
                 <th className="py-3 px-4">Vehicle Plate</th>
+                <th className="py-3 px-4">Dealer Payout</th>
                 <th className="py-3 px-4">Status</th>
                 <th className="py-3 px-4 text-right">Actions</th>
               </tr>
@@ -354,7 +363,7 @@ export default function DealerPackageHistoryPage() {
                 ))
               ) : filteredOrders.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="py-12 text-center text-slate-500">
+                  <td colSpan={7} className="py-12 text-center text-slate-500">
                     <div className="max-w-xs mx-auto space-y-2">
                       <FileText className="h-8 w-8 text-slate-400 mx-auto" />
                       <p className="font-semibold text-slate-700">No packages found</p>
@@ -405,6 +414,22 @@ export default function DealerPackageHistoryPage() {
                           <Car className="h-3 w-3 text-slate-500" />
                           <span>{order.vehicle?.vehicle_reg_number || "N/A"}</span>
                         </span>
+                      </td>
+                      <td className="py-3.5 px-4">
+                        {order.payout_amount !== undefined ? (
+                          <div>
+                            <span className="font-bold text-emerald-700">
+                              {formatCurrency(order.payout_amount)}
+                            </span>
+                            {order.payout_percentage !== undefined && (
+                              <span className="text-[10px] text-slate-400 block font-normal">
+                                {order.payout_percentage}% payout
+                              </span>
+                            )}
+                          </div>
+                        ) : (
+                          <span className="text-slate-400">—</span>
+                        )}
                       </td>
                       <td className="py-3.5 px-4">
                         <span

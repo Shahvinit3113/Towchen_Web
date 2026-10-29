@@ -260,16 +260,32 @@ export default function DealerPackageDetailPage() {
 
           {/* Pricing Highlight Pill */}
           {order.amount !== undefined && (
-            <div className="bg-white/10 backdrop-blur-md border border-white/15 rounded-2xl p-4 sm:px-6 sm:py-3.5 shrink-0 self-start md:self-auto text-left md:text-right shadow-inner">
-              <span className="text-[10px] uppercase font-bold text-slate-300 block tracking-wider">
-                Total Price Paid
-              </span>
-              <span className="text-2xl sm:text-3xl font-black text-white">
-                {formatCurrency(order.amount || 0)}
-              </span>
-              <span className="text-[10px] text-emerald-400 block font-medium mt-0.5">
-                GST Included
-              </span>
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 self-start md:self-auto">
+              <div className="bg-white/10 backdrop-blur-md border border-white/15 rounded-2xl p-4 sm:px-5 sm:py-3.5 text-left md:text-right shadow-inner">
+                <span className="text-[10px] uppercase font-bold text-slate-300 block tracking-wider">
+                  Package Price
+                </span>
+                <span className="text-2xl sm:text-3xl font-black text-white">
+                  {formatCurrency(order.amount || 0)}
+                </span>
+                <span className="text-[10px] text-slate-300 block font-medium mt-0.5">
+                  Net / Policy Price
+                </span>
+              </div>
+
+              {(order.payout_amount !== undefined || order.payout_percentage !== undefined) && (
+                <div className="bg-emerald-500/20 backdrop-blur-md border border-emerald-400/30 rounded-2xl p-4 sm:px-5 sm:py-3.5 text-left md:text-right shadow-inner">
+                  <span className="text-[10px] uppercase font-bold text-emerald-200 block tracking-wider">
+                    Dealer Payout {order.payout_percentage ? `(${order.payout_percentage}%)` : ""}
+                  </span>
+                  <span className="text-2xl sm:text-3xl font-black text-emerald-300">
+                    {formatCurrency(order.payout_amount || 0)}
+                  </span>
+                  <span className="text-[10px] text-emerald-200 block font-medium mt-0.5">
+                    Commission Earned
+                  </span>
+                </div>
+              )}
             </div>
           )}
         </div>

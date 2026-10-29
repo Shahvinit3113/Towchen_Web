@@ -15,6 +15,7 @@ let mockDealerProfile: DealerProfile = {
   gstinOrTaxId: "07AAACA1234F1Z5",
   isVerified: true,
   commissionTier: "gold",
+  payout_percentage: 15,
   bankDetails: {
     accountHolderName: "Apex Motors Autocare Pvt Ltd",
     accountNumber: "918020038891234",
@@ -54,6 +55,7 @@ export const dealerApi = {
       aadhar_image: "https://images.unsplash.com/photo-1557804506-669a67965ba0?w=800&auto=format&fit=crop&q=80",
       pan_image: "https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?w=800&auto=format&fit=crop&q=80",
       bankdetails_image: "https://images.unsplash.com/photo-1554224154-26032ffc0d07?w=800&auto=format&fit=crop&q=80",
+      payout_percentage: 15,
       created_at: "2026-01-15T09:30:00.000Z",
       updated_at: "2026-03-20T11:45:00.000Z",
     };

@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { packagesApi } from "@/lib/api/packages";
+import { dealerApi } from "@/lib/api/dealer";
 import { formatCurrency, formatDate, cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -33,6 +34,7 @@ import {
 export default function DealerPackagesPage() {
   const [plans, setPlans] = useState<any[]>([]);
   const [isLoadingPlans, setIsLoadingPlans] = useState(false);
+  const [dealerPayoutPercentage, setDealerPayoutPercentage] = useState<number>(0);
   
   const [segment, setSegment] = useState<string>("Basic");
 
@@ -93,6 +95,14 @@ export default function DealerPackagesPage() {
 
   // Validation errors
   const [errors, setErrors] = useState<Record<string, string>>({});
+
+  useEffect(() => {
+    dealerApi.getAccountDetails().then((dealer) => {
+      if (dealer && dealer.payout_percentage !== undefined) {
+        setDealerPayoutPercentage(Number(dealer.payout_percentage));
+      }
+    }).catch(() => {});
+  }, []);
 
   useEffect(() => {
     loadPlans(segment);
@@ -331,6 +341,13 @@ export default function DealerPackagesPage() {
                     <p className="text-[10px] sm:text-[11px] text-slate-400 mt-0.5">
                       One-time payment
                     </p>
+                    {dealerPayoutPercentage > 0 && (
+                      <div className="mt-2 flex items-center gap-1.5 flex-wrap">
+                        <span className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 py-0.5 rounded-full shadow-2xs">
+                          Dealer Payout ({dealerPayoutPercentage}%): {formatCurrency(Math.round((((plan.resolved_price || plan.base_price || 0) * dealerPayoutPercentage) / 100) * 100) / 100)}
+                        </span>
+                      </div>
+                    )}
                   </div>
 
                   {/* Features Grid */}
@@ -752,7 +769,7 @@ export default function DealerPackagesPage() {
         isOpen={Boolean(selectedPlan)}
         onClose={() => { setSelectedPlan(null); setCurrentStep(1); setErrors({}); }}
         title={`Activate ${selectedPlan?.name}`}
-        description={`Segment: ${segment} | Cost: ${formatCurrency(selectedPlan?.resolved_price || 0)}`}
+        description={`Segment: ${segment} | Price: ${formatCurrency(selectedPlan?.resolved_price || 0)}${dealerPayoutPercentage > 0 ? ` • Your Payout (${dealerPayoutPercentage}%): ${formatCurrency(Math.round((((selectedPlan?.resolved_price || 0) * dealerPayoutPercentage) / 100) * 100) / 100)}` : ""}`}
         maxWidth="4xl"
       >
         <form onSubmit={handleCheckout} className="pt-2 max-h-[78vh] overflow-y-auto px-1 flex flex-col">

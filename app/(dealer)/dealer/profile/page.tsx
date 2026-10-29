@@ -18,6 +18,7 @@ import {
   Check,
   Calendar,
   RefreshCw,
+  Percent,
 } from "lucide-react";
 
 export default function DealerProfilePage() {
@@ -238,6 +239,17 @@ export default function DealerProfilePage() {
               <p className="text-sm font-semibold text-slate-800 leading-relaxed break-words">
                 {address}
               </p>
+            </div>
+
+            {/* Payout Percentage */}
+            <div className="sm:col-span-2 p-3 sm:p-3.5 rounded-xl bg-emerald-50/70 border border-emerald-200/70 flex items-center justify-between text-xs gap-2">
+              <div className="flex items-center gap-1.5 min-w-0">
+                <Percent className="h-3.5 w-3.5 text-emerald-600 shrink-0" />
+                <span className="font-bold text-emerald-900">Dealer Payout Commission Rate</span>
+              </div>
+              <span className="font-black text-sm text-emerald-700 bg-white px-2.5 py-0.5 rounded-lg border border-emerald-200 shrink-0">
+                {profile?.payout_percentage !== undefined ? `${profile.payout_percentage}%` : "15%"}
+              </span>
             </div>
 
             {/* Member Since (if available) */}
