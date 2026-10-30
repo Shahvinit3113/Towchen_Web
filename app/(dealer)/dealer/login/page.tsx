@@ -73,7 +73,7 @@ export default function DealerLoginPage() {
         <div className="text-center space-y-3">
           <Link
             href="/"
-            className="inline-flex items-center justify-center px-6 py-3.5 rounded-2xl bg-[#070f26] border border-slate-800 shadow-xl shadow-slate-900/10 group transition-all hover:scale-105"
+            className="inline-flex items-center justify-center px-6 py-3.5 rounded-2xl bg-[#003EF9] border border-blue-600/30 shadow-xl shadow-[#003EF9]/25 group transition-all hover:scale-105"
           >
             <Image
               src="/NEXPOW1.png"

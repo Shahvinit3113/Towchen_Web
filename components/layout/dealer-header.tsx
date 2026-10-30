@@ -28,7 +28,7 @@ export function DealerHeader({ onOpenMobileSidebar }: DealerHeaderProps) {
 
         <Link
           href="/dealer/dashboard"
-          className="lg:hidden flex items-center px-2 py-1 rounded-lg bg-[#070f26] shrink-0"
+          className="lg:hidden flex items-center px-2 py-1 rounded-lg bg-[#003EF9] shrink-0"
         >
           <Image
             src="/NEXPOW1.png"
