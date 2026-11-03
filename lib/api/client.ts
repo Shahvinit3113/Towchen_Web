@@ -18,12 +18,19 @@ export class ApiError extends Error {
   }
 }
 
-const rawBaseUrl = process.env.NEXT_PUBLIC_API_URL || "https://towchen-api-1.onrender.com";
+const rawBaseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
 const API_BASE_URL = rawBaseUrl.replace(/\/+$/, "");
 
 interface RequestOptions extends RequestInit {
   timeoutMs?: number;
   params?: Record<string, string | number | boolean | undefined>;
+}
+
+function serializeBody(body: any) {
+  if (body === undefined || body === null) return undefined;
+  if (typeof FormData !== "undefined" && body instanceof FormData) return body;
+  if (typeof body === "string") return body;
+  return JSON.stringify(body);
 }
 
 export async function apiClient<T>(
@@ -50,13 +57,28 @@ export async function apiClient<T>(
 
   const token = getAuthToken();
 
+  const isFormData = typeof FormData !== "undefined" && restOptions.body instanceof FormData;
+
   const defaultHeaders: Record<string, string> = {
-    "Content-Type": "application/json",
     Accept: "application/json",
   };
 
+  if (!isFormData) {
+    defaultHeaders["Content-Type"] = "application/json";
+  }
+
   if (token) {
     defaultHeaders["Authorization"] = `Bearer ${token}`;
+  }
+
+  const mergedHeaders: Record<string, string> = {
+    ...defaultHeaders,
+    ...(headers as Record<string, string>),
+  };
+
+  if (isFormData) {
+    delete mergedHeaders["Content-Type"];
+    delete mergedHeaders["content-type"];
   }
 
   const controller = new AbortController();
@@ -71,10 +93,7 @@ export async function apiClient<T>(
 
     const response = await fetch(url, {
       ...restOptions,
-      headers: {
-        ...defaultHeaders,
-        ...(headers as Record<string, string>),
-      },
+      headers: mergedHeaders,
       signal: controller.signal,
     });
 
@@ -147,6 +166,32 @@ async function handleMockOrLocalApi<T>(
     return { data: booking as unknown as T, success: true, status: 201 };
   }
 
+  // Public Customer Inspection Mock / Fallback
+  if (endpoint.includes("/dealer-package-order/public/inspection/")) {
+    const segments = endpoint.split("/");
+    const param = decodeURIComponent(segments[segments.length - 1] || "");
+    const mockInspection = {
+      id: 2,
+      order_number: param || "DPKG00000045",
+      customer_name: "Customer",
+      customer_phone: "9876543210",
+      customer_email: "customer@example.com",
+      vehicle_reg_number: "GJ09DS4171",
+      vehicle_make: "TVS",
+      vehicle_model: "Ronin 225",
+      plan_name: "Gold Mobility Shield",
+      status: "PendingInspection",
+      is_completed: false,
+      uploaded_by_dealer: null,
+      package_pdf_url: null,
+    };
+    return {
+      data: { is_success: true, status: 200, data: mockInspection } as unknown as T,
+      success: true,
+      status: 200,
+    };
+  }
+
   // Dealer Login
   if (endpoint.includes("/dealer-auth/login") || endpoint.includes("/auth/dealer/login")) {
     const body = options.body ? JSON.parse(options.body as string) : {};
@@ -210,19 +255,19 @@ export const api = {
     apiClient<T>(endpoint, {
       ...options,
       method: "POST",
-      body: body ? JSON.stringify(body) : undefined,
+      body: serializeBody(body),
     }),
   put: <T>(endpoint: string, body?: any, options?: Omit<RequestOptions, "method" | "body">) =>
     apiClient<T>(endpoint, {
       ...options,
       method: "PUT",
-      body: body ? JSON.stringify(body) : undefined,
+      body: serializeBody(body),
     }),
   patch: <T>(endpoint: string, body?: any, options?: Omit<RequestOptions, "method" | "body">) =>
     apiClient<T>(endpoint, {
       ...options,
       method: "PATCH",
-      body: body ? JSON.stringify(body) : undefined,
+      body: serializeBody(body),
     }),
   delete: <T>(endpoint: string, options?: Omit<RequestOptions, "method">) =>
     apiClient<T>(endpoint, { ...options, method: "DELETE" }),

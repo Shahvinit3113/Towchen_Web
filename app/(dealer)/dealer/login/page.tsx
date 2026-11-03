@@ -27,7 +27,7 @@ export default function DealerLoginPage() {
   } = useForm<DealerLoginFormData>({
     resolver: zodResolver(dealerLoginSchema),
     defaultValues: {
-      email: "dealer@nexttow.com",
+      email: "dealer@towchen.com",
       password: "Password@123",
     },
   });
@@ -49,10 +49,10 @@ export default function DealerLoginPage() {
   };
 
   const handleQuickDemoLogin = () => {
-    setValue("email", "dealer@nexttow.com");
+    setValue("email", "dealer@towchen.com");
     setValue("password", "Password@123");
     handleLogin({
-      email: "dealer@nexttow.com",
+      email: "dealer@towchen.com",
       password: "Password@123",
     });
   };

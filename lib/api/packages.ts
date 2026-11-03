@@ -36,13 +36,14 @@ export interface SubmitPackageOrderParams {
     planId: number;
     startDate: string;
   };
-  files: {
-    front: File;
-    rear: File;
-    left: File;
-    right: File;
-    odometer: File;
+  files?: {
+    front?: File | null;
+    rear?: File | null;
+    left?: File | null;
+    right?: File | null;
+    odometer?: File | null;
   };
+  uploaded_by_dealer?: boolean;
   geoData?: GeoData;
 }
 
@@ -230,19 +231,26 @@ export const packagesApi = {
       formData.append('odometer_image_meta', metaString);
     }
 
-    // Files
-    formData.append('image_front', data.files.front);
-    formData.append('image_rear', data.files.rear);
-    formData.append('image_left', data.files.left);
-    formData.append('image_right', data.files.right);
-    formData.append('odometer_image', data.files.odometer);
+        // Files (Optional: Dealer vs Customer upload)
+    const hasAnyFile = Boolean(
+      data.files?.front ||
+      data.files?.rear ||
+      data.files?.left ||
+      data.files?.right ||
+      data.files?.odometer
+    );
 
-    const res = await api.post<any>(API_ENDPOINTS.packages.dealerPackageOrder, formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      },
-    });
-    return res.data?.data;
+    if (data.files?.front) formData.append('image_front', data.files.front);
+    if (data.files?.rear) formData.append('image_rear', data.files.rear);
+    if (data.files?.left) formData.append('image_left', data.files.left);
+    if (data.files?.right) formData.append('image_right', data.files.right);
+    if (data.files?.odometer) formData.append('odometer_image', data.files.odometer);
+
+    const uploadedByDealer = data.uploaded_by_dealer !== undefined ? data.uploaded_by_dealer : hasAnyFile;
+    formData.append('uploaded_by_dealer', String(uploadedByDealer));
+
+    const res = await api.post<any>(API_ENDPOINTS.packages.dealerPackageOrder, formData);
+    return res?.data?.data ?? res?.data;
   },
 
   getDealerPackageOrders: async (params?: { page?: number; limit?: number; search?: string; status?: string; payment_status?: string }) => {
@@ -270,8 +278,71 @@ export const packagesApi = {
     );
   },
 
+  
+  uploadInspectionImages: async (
+    orderId: string | number,
+    files: { front: File; rear: File; left: File; right: File; odometer: File },
+    geoData?: GeoData,
+    uploadedByDealer: boolean = true
+  ) => {
+    const formData = new FormData();
+    formData.append('image_front', files.front);
+    formData.append('image_rear', files.rear);
+    formData.append('image_left', files.left);
+    formData.append('image_right', files.right);
+    formData.append('odometer_image', files.odometer);
+    formData.append('uploaded_by_dealer', String(uploadedByDealer));
+    if (geoData) {
+      const meta = JSON.stringify(geoData);
+      formData.append('vehicle_images_meta', meta);
+      formData.append('odometer_image_meta', meta);
+    }
+    const res = await api.post<any>(`/dealer-package-order/${orderId}/upload-inspection`, formData);
+    return res.data?.data;
+  },
+
   getCertificateDownloadUrl: async (id: string | number) => {
     const res = await api.get<any>(API_ENDPOINTS.packages.dealerPackageOrderDownload(id));
     return res.data?.data?.download_url;
-  }
+  },
+
+  createInspectionLink: async (orderId: string | number) => {
+    const res = await api.post<any>(`/dealer-package-order/${orderId}/inspection-link`);
+    return res.data?.data;
+  },
+
+  getInspectionLink: async (orderId: string | number) => {
+    const res = await api.get<any>(`/dealer-package-order/${orderId}/inspection-link`);
+    return res.data?.data;
+  },
+
+  getPublicInspection: async (orderIdentifier: string) => {
+    const res = await api.get<any>(`/dealer-package-order/public/inspection/${encodeURIComponent(orderIdentifier.trim())}`);
+    if (res?.data?.data) return res.data.data;
+    if (res?.data && typeof res.data === 'object' && ('order_number' in res.data || 'id' in res.data)) {
+      return res.data;
+    }
+    return res?.data?.data ?? res?.data;
+  },
+
+  submitCustomerInspection: async (
+    orderIdentifier: string,
+    files: { front: File; rear: File; left: File; right: File; odometer: File },
+    geoData?: GeoData
+  ) => {
+    const formData = new FormData();
+    formData.append('image_front', files.front);
+    formData.append('image_rear', files.rear);
+    formData.append('image_left', files.left);
+    formData.append('image_right', files.right);
+    formData.append('odometer_image', files.odometer);
+    formData.append('uploaded_by_dealer', 'false');
+    if (geoData) {
+      const meta = JSON.stringify(geoData);
+      formData.append('vehicle_images_meta', meta);
+      formData.append('odometer_image_meta', meta);
+    }
+    const res = await api.post<any>(`/dealer-package-order/public/inspection/${orderIdentifier}`, formData);
+    return res.data?.data;
+  },
 };

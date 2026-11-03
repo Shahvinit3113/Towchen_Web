@@ -1,5 +1,6 @@
-"use client";
 
+"use client";
+import { showToast } from "@/lib/swal";
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { packagesApi } from "@/lib/api/packages";
@@ -23,7 +24,7 @@ export default function DealerPackageHistoryPage() {
   const [orders, setOrders] = useState<any[]>([]);
   const [isLoadingOrders, setIsLoadingOrders] = useState(false);
   const [search, setSearch] = useState("");
-  const [statusFilter, setStatusFilter] = useState<"all" | "active" | "expired">("all");
+  const [statusFilter, setStatusFilter] = useState<"all" | "active" | "pending" | "expired">("all");
   const [downloadingId, setDownloadingId] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 8;
@@ -65,10 +66,10 @@ export default function DealerPackageHistoryPage() {
       if (url) {
         window.open(url, "_blank");
       } else {
-        alert("Certificate download URL is not available.");
+        showToast("warning", "Certificate download URL is not available.");
       }
     } catch (err) {
-      alert("Failed to download certificate. Please try again.");
+      showToast("error", "Failed to download certificate. Please try again.");
     } finally {
       setDownloadingId(null);
     }
@@ -84,7 +85,12 @@ export default function DealerPackageHistoryPage() {
   const isOrderActive = (order: any) => {
     if (isOrderExpired(order)) return false;
     const s = String(order.status || "").toLowerCase();
-    return s === "active" || s === "success" || !s;
+    return s === "active" || s === "success";
+  };
+
+  const isOrderPending = (order: any) => {
+    const s = String(order.status || "").toLowerCase();
+    return s === "pendinginspection";
   };
 
   // Filter orders by active status tab
@@ -125,9 +131,8 @@ export default function DealerPackageHistoryPage() {
           title="Refresh orders list"
         >
           <RefreshCw
-            className={`h-3.5 w-3.5 text-slate-500 ${
-              isLoadingOrders ? "animate-spin text-primary" : ""
-            }`}
+            className={`h-3.5 w-3.5 text-slate-500 ${isLoadingOrders ? "animate-spin text-primary" : ""
+              }`}
           />
           <span>Refresh</span>
         </button>
@@ -160,31 +165,28 @@ export default function DealerPackageHistoryPage() {
         <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-xl self-start sm:self-auto overflow-x-auto max-w-full">
           <button
             onClick={() => setStatusFilter("all")}
-            className={`px-3 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer shrink-0 ${
-              statusFilter === "all"
+            className={`px-3 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer shrink-0 ${statusFilter === "all"
                 ? "bg-white text-slate-900 shadow-2xs"
                 : "text-slate-600 hover:text-slate-900"
-            }`}
+              }`}
           >
             All ({orders.length})
           </button>
           <button
             onClick={() => setStatusFilter("active")}
-            className={`px-3 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer shrink-0 ${
-              statusFilter === "active"
+            className={`px-3 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer shrink-0 ${statusFilter === "active"
                 ? "bg-white text-slate-900 shadow-2xs"
                 : "text-slate-600 hover:text-slate-900"
-            }`}
+              }`}
           >
             Active ({activeCount})
           </button>
           <button
             onClick={() => setStatusFilter("expired")}
-            className={`px-3 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer shrink-0 ${
-              statusFilter === "expired"
+            className={`px-3 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer shrink-0 ${statusFilter === "expired"
                 ? "bg-white text-slate-900 shadow-2xs"
                 : "text-slate-600 hover:text-slate-900"
-            }`}
+              }`}
           >
             Expired ({expiredCount})
           </button>
@@ -234,7 +236,8 @@ export default function DealerPackageHistoryPage() {
           paginatedOrders.map((order) => {
             const isExpired = isOrderExpired(order);
             const isActive = isOrderActive(order);
-            const displayStatus = isExpired ? "Expired" : (order.status || "Active");
+            const isPending = isOrderPending(order);
+            const displayStatus = isExpired ? "Expired" : isPending ? "Pending Inspection" : (order.status || "Active");
 
             return (
               <div
@@ -254,22 +257,12 @@ export default function DealerPackageHistoryPage() {
                   </div>
 
                   <span
-                    className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold shrink-0 ${
-                      isExpired
-                        ? "bg-rose-50 text-rose-700 border border-rose-200"
-                        : isActive
-                        ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
-                        : "bg-slate-100 text-slate-600 border border-slate-200"
-                    }`}
+                    className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold shrink-0 ${isExpired ? "bg-rose-50 text-rose-700 border border-rose-200" : isPending ? "bg-amber-50 text-amber-700 border border-amber-200" : isActive ? "bg-emerald-50 text-emerald-700 border border-emerald-200" : "bg-slate-100 text-slate-600 border border-slate-200"
+                      }`}
                   >
                     <span
-                      className={`w-1.5 h-1.5 rounded-full ${
-                        isExpired
-                          ? "bg-rose-500"
-                          : isActive
-                          ? "bg-emerald-500"
-                          : "bg-slate-400"
-                      }`}
+                      className={`w-1.5 h-1.5 rounded-full ${isExpired ? "bg-rose-500" : isPending ? "bg-amber-500" : isActive ? "bg-emerald-500" : "bg-slate-400"
+                        }`}
                     />
                     <span>{displayStatus}</span>
                   </span>
@@ -385,7 +378,8 @@ export default function DealerPackageHistoryPage() {
                 paginatedOrders.map((order) => {
                   const isExpired = isOrderExpired(order);
                   const isActive = isOrderActive(order);
-                  const displayStatus = isExpired ? "Expired" : (order.status || "Active");
+                  const isPending = isOrderPending(order);
+                  const displayStatus = isExpired ? "Expired" : isPending ? "Pending Inspection" : (order.status || "Active");
 
                   return (
                     <tr
@@ -433,22 +427,12 @@ export default function DealerPackageHistoryPage() {
                       </td>
                       <td className="py-3.5 px-4">
                         <span
-                          className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold ${
-                            isExpired
-                              ? "bg-rose-50 text-rose-700 border border-rose-200"
-                              : isActive
-                              ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
-                              : "bg-slate-100 text-slate-600 border border-slate-200"
-                          }`}
+                          className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold ${isExpired ? "bg-rose-50 text-rose-700 border border-rose-200" : isPending ? "bg-amber-50 text-amber-700 border border-amber-200" : isActive ? "bg-emerald-50 text-emerald-700 border border-emerald-200" : "bg-slate-100 text-slate-600 border border-slate-200"
+                            }`}
                         >
                           <span
-                            className={`w-1.5 h-1.5 rounded-full ${
-                              isExpired
-                                ? "bg-rose-500"
-                                : isActive
-                                ? "bg-emerald-500"
-                                : "bg-slate-400"
-                            }`}
+                            className={`w-1.5 h-1.5 rounded-full ${isExpired ? "bg-rose-500" : isPending ? "bg-amber-500" : isActive ? "bg-emerald-500" : "bg-slate-400"
+                              }`}
                           />
                           <span>{displayStatus}</span>
                         </span>
@@ -512,11 +496,10 @@ export default function DealerPackageHistoryPage() {
                 <button
                   key={page}
                   onClick={() => setCurrentPage(page)}
-                  className={`w-7 h-7 sm:w-8 sm:h-8 rounded-lg text-xs font-bold transition-all cursor-pointer ${
-                    currentPage === page
+                  className={`w-7 h-7 sm:w-8 sm:h-8 rounded-lg text-xs font-bold transition-all cursor-pointer ${currentPage === page
                       ? "bg-primary text-white shadow-2xs"
                       : "text-slate-600 hover:bg-slate-100"
-                  }`}
+                    }`}
                 >
                   {page}
                 </button>

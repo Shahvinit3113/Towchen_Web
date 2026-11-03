@@ -29,7 +29,15 @@ import {
   Headphones,
   FileCheck,
   Sparkles,
+  X,
 } from "lucide-react";
+import Swal, {
+  Toast,
+  showToast,
+  showPendingInspectionModal,
+  showOrderActiveModal,
+  showOrderErrorModal,
+} from "@/lib/swal";
 
 export default function DealerPackagesPage() {
   const [plans, setPlans] = useState<any[]>([]);
@@ -82,6 +90,20 @@ export default function DealerPackagesPage() {
     left: File | null;
     right: File | null;
     odometer: File | null;
+  }>({
+    front: null,
+    rear: null,
+    left: null,
+    right: null,
+    odometer: null,
+  });
+
+  const [filePreviews, setFilePreviews] = useState<{
+    front: string | null;
+    rear: string | null;
+    left: string | null;
+    right: string | null;
+    odometer: string | null;
   }>({
     front: null,
     rear: null,
@@ -155,9 +177,33 @@ export default function DealerPackagesPage() {
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>, key: keyof typeof files) => {
     if (e.target.files && e.target.files[0]) {
-      setFiles((prev) => ({ ...prev, [key]: e.target.files![0] }));
+      const selected = e.target.files[0];
+      setFiles((prev) => ({ ...prev, [key]: selected }));
+      if (filePreviews[key]) {
+        URL.revokeObjectURL(filePreviews[key]!);
+      }
+      const url = URL.createObjectURL(selected);
+      setFilePreviews((prev) => ({ ...prev, [key]: url }));
       if (!geoData) captureGeoLocation(); // Capture once when an image is selected
     }
+  };
+
+  const removeSingleFile = (key: keyof typeof files, e: React.MouseEvent) => {
+    e.stopPropagation();
+    e.preventDefault();
+    if (filePreviews[key]) {
+      URL.revokeObjectURL(filePreviews[key]!);
+    }
+    setFilePreviews((prev) => ({ ...prev, [key]: null }));
+    setFiles((prev) => ({ ...prev, [key]: null }));
+  };
+
+  const clearAllFiles = () => {
+    Object.values(filePreviews).forEach((url) => {
+      if (url) URL.revokeObjectURL(url);
+    });
+    setFilePreviews({ front: null, rear: null, left: null, right: null, odometer: null });
+    setFiles({ front: null, rear: null, left: null, right: null, odometer: null });
   };
 
   const validateStep = (step: number): boolean => {
@@ -192,12 +238,17 @@ export default function DealerPackagesPage() {
       else if (!/^\d{6}$/.test(formData.pincode.trim())) newErrors.pincode = "Enter a valid 6-digit pincode";
     }
 
-    if (step === 4) {
-      if (!files.front) newErrors.front = "Required";
-      if (!files.rear) newErrors.rear = "Required";
-      if (!files.left) newErrors.left = "Required";
-      if (!files.right) newErrors.right = "Required";
-      if (!files.odometer) newErrors.odometer = "Required";
+        if (step === 4) {
+      // Photos are optional for dealer form submission; if any are selected, encourage all 5, or allow clearing for customer upload
+      const hasAnyPhoto = Boolean(files.front || files.rear || files.left || files.right || files.odometer);
+      const hasAllPhotos = Boolean(files.front && files.rear && files.left && files.right && files.odometer);
+      if (hasAnyPhoto && !hasAllPhotos) {
+        if (!files.front) newErrors.front = "Required if uploading";
+        if (!files.rear) newErrors.rear = "Required if uploading";
+        if (!files.left) newErrors.left = "Required if uploading";
+        if (!files.right) newErrors.right = "Required if uploading";
+        if (!files.odometer) newErrors.odometer = "Required if uploading";
+      }
     }
 
     setErrors(newErrors);
@@ -217,6 +268,7 @@ export default function DealerPackagesPage() {
 
     setIsProcessing(true);
     try {
+            const hasInspectionImages = Boolean(files.front || files.rear || files.left || files.right || files.odometer);
       const payload = {
         customerData: { ...formData },
         vehicleData: { ...formData, odometerReading: Number(formData.odometerReading), carSegment: segment },
@@ -224,21 +276,37 @@ export default function DealerPackagesPage() {
           planId: selectedPlan.id,
           startDate: new Date().toISOString().split('T')[0],
         },
-        files: files as { front: File; rear: File; left: File; right: File; odometer: File },
+        files: files,
         geoData: geoData || undefined,
+        uploaded_by_dealer: hasInspectionImages,
       };
 
       const purchase = await packagesApi.submitDealerPackageOrder(payload);
       setSelectedPlan(null);
       setCurrentStep(1);
       setErrors({});
-      alert(`Package successfully activated! Order Number: ${purchase?.order_number}`);
-      
-      if (purchase?.package_pdf_url) {
-        window.open(purchase.package_pdf_url, '_blank');
+      clearAllFiles();
+      if (purchase?.status === "PendingInspection") {
+        showToast("info", `Order ${purchase?.order_number || ""} saved (Pending Inspection)`);
+        const result = await showPendingInspectionModal(purchase?.order_number);
+        if (result.isConfirmed) {
+          window.location.href = "/dealer/package-history";
+        }
+      } else {
+        showToast("success", `Package ${purchase?.order_number || ""} successfully activated!`);
+        const result = await showOrderActiveModal(purchase?.order_number, purchase?.package_pdf_url);
+        if (result.isConfirmed) {
+          if (purchase?.package_pdf_url) {
+            window.open(purchase.package_pdf_url, "_blank");
+          } else {
+            window.location.href = "/dealer/package-history";
+          }
+        }
       }
     } catch (err: unknown) {
-      alert((err as Error).message || "Failed to process package purchase.");
+      const errorMsg = (err as Error).message || "Failed to process package purchase.";
+      showToast("error", errorMsg);
+      showOrderErrorModal(errorMsg);
     } finally {
       setIsProcessing(false);
     }
@@ -767,7 +835,7 @@ export default function DealerPackagesPage() {
       {/* ── Checkout Modal ── */}
       <Modal
         isOpen={Boolean(selectedPlan)}
-        onClose={() => { setSelectedPlan(null); setCurrentStep(1); setErrors({}); }}
+        onClose={() => { setSelectedPlan(null); setCurrentStep(1); setErrors({}); clearAllFiles(); }}
         title={`Activate ${selectedPlan?.name}`}
         description={`Segment: ${segment} | Price: ${formatCurrency(selectedPlan?.resolved_price || 0)}${dealerPayoutPercentage > 0 ? ` • Your Payout (${dealerPayoutPercentage}%): ${formatCurrency(Math.round((((selectedPlan?.resolved_price || 0) * dealerPayoutPercentage) / 100) * 100) / 100)}` : ""}`}
         maxWidth="4xl"
@@ -986,8 +1054,15 @@ export default function DealerPackagesPage() {
               <div className="space-y-6">
                 <div className="flex items-center justify-between pb-3 border-b border-slate-100">
                   <div>
-                    <h3 className="font-bold text-slate-900">Upload Vehicle Photos</h3>
-                    <p className="text-xs text-slate-500 mt-0.5">Take clear photos of the vehicle from all angles</p>
+                    <div className="flex items-center gap-2">
+                      <h3 className="font-bold text-slate-900">Upload Vehicle Photos</h3>
+                      <Badge variant="secondary" className="text-[10px] text-slate-600 font-semibold">
+                        Optional
+                      </Badge>
+                    </div>
+                    <p className="text-xs text-slate-500 mt-0.5">
+                      Upload photos now as Dealer, or skip to allow Customer to upload later
+                    </p>
                   </div>
                   {geoData ? (
                     <Badge variant="success" className="text-[10px]">
@@ -1001,9 +1076,41 @@ export default function DealerPackagesPage() {
                 </div>
 
                 {Object.keys(errors).some(k => ['front','rear','left','right','odometer'].includes(k)) && (
-                  <p className="text-xs text-red-600 font-medium bg-red-50 border border-red-200 px-4 py-2.5 rounded-xl">
-                    Please upload all 5 inspection photos before submitting.
-                  </p>
+                  <div className="flex items-center justify-between text-xs text-red-600 font-medium bg-red-50 border border-red-200 px-4 py-2.5 rounded-xl">
+                    <span>If uploading photos now, please provide all 5 inspection photos, or clear them to allow customer upload.</span>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        clearAllFiles();
+                        setErrors(prev => {
+                          const clean = { ...prev };
+                          delete clean.front;
+                          delete clean.rear;
+                          delete clean.left;
+                          delete clean.right;
+                          delete clean.odometer;
+                          return clean;
+                        });
+                      }}
+                      className="ml-3 text-red-700 underline font-bold hover:text-red-900 cursor-pointer shrink-0"
+                    >
+                      Clear Photos
+                    </button>
+                  </div>
+                )}
+                {Boolean(files.front || files.rear || files.left || files.right || files.odometer) && !Object.keys(errors).some(k => ['front','rear','left','right','odometer'].includes(k)) && (
+                  <div className="flex items-center justify-between bg-blue-50 border border-blue-200 px-4 py-2 rounded-xl text-xs text-blue-700">
+                    <span className="font-medium">Photos uploaded by Dealer</span>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        clearAllFiles();
+                      }}
+                      className="font-bold underline hover:text-blue-900 cursor-pointer"
+                    >
+                      Clear & Leave for Customer Upload
+                    </button>
+                  </div>
                 )}
 
                 <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
@@ -1013,28 +1120,92 @@ export default function DealerPackagesPage() {
                     { key: 'left', label: 'Left Side' },
                     { key: 'right', label: 'Right Side' },
                     { key: 'odometer', label: 'Odometer' },
-                  ].map((img) => (
-                    <div key={img.key} className="relative">
-                      <label className={`flex flex-col items-center justify-center h-28 border-2 border-dashed rounded-xl cursor-pointer transition-all ${
-                        files[img.key as keyof typeof files]
-                          ? 'border-primary bg-primary/5 shadow-sm shadow-primary/10'
-                          : errors[img.key]
-                            ? 'border-red-400 bg-red-50/50 hover:bg-red-50'
-                            : 'border-slate-300 hover:border-slate-400 hover:bg-slate-50'
-                      }`}>
-                        <Camera className={`h-7 w-7 mb-2 ${
-                          files[img.key as keyof typeof files] ? 'text-primary' : errors[img.key] ? 'text-red-400' : 'text-slate-400'
-                        }`} />
-                        <span className={`text-[11px] font-bold text-center px-2 ${errors[img.key] ? 'text-red-500' : ''}`}>{img.label}</span>
-                        <input type="file" className="hidden" accept="image/*" capture="environment" onChange={(e) => { handleFileChange(e, img.key as keyof typeof files); if (errors[img.key]) setErrors(prev => ({...prev, [img.key]: ''})); }} />
-                      </label>
-                      {files[img.key as keyof typeof files] && (
-                        <div className="absolute top-1.5 right-1.5">
-                          <CheckCircle2 className="h-5 w-5 text-emerald-500 bg-white rounded-full shadow-sm" />
-                        </div>
-                      )}
-                    </div>
-                  ))}
+                  ].map((img) => {
+                    const hasFile = Boolean(files[img.key as keyof typeof files]);
+                    const previewUrl = filePreviews[img.key as keyof typeof filePreviews];
+                    const hasError = Boolean(errors[img.key]);
+
+                    return (
+                      <div key={img.key} className="relative">
+                        <label
+                          className={`relative flex flex-col items-center justify-center h-28 sm:h-32 border-2 rounded-xl cursor-pointer transition-all overflow-hidden ${
+                            hasFile
+                              ? 'border-primary ring-2 ring-primary/25 shadow-md bg-slate-900'
+                              : hasError
+                                ? 'border-dashed border-red-400 bg-red-50/50 hover:bg-red-50'
+                                : 'border-dashed border-slate-300 hover:border-primary/60 hover:bg-slate-50'
+                          }`}
+                        >
+                          {hasFile && previewUrl ? (
+                            <div className="relative w-full h-full group">
+                              <img
+                                src={previewUrl}
+                                alt={img.label}
+                                className="w-full h-full object-cover transition-transform duration-200 group-hover:scale-105"
+                              />
+                              {/* Overlay at bottom */}
+                              <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/85 via-black/40 to-transparent p-1.5 px-2 flex items-center justify-between">
+                                <span className="text-[10px] sm:text-[11px] font-bold text-white drop-shadow truncate">
+                                  {img.label}
+                                </span>
+                                <span className="text-[9px] font-medium text-blue-200 group-hover:underline">
+                                  Change
+                                </span>
+                              </div>
+                            </div>
+                          ) : (
+                            <div className="flex flex-col items-center justify-center p-2 text-center">
+                              <Camera
+                                className={`h-7 w-7 mb-1.5 transition-colors ${
+                                  hasError ? 'text-red-400' : 'text-slate-400'
+                                }`}
+                              />
+                              <span
+                                className={`text-[11px] font-bold ${
+                                  hasError ? 'text-red-500' : 'text-slate-700'
+                                }`}
+                              >
+                                {img.label}
+                              </span>
+                              <span className="text-[9px] text-slate-400 mt-0.5">Click to upload</span>
+                            </div>
+                          )}
+
+                          <input
+                            type="file"
+                            className="hidden"
+                            accept="image/*"
+                            capture="environment"
+                            onChange={(e) => {
+                              handleFileChange(e, img.key as keyof typeof files);
+                              if (errors[img.key]) {
+                                setErrors((prev) => ({ ...prev, [img.key]: '' }));
+                              }
+                            }}
+                          />
+                        </label>
+
+                        {/* Badges and actions */}
+                        {hasFile && (
+                          <>
+                            {/* Checkmark badge */}
+                            <div className="absolute top-1.5 left-1.5 z-10 pointer-events-none">
+                              <CheckCircle2 className="h-5 w-5 text-emerald-500 bg-white rounded-full shadow" />
+                            </div>
+                            {/* Remove button */}
+                            <button
+                              type="button"
+                              onClick={(e) => removeSingleFile(img.key as keyof typeof files, e)}
+                              className="absolute top-1.5 right-1.5 z-10 p-1 rounded-full bg-black/60 text-white hover:bg-red-600 transition-colors shadow cursor-pointer"
+                              title={`Remove ${img.label}`}
+                            >
+                              <X className="h-3.5 w-3.5" />
+                            </button>
+                          </>
+                        )}
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
             )}
@@ -1047,7 +1218,7 @@ export default function DealerPackagesPage() {
                 &#8592; Back
               </Button>
             ) : (
-              <Button type="button" variant="outline" className="font-bold w-36 border-slate-200 hover:bg-slate-50" onClick={() => { setSelectedPlan(null); setCurrentStep(1); setErrors({}); }}>
+              <Button type="button" variant="outline" className="font-bold w-36 border-slate-200 hover:bg-slate-50" onClick={() => { setSelectedPlan(null); setCurrentStep(1); setErrors({}); clearAllFiles(); }}>
                 Cancel
               </Button>
             )}

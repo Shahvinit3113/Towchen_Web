@@ -1,10 +1,13 @@
 "use client";
+import Swal, { showToast } from "@/lib/swal";
+import { GeoData } from "@/lib/api/packages";
 
 import React, { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { packagesApi } from "@/lib/api/packages";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { formatCurrency, formatDate } from "@/lib/utils";
 import {
   ArrowLeft,
@@ -22,6 +25,7 @@ import {
   CreditCard,
   ExternalLink,
   FileText,
+  Camera,
   AlertCircle,
   RefreshCw,
   CheckCircle2,
@@ -29,6 +33,11 @@ import {
   Layers,
   Fuel,
   Settings,
+  X,
+  Share2,
+  Copy,
+  Smartphone,
+  Send,
 } from "lucide-react";
 
 export default function DealerPackageDetailPage() {
@@ -39,6 +48,269 @@ export default function DealerPackageDetailPage() {
   const [order, setOrder] = useState<any | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [downloading, setDownloading] = useState(false);
+
+  // Inspection Photo Upload State
+  const [files, setFiles] = useState<{
+    front: File | null;
+    rear: File | null;
+    left: File | null;
+    right: File | null;
+    odometer: File | null;
+  }>({
+    front: null,
+    rear: null,
+    left: null,
+    right: null,
+    odometer: null,
+  });
+
+  const [filePreviews, setFilePreviews] = useState<{
+    front: string | null;
+    rear: string | null;
+    left: string | null;
+    right: string | null;
+    odometer: string | null;
+  }>({
+    front: null,
+    rear: null,
+    left: null,
+    right: null,
+    odometer: null,
+  });
+
+  const [geoData, setGeoData] = useState<GeoData | null>(null);
+  const [isUploadingInspection, setIsUploadingInspection] = useState(false);
+  const [uploadErrors, setUploadErrors] = useState<Record<string, string>>({});
+  const [isCreatingLink, setIsCreatingLink] = useState(false);
+  const [activeLink, setActiveLink] = useState<any | null>(null);
+
+  const captureGeoLocation = () => {
+    if (!navigator.geolocation) {
+      setGeoData({ latitude: null, longitude: null, captured_at: new Date().toISOString() });
+      return;
+    }
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        setGeoData({
+          latitude: pos.coords.latitude,
+          longitude: pos.coords.longitude,
+          captured_at: new Date().toISOString(),
+        });
+      },
+      () => {
+        setGeoData({ latitude: null, longitude: null, captured_at: new Date().toISOString() });
+      },
+      { enableHighAccuracy: true, timeout: 10000 }
+    );
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>, key: keyof typeof files) => {
+    if (e.target.files && e.target.files[0]) {
+      const selected = e.target.files[0];
+      setFiles((prev) => ({ ...prev, [key]: selected }));
+      if (filePreviews[key]) {
+        URL.revokeObjectURL(filePreviews[key]!);
+      }
+      setFilePreviews((prev) => ({ ...prev, [key]: URL.createObjectURL(selected) }));
+      if (!geoData) captureGeoLocation();
+      setUploadErrors((prev) => {
+        const clean = { ...prev };
+        delete clean[key];
+        return clean;
+      });
+    }
+  };
+
+  const removeSingleFile = (key: keyof typeof files, e: React.MouseEvent) => {
+    e.stopPropagation();
+    e.preventDefault();
+    if (filePreviews[key]) {
+      URL.revokeObjectURL(filePreviews[key]!);
+    }
+    setFilePreviews((prev) => ({ ...prev, [key]: null }));
+    setFiles((prev) => ({ ...prev, [key]: null }));
+  };
+
+  const clearAllFiles = () => {
+    Object.values(filePreviews).forEach((url) => {
+      if (url) URL.revokeObjectURL(url);
+    });
+    setFilePreviews({ front: null, rear: null, left: null, right: null, odometer: null });
+    setFiles({ front: null, rear: null, left: null, right: null, odometer: null });
+    setUploadErrors({});
+  };
+
+  const openInspectionLinkModal = (linkData: any) => {
+    if (!linkData?.url || !order) return;
+    const url = linkData.url;
+    const phone = order.customer?.customer_number || "";
+    const cleanPhone = phone.replace(/[^0-9]/g, "");
+    const customerName = order.customer?.customer_name || "Customer";
+    const vehicleName = `${order.vehicle?.vehicle_make || ""} ${order.vehicle?.vehicle_model || ""}`.trim();
+    const regNo = order.vehicle?.vehicle_reg_number || "";
+
+    const expiresFormatted = linkData.expires_at
+      ? new Date(linkData.expires_at).toLocaleString("en-IN", {
+          month: "short",
+          day: "numeric",
+          hour: "2-digit",
+          minute: "2-digit",
+        })
+      : "48 hours";
+
+    const isSubmitted = Boolean(linkData.is_submitted);
+    const isExpired = Boolean(linkData.is_expired || (linkData.expires_at && new Date() > new Date(linkData.expires_at)));
+
+    const message = encodeURIComponent(
+      `Hello ${customerName},\n\nPlease complete your vehicle inspection for ${vehicleName} (${regNo}) by capturing 5 vehicle photos using your mobile camera at this encrypted link:\n${url}\n\n• Link valid until: ${expiresFormatted}\n• Once submitted, your protection coverage will be activated immediately.`
+    );
+    const waUrl = cleanPhone
+      ? `https://api.whatsapp.com/send?phone=${cleanPhone}&text=${message}`
+      : `https://api.whatsapp.com/send?text=${message}`;
+
+    Swal.fire({
+      title: "Encrypted Customer Inspection Link",
+      html: `
+        <div class="space-y-3.5 pt-1 text-center">
+          <div class="flex flex-wrap items-center justify-center gap-2">
+            <span class="inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-bold ${
+              isSubmitted
+                ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
+                : isExpired
+                ? "bg-red-50 text-red-700 border border-red-200"
+                : "bg-blue-50 text-blue-700 border border-blue-200"
+            }">
+              ${isSubmitted ? "✓ Photos Submitted" : isExpired ? "⚠ Link Expired" : "● Awaiting Customer Capture"}
+            </span>
+            <span class="inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-medium bg-slate-100 text-slate-600 border border-slate-200">
+              Expires: ${expiresFormatted}
+            </span>
+          </div>
+
+          <p class="text-xs sm:text-sm text-slate-600 text-left">
+            Share this encrypted camera link with <strong>${customerName}</strong>. The package ID is fully encrypted to prevent unauthorized access.
+          </p>
+
+          <div class="bg-slate-50 border border-slate-200 rounded-2xl p-3 flex items-center justify-between gap-2 text-left">
+            <span class="font-mono text-[11px] text-slate-800 break-all select-all">${url}</span>
+            <button id="swal-copy-btn" class="shrink-0 px-3 py-1.5 bg-white hover:bg-slate-100 border border-slate-300 rounded-xl text-xs font-bold text-slate-800 shadow-xs cursor-pointer transition-colors">
+              Copy Link
+            </button>
+          </div>
+
+          <div class="pt-1 flex flex-col sm:flex-row gap-2">
+            <a href="${waUrl}" target="_blank" rel="noopener noreferrer" class="w-full text-center py-2.5 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-sm flex items-center justify-center gap-1.5 transition-colors">
+              <span>Share via WhatsApp</span>
+            </a>
+            <a href="${url}" target="_blank" rel="noopener noreferrer" class="w-full text-center py-2.5 px-3 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-xs border border-slate-200 flex items-center justify-center gap-1.5 transition-colors">
+              <span>Preview Link</span>
+            </a>
+          </div>
+        </div>
+      `,
+      showConfirmButton: false,
+      showCloseButton: true,
+      didOpen: () => {
+        const btn = document.getElementById("swal-copy-btn");
+        if (btn) {
+          btn.addEventListener("click", () => {
+            navigator.clipboard?.writeText(url);
+            btn.innerText = "Copied!";
+            setTimeout(() => {
+              if (btn) btn.innerText = "Copy Link";
+            }, 2000);
+          });
+        }
+      },
+    });
+  };
+
+  const handleCreateInspectionLink = async () => {
+    if (!order?.id) return;
+    setIsCreatingLink(true);
+    try {
+      const link = await packagesApi.createInspectionLink(order.id);
+      setActiveLink(link);
+      showToast("success", "Encrypted inspection link generated!");
+      openInspectionLinkModal(link);
+    } catch (err: any) {
+      console.error("Failed to generate link:", err);
+      const msg = err.message || "Failed to create customer inspection link.";
+      showToast("error", msg);
+      Swal.fire({
+        icon: "error",
+        title: "Creation Failed",
+        text: msg,
+        confirmButtonColor: "#003EF9",
+      });
+    } finally {
+      setIsCreatingLink(false);
+    }
+  };
+
+  const handleUploadInspection = async () => {
+    const missing: Record<string, string> = {};
+    if (!files.front) missing.front = "Front photo required";
+    if (!files.rear) missing.rear = "Rear photo required";
+    if (!files.left) missing.left = "Left side photo required";
+    if (!files.right) missing.right = "Right side photo required";
+    if (!files.odometer) missing.odometer = "Odometer photo required";
+
+    if (Object.keys(missing).length > 0) {
+      setUploadErrors(missing);
+      showToast("warning", "Please upload all 5 inspection photos to activate coverage.");
+      return;
+    }
+
+    setIsUploadingInspection(true);
+    try {
+      await packagesApi.uploadInspectionImages(
+        order.id,
+        {
+          front: files.front!,
+          rear: files.rear!,
+          left: files.left!,
+          right: files.right!,
+          odometer: files.odometer!,
+        },
+        geoData || undefined,
+        true
+      );
+
+      clearAllFiles();
+      showToast("success", "Inspection photos uploaded successfully!");
+      await Swal.fire({
+        icon: "success",
+        title: "Inspection Verified!",
+        html: `
+          <div class="space-y-3 pt-1 text-center">
+            <div class="bg-emerald-50/90 border border-emerald-200/90 rounded-2xl p-4 text-center">
+              <p class="text-emerald-950 font-bold text-sm sm:text-base">Photos uploaded by Dealer</p>
+              <p class="text-xs sm:text-sm text-emerald-700 mt-1.5 leading-relaxed">
+                Package order status is now <strong>Active</strong> and the official certificate has been generated.
+              </p>
+            </div>
+          </div>
+        `,
+        confirmButtonText: "Done",
+        confirmButtonColor: "#003EF9",
+      });
+
+      await loadOrderDetail();
+    } catch (err: any) {
+      console.error("Upload inspection failed:", err);
+      const msg = err.message || "Failed to upload inspection photos.";
+      showToast("error", msg);
+      Swal.fire({
+        icon: "error",
+        title: "Upload Failed",
+        text: msg,
+        confirmButtonColor: "#003EF9",
+      });
+    } finally {
+      setIsUploadingInspection(false);
+    }
+  };
 
   useEffect(() => {
     if (orderId) {
@@ -51,6 +323,12 @@ export default function DealerPackageDetailPage() {
     try {
       const data = await packagesApi.getDealerPackageOrderDetail(orderId);
       setOrder(data);
+      try {
+        const linkData = await packagesApi.getInspectionLink(orderId);
+        setActiveLink(linkData);
+      } catch (e) {
+        // Non-blocking
+      }
     } catch (err) {
       console.error("Failed to load order details:", err);
       setOrder(null);
@@ -67,10 +345,10 @@ export default function DealerPackageDetailPage() {
       if (url) {
         window.open(url, "_blank");
       } else {
-        alert("Certificate download URL is not available.");
+        showToast("warning", "Certificate download URL is not available.");
       }
     } catch (err) {
-      alert("Failed to download certificate. Please try again.");
+      showToast("error", "Failed to download certificate. Please try again.");
     } finally {
       setDownloading(false);
     }
@@ -125,6 +403,7 @@ export default function DealerPackageDetailPage() {
     String(order.status || "").toLowerCase() === "expired" ||
     (Boolean(order.expiry_date) && new Date(order.expiry_date).getTime() < Date.now());
 
+  const isPendingInspection = String(order.status || "").toLowerCase() === "pendinginspection";
   const isActive =
     !isExpired &&
     (String(order.status || "").toLowerCase() === "active" ||
@@ -173,12 +452,28 @@ export default function DealerPackageDetailPage() {
             title="Refresh order details"
           >
             <RefreshCw
-              className={`h-3.5 w-3.5 text-slate-500 ${
-                isLoading ? "animate-spin text-primary" : ""
-              }`}
+              className={`h-3.5 w-3.5 text-slate-500 ${isLoading ? "animate-spin text-primary" : ""
+                }`}
             />
             <span>Refresh</span>
           </button>
+
+          {isPendingInspection && (
+            <Button
+              type="button"
+              onClick={activeLink ? () => openInspectionLinkModal(activeLink) : handleCreateInspectionLink}
+              disabled={isCreatingLink}
+              variant="outline"
+              className="inline-flex items-center gap-1.5 text-xs font-bold px-3.5 py-2 border-blue-200 bg-blue-50 text-blue-700 hover:bg-blue-100 shadow-2xs cursor-pointer"
+            >
+              {isCreatingLink ? (
+                <RefreshCw className="h-3.5 w-3.5 text-blue-600 animate-spin" />
+              ) : (
+                <Smartphone className="h-3.5 w-3.5 text-blue-600" />
+              )}
+              <span>{activeLink ? "View Customer Link" : "Create Link"}</span>
+            </Button>
+          )}
 
           <Button
             onClick={handleDownload}
@@ -204,22 +499,20 @@ export default function DealerPackageDetailPage() {
               </span>
 
               <span
-                className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold ${
-                  isExpired
+                className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold ${isExpired
                     ? "bg-rose-500/20 text-rose-300 border border-rose-500/30"
                     : isActive
-                    ? "bg-emerald-500/20 text-emerald-300 border border-emerald-500/30"
-                    : "bg-slate-700 text-slate-300 border border-slate-600"
-                }`}
+                      ? "bg-emerald-500/20 text-emerald-300 border border-emerald-500/30"
+                      : "bg-slate-700 text-slate-300 border border-slate-600"
+                  }`}
               >
                 <span
-                  className={`w-2 h-2 rounded-full ${
-                    isExpired
+                  className={`w-2 h-2 rounded-full ${isExpired
                       ? "bg-rose-400"
                       : isActive
-                      ? "bg-emerald-400"
-                      : "bg-slate-400"
-                  }`}
+                        ? "bg-emerald-400"
+                        : "bg-slate-400"
+                    }`}
                 />
                 <span>{isExpired ? "Expired" : (order.status || "Active")}</span>
               </span>
@@ -564,9 +857,19 @@ export default function DealerPackageDetailPage() {
                 </p>
               </div>
             </div>
-            <span className="text-xs font-semibold text-slate-500">
-              {inspectionImages.length} Photos
-            </span>
+            <div className="flex items-center gap-2">
+              <Badge variant={order.vehicle?.uploaded_by_dealer !== false ? "primary" : "secondary"} className="text-[10px]">
+                {order.vehicle?.uploaded_by_dealer !== false ? "Uploaded by Dealer" : "Uploaded by Customer"}
+              </Badge>
+              {isPendingInspection && (
+                <Badge variant="secondary" className="text-[10px] bg-amber-50 text-amber-700 border-amber-200">
+                  Pending Inspection
+                </Badge>
+              )}
+              <span className="text-xs font-semibold text-slate-500">
+                {inspectionImages.length} Photos
+              </span>
+            </div>
           </div>
 
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3 pt-1">
@@ -592,6 +895,245 @@ export default function DealerPackageDetailPage() {
                 </span>
               </a>
             ))}
+          </div>
+        </div>
+      )}
+
+      {/* Empty State / Photo Upload Option when photos are pending */}
+      {inspectionImages.length === 0 && (
+        <div className="rounded-3xl border border-slate-200 bg-white p-5 sm:p-7 shadow-2xs space-y-5">
+          {/* Header */}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-100">
+            <div>
+              <div className="flex items-center gap-2">
+                <h3 className="text-base sm:text-lg font-bold text-slate-900">Upload Vehicle Photos</h3>
+                <Badge variant="secondary" className="text-[10px] text-amber-700 bg-amber-50 border-amber-200 font-semibold">
+                  Pending Inspection
+                </Badge>
+              </div>
+              <p className="text-xs text-slate-500 mt-1">
+                Upload all 5 vehicle inspection photos now as Dealer to activate coverage and generate the official certificate.
+              </p>
+            </div>
+            <div className="flex items-center gap-2 self-start sm:self-auto">
+              <Button
+                type="button"
+                onClick={activeLink ? () => openInspectionLinkModal(activeLink) : handleCreateInspectionLink}
+                disabled={isCreatingLink}
+                size="sm"
+                variant="outline"
+                className="font-bold text-xs border-blue-200 bg-blue-50 text-blue-700 hover:bg-blue-100 rounded-xl cursor-pointer"
+              >
+                {isCreatingLink ? (
+                  <RefreshCw className="h-3.5 w-3.5 text-blue-600 mr-1 animate-spin" />
+                ) : (
+                  <Smartphone className="h-3.5 w-3.5 text-blue-600 mr-1" />
+                )}
+                {activeLink ? "View Customer Link" : "Create Link"}
+              </Button>
+              {geoData ? (
+                <Badge variant="success" className="text-[10px]">
+                  <MapPin className="h-3 w-3 mr-1" /> Geo-tagged
+                </Badge>
+              ) : (
+                <Badge variant="secondary" className="text-[10px] text-slate-500">
+                  <MapPin className="h-3 w-3 mr-1" /> Awaiting Image
+                </Badge>
+              )}
+            </div>
+          </div>
+
+          {/* Customer Self-Inspection Option Banner */}
+          <div className="bg-gradient-to-r from-blue-50/80 via-indigo-50/40 to-blue-50/80 border border-blue-200/80 rounded-2xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div className="space-y-1">
+              <h4 className="text-xs font-bold text-blue-900 flex items-center gap-1.5">
+                <Smartphone className="h-4 w-4 text-blue-600" />
+                <span>Want Customer to Capture Photos From Their Smartphone?</span>
+              </h4>
+              <p className="text-[11px] text-blue-700 leading-relaxed">
+                Generate an encrypted self-inspection link. The link tracks expiration (48h) and automatically marks photos as <strong>Uploaded by Customer</strong> once submitted.
+              </p>
+              {activeLink && (
+                <div className="flex items-center gap-2 pt-1 flex-wrap">
+                  <span className="inline-flex items-center text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-blue-100 text-blue-800">
+                    {activeLink.is_submitted ? "✓ Photos Submitted" : "Active Encrypted Link Ready"}
+                  </span>
+                  {activeLink.expires_at && !activeLink.is_submitted && (
+                    <span className="text-[10px] text-blue-600 font-medium">
+                      Valid until {new Date(activeLink.expires_at).toLocaleString("en-IN", { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" })}
+                    </span>
+                  )}
+                </div>
+              )}
+            </div>
+            <div className="flex items-center gap-2 shrink-0">
+              {activeLink && (
+                <Button
+                  type="button"
+                  onClick={() => openInspectionLinkModal(activeLink)}
+                  variant="outline"
+                  className="font-bold text-xs px-3.5 py-2 border-blue-300 bg-white hover:bg-blue-50 text-blue-700 rounded-xl shadow-2xs cursor-pointer"
+                >
+                  <Share2 className="h-3.5 w-3.5 mr-1.5" /> View / Share
+                </Button>
+              )}
+              <Button
+                type="button"
+                onClick={handleCreateInspectionLink}
+                disabled={isCreatingLink}
+                className="font-bold text-xs px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl shadow-sm cursor-pointer"
+              >
+                {isCreatingLink ? (
+                  <RefreshCw className="h-3.5 w-3.5 mr-1.5 animate-spin" />
+                ) : (
+                  <Share2 className="h-3.5 w-3.5 mr-1.5" />
+                )}
+                {activeLink ? "Create New Link" : "Create Link"}
+              </Button>
+            </div>
+          </div>
+
+          {/* Error Banner */}
+          {Object.keys(uploadErrors).length > 0 && (
+            <div className="flex items-center justify-between text-xs text-red-600 font-medium bg-red-50 border border-red-200 px-4 py-2.5 rounded-xl">
+              <span>Please provide all 5 inspection photos to activate the package.</span>
+              <button
+                type="button"
+                onClick={clearAllFiles}
+                className="ml-3 text-red-700 underline font-bold hover:text-red-900 cursor-pointer shrink-0"
+              >
+                Clear Photos
+              </button>
+            </div>
+          )}
+
+          {/* 5 Photo Boxes (Same Design as Form!) */}
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
+            {[
+              { key: 'front', label: 'Front View' },
+              { key: 'rear', label: 'Rear View' },
+              { key: 'left', label: 'Left Side' },
+              { key: 'right', label: 'Right Side' },
+              { key: 'odometer', label: 'Odometer' },
+            ].map((img) => {
+              const hasFile = Boolean(files[img.key as keyof typeof files]);
+              const previewUrl = filePreviews[img.key as keyof typeof filePreviews];
+              const hasError = Boolean(uploadErrors[img.key]);
+
+              return (
+                <div key={img.key} className="relative">
+                  <label
+                    className={`relative flex flex-col items-center justify-center h-28 sm:h-32 border-2 rounded-xl cursor-pointer transition-all overflow-hidden ${
+                      hasFile
+                        ? 'border-primary ring-2 ring-primary/25 shadow-md bg-slate-900'
+                        : hasError
+                          ? 'border-dashed border-red-400 bg-red-50/50 hover:bg-red-50'
+                          : 'border-dashed border-slate-300 hover:border-primary/60 hover:bg-slate-50'
+                    }`}
+                  >
+                    {hasFile && previewUrl ? (
+                      <div className="relative w-full h-full group">
+                        <img
+                          src={previewUrl}
+                          alt={img.label}
+                          className="w-full h-full object-cover transition-transform duration-200 group-hover:scale-105"
+                        />
+                        {/* Overlay at bottom */}
+                        <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/85 via-black/40 to-transparent p-1.5 px-2 flex items-center justify-between">
+                          <span className="text-[10px] sm:text-[11px] font-bold text-white drop-shadow truncate">
+                            {img.label}
+                          </span>
+                          <span className="text-[9px] font-medium text-blue-200 group-hover:underline">
+                            Change
+                          </span>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="flex flex-col items-center justify-center p-2 text-center">
+                        <Camera
+                          className={`h-7 w-7 mb-1.5 transition-colors ${
+                            hasError ? 'text-red-400' : 'text-slate-400'
+                          }`}
+                        />
+                        <span
+                          className={`text-[11px] font-bold ${
+                            hasError ? 'text-red-500' : 'text-slate-700'
+                          }`}
+                        >
+                          {img.label}
+                        </span>
+                        <span className="text-[9px] text-slate-400 mt-0.5">Click to upload</span>
+                      </div>
+                    )}
+
+                    <input
+                      type="file"
+                      className="hidden"
+                      accept="image/*"
+                      capture="environment"
+                      onChange={(e) => handleFileChange(e, img.key as keyof typeof files)}
+                    />
+                  </label>
+
+                  {/* Badges and actions */}
+                  {hasFile && (
+                    <>
+                      {/* Checkmark badge */}
+                      <div className="absolute top-1.5 left-1.5 z-10 pointer-events-none">
+                        <CheckCircle2 className="h-5 w-5 text-emerald-500 bg-white rounded-full shadow" />
+                      </div>
+                      {/* Remove button */}
+                      <button
+                        type="button"
+                        onClick={(e) => removeSingleFile(img.key as keyof typeof files, e)}
+                        className="absolute top-1.5 right-1.5 z-10 p-1 rounded-full bg-black/60 text-white hover:bg-red-600 transition-colors shadow cursor-pointer"
+                        title={`Remove ${img.label}`}
+                      >
+                        <X className="h-3.5 w-3.5" />
+                      </button>
+                    </>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+
+          {/* Action Row */}
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-3 border-t border-slate-100">
+            <div className="text-xs text-slate-500">
+              {Object.values(files).filter(Boolean).length === 5 ? (
+                <span className="text-emerald-600 font-semibold flex items-center gap-1.5">
+                  <CheckCircle2 className="h-4 w-4" /> All 5 photos selected. Ready to activate coverage.
+                </span>
+              ) : (
+                <span>
+                  {Object.values(files).filter(Boolean).length} of 5 photos added
+                </span>
+              )}
+            </div>
+
+            <div className="flex items-center gap-2.5 w-full sm:w-auto">
+              {Boolean(files.front || files.rear || files.left || files.right || files.odometer) && (
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={clearAllFiles}
+                  disabled={isUploadingInspection}
+                  className="text-xs font-bold px-4 py-2 border-slate-200 hover:bg-slate-50 cursor-pointer"
+                >
+                  Clear All
+                </Button>
+              )}
+              <Button
+                type="button"
+                onClick={handleUploadInspection}
+                isLoading={isUploadingInspection}
+                disabled={isUploadingInspection}
+                className="w-full sm:w-auto font-bold text-xs px-6 py-2.5 bg-primary hover:bg-secondary text-white shadow-md shadow-primary/20 cursor-pointer"
+              >
+                Upload & Activate Package
+              </Button>
+            </div>
           </div>
         </div>
       )}
