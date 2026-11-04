@@ -84,19 +84,21 @@ export default function DealerPackageHistoryPage() {
 
   const isOrderActive = (order: any) => {
     if (isOrderExpired(order)) return false;
+    if (isOrderPending(order)) return false;
     const s = String(order.status || "").toLowerCase();
     return s === "active" || s === "success";
   };
 
   const isOrderPending = (order: any) => {
     const s = String(order.status || "").toLowerCase();
-    return s === "pendinginspection";
+    return s === "pendinginspection" || s === "pending_inspection";
   };
 
   // Filter orders by active status tab
   const filteredOrders = orders.filter((order) => {
     if (statusFilter === "all") return true;
     if (statusFilter === "active") return isOrderActive(order);
+    if (statusFilter === "pending") return isOrderPending(order);
     if (statusFilter === "expired") return isOrderExpired(order);
     return true;
   });
@@ -108,6 +110,7 @@ export default function DealerPackageHistoryPage() {
   );
 
   const activeCount = orders.filter(isOrderActive).length;
+  const pendingCount = orders.filter(isOrderPending).length;
   const expiredCount = orders.filter(isOrderExpired).length;
 
   return (
@@ -180,6 +183,15 @@ export default function DealerPackageHistoryPage() {
               }`}
           >
             Active ({activeCount})
+          </button>
+          <button
+            onClick={() => setStatusFilter("pending")}
+            className={`px-3 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer shrink-0 ${statusFilter === "pending"
+                ? "bg-white text-amber-700 shadow-2xs"
+                : "text-slate-600 hover:text-slate-900"
+              }`}
+          >
+            Pending Inspection ({pendingCount})
           </button>
           <button
             onClick={() => setStatusFilter("expired")}

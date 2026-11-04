@@ -474,9 +474,12 @@ export default function DealerPackageDetailPage() {
     String(order.status || "").toLowerCase() === "expired" ||
     (Boolean(order.expiry_date) && new Date(order.expiry_date).getTime() < Date.now());
 
-  const isPendingInspection = String(order.status || "").toLowerCase() === "pendinginspection";
+  const isPendingInspection =
+    String(order.status || "").toLowerCase() === "pendinginspection" ||
+    String(order.status || "").toLowerCase() === "pending_inspection";
   const isActive =
     !isExpired &&
+    !isPendingInspection &&
     (String(order.status || "").toLowerCase() === "active" ||
       String(order.status || "").toLowerCase() === "success" ||
       !order.status);
@@ -555,20 +558,26 @@ export default function DealerPackageDetailPage() {
               <span
                 className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] sm:text-xs font-bold ${isExpired
                     ? "bg-rose-500/20 text-rose-300 border border-rose-500/30"
-                    : isActive
-                      ? "bg-emerald-500/20 text-emerald-300 border border-emerald-500/30"
-                      : "bg-slate-700 text-slate-300 border border-slate-600"
+                    : isPendingInspection
+                      ? "bg-amber-500/20 text-amber-300 border border-amber-500/30"
+                      : isActive
+                        ? "bg-emerald-500/20 text-emerald-300 border border-emerald-500/30"
+                        : "bg-slate-700 text-slate-300 border border-slate-600"
                   }`}
               >
                 <span
                   className={`w-2 h-2 rounded-full ${isExpired
                       ? "bg-rose-400"
-                      : isActive
-                        ? "bg-emerald-400"
-                        : "bg-slate-400"
+                      : isPendingInspection
+                        ? "bg-amber-400"
+                        : isActive
+                          ? "bg-emerald-400"
+                          : "bg-slate-400"
                     }`}
                 />
-                <span>{isExpired ? "Expired" : (order.status || "Active")}</span>
+                <span>
+                  {isExpired ? "Expired" : isPendingInspection ? "Pending Inspection" : (order.status || "Active")}
+                </span>
               </span>
 
               {order.payment_status && (

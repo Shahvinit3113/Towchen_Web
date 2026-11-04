@@ -212,7 +212,7 @@ export interface PackagePurchase {
   commissionEarned: number;
   payout_percentage?: number;
   payout_amount?: number;
-  status: "active" | "expired" | "cancelled";
+  status: "active" | "expired" | "cancelled" | "PendingInspection" | "pending_inspection";
   purchasedAt: string;
   expiresAt: string;
 }
