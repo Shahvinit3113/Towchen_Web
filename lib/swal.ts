@@ -51,12 +51,10 @@ export const showPendingInspectionModal = (orderNumber?: string) => {
         </div>
       </div>
     `,
-    confirmButtonText: "View History",
-    showCancelButton: true,
-    cancelButtonText: "Done",
+    confirmButtonText: "Done",
     confirmButtonColor: "#003EF9",
-    cancelButtonColor: "#f1f5f9",
-    reverseButtons: true,
+    showCancelButton: false,
+    showDenyButton: false,
   });
 };
 
@@ -88,8 +86,8 @@ export const showOrderActiveModal = (
         </div>
       </div>
     `,
-    confirmButtonText: pdfUrl ? "Download PDF" : "View History",
-    showCancelButton: true,
+    confirmButtonText: pdfUrl ? "Download PDF" : "Done",
+    showCancelButton: Boolean(pdfUrl),
     cancelButtonText: "Done",
     confirmButtonColor: "#003EF9",
     cancelButtonColor: "#f1f5f9",

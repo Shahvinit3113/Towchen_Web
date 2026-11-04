@@ -8,10 +8,12 @@ import { packagesApi, GeoData } from "@/lib/api/packages";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import Swal, { showToast } from "@/lib/swal";
+import { LiveCameraModal } from "@/components/ui/live-camera-modal";
 import {
   Camera,
   CheckCircle2,
   ShieldCheck,
+  ShieldAlert,
   AlertCircle,
   RefreshCw,
   Download,
@@ -23,6 +25,7 @@ import {
   X,
   FileCheck2,
   Clock,
+  Ban,
 } from "lucide-react";
 
 interface InspectionDetail {
@@ -46,6 +49,8 @@ interface InspectionDetail {
     is_submitted: boolean;
     submitted_at?: string | null;
     is_expired: boolean;
+    is_revoked?: boolean;
+    revoked_at?: string | null;
   } | null;
   existing_photos?: {
     front?: string;
@@ -96,6 +101,11 @@ export default function CustomerSelfInspectionPage() {
   const [geoData, setGeoData] = useState<GeoData | null>(null);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [activeCameraAngle, setActiveCameraAngle] = useState<{
+    key: keyof typeof files;
+    label: string;
+    guide: string;
+  } | null>(null);
 
   useEffect(() => {
     if (orderNumber) {
@@ -150,23 +160,34 @@ export default function CustomerSelfInspectionPage() {
     );
   };
 
+  const handleLivePhotoCapture = (key: keyof typeof files, file: File) => {
+    setFiles((prev) => ({ ...prev, [key]: file }));
+    if (filePreviews[key]) {
+      URL.revokeObjectURL(filePreviews[key]!);
+    }
+    setFilePreviews((prev) => ({ ...prev, [key]: URL.createObjectURL(file) }));
+    if (!geoData) captureGeoLocation();
+    setErrors((prev) => {
+      const copy = { ...prev };
+      delete copy[key];
+      return copy;
+    });
+  };
+
   const handleFileChange = (
     e: React.ChangeEvent<HTMLInputElement>,
     key: keyof typeof files
   ) => {
     if (e.target.files && e.target.files[0]) {
       const selected = e.target.files[0];
-      setFiles((prev) => ({ ...prev, [key]: selected }));
-      if (filePreviews[key]) {
-        URL.revokeObjectURL(filePreviews[key]!);
+      const now = Date.now();
+      // Strict gallery restriction: Reject files older than 3 minutes
+      if (selected.lastModified && now - selected.lastModified > 3 * 60 * 1000) {
+        showToast("error", "Gallery / saved images are NOT allowed. You must capture a fresh live photo right now with your camera.");
+        e.target.value = "";
+        return;
       }
-      setFilePreviews((prev) => ({ ...prev, [key]: URL.createObjectURL(selected) }));
-      if (!geoData) captureGeoLocation();
-      setErrors((prev) => {
-        const copy = { ...prev };
-        delete copy[key];
-        return copy;
-      });
+      handleLivePhotoCapture(key, selected);
     }
   };
 
@@ -258,6 +279,40 @@ export default function CustomerSelfInspectionPage() {
             <div className="h-4 bg-slate-100 rounded w-1/2" />
           </div>
           <div className="h-72 bg-white rounded-3xl border border-slate-200" />
+        </div>
+      </div>
+    );
+  }
+
+  // ── LINK CLOSED / REVOKED ──
+  if (order?.link_meta?.is_revoked) {
+    return (
+      <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center p-4">
+        <div className="w-full max-w-md bg-white border border-rose-200 rounded-3xl p-7 text-center shadow-sm space-y-4">
+          <div className="w-16 h-16 rounded-2xl bg-rose-50 text-rose-600 flex items-center justify-center mx-auto border border-rose-200">
+            <Ban className="h-8 w-8" />
+          </div>
+          <h2 className="text-xl font-bold text-slate-900">Inspection Link Closed</h2>
+          <p className="text-xs text-slate-600 leading-relaxed">
+            This self-inspection link has been closed or revoked by your dealership partner. Photos can no longer be uploaded through this link.
+          </p>
+          <div className="bg-slate-50 border border-slate-200 rounded-2xl p-4 text-xs text-slate-700 space-y-1.5 text-left">
+            <div className="flex justify-between">
+              <span className="text-slate-400">Vehicle:</span>
+              <span className="font-bold">{order.vehicle_make} {order.vehicle_model}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-slate-400">Reg No:</span>
+              <span className="font-mono font-bold">{order.vehicle_reg_number}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-slate-400">Customer:</span>
+              <span className="font-bold">{order.customer_name}</span>
+            </div>
+          </div>
+          <p className="text-[11px] text-slate-500">
+            If you need to complete the inspection, please contact your dealer to send you a fresh active link.
+          </p>
         </div>
       </div>
     );
@@ -460,16 +515,21 @@ export default function CustomerSelfInspectionPage() {
           </div>
         ) : (
           /* ── CASE 2: PENDING UPLOAD (CUSTOMER CAMERA CAPTURE) ── */
-          <form onSubmit={handleSubmit} className="space-y-5">
+          <form onSubmit={handleSubmit} className="space-y-5 pb-28 sm:pb-32">
             {/* Instruction banner */}
-            <div className="bg-blue-50/80 border border-blue-200/80 rounded-2xl p-4 flex items-start gap-3">
+            <div className="bg-blue-50/90 border border-blue-200/90 rounded-2xl p-4 flex items-start gap-3">
               <div className="p-2 rounded-xl bg-[#003EF9] text-white shrink-0 mt-0.5 shadow-sm">
                 <Camera className="h-4 w-4" />
               </div>
-              <div className="space-y-0.5 text-xs text-blue-900">
-                <p className="font-bold">Take 5 Live Photos of Your Vehicle</p>
+              <div className="space-y-1 text-xs text-blue-900">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <p className="font-bold text-sm">Live Camera Capture Only</p>
+                  <span className="text-[10px] font-bold bg-amber-100 text-amber-800 border border-amber-300 px-2 py-0.5 rounded-full flex items-center gap-1">
+                    <ShieldAlert className="h-3 w-3" /> Gallery Upload Disabled
+                  </span>
+                </div>
                 <p className="text-blue-700 leading-relaxed text-[11px] sm:text-xs">
-                  Tap each box below to open your camera and capture each angle. Ensure your vehicle is in good daylight with the license plate clearly visible.
+                  Tap each box below to launch the live camera viewfinder. Saved images or gallery uploads cannot be added — all 5 angles must be captured live.
                 </p>
               </div>
             </div>
@@ -490,12 +550,21 @@ export default function CustomerSelfInspectionPage() {
 
                 return (
                   <div key={ang.key} className="relative">
-                    <label
-                      className={`relative flex flex-col items-center justify-center h-36 sm:h-40 border-2 rounded-2xl cursor-pointer transition-all overflow-hidden ${
+                    <div
+                      role="button"
+                      tabIndex={0}
+                      onClick={() => setActiveCameraAngle(ang)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" || e.key === " ") {
+                          e.preventDefault();
+                          setActiveCameraAngle(ang);
+                        }
+                      }}
+                      className={`relative flex flex-col items-center justify-center h-36 sm:h-40 border-2 rounded-2xl cursor-pointer transition-all overflow-hidden select-none ${
                         hasFile
                           ? "border-primary ring-2 ring-primary/25 shadow-md bg-slate-900"
                           : hasError
-                          ? "border-dashed border-red-400 bg-red-50/60"
+                          ? "border-dashed border-red-400 bg-red-50/60 hover:bg-red-50"
                           : "border-dashed border-slate-300 hover:border-primary/70 hover:bg-slate-50 bg-white"
                       }`}
                     >
@@ -511,7 +580,7 @@ export default function CustomerSelfInspectionPage() {
                               {ang.label}
                             </span>
                             <span className="text-[9px] font-medium text-blue-200 group-hover:underline">
-                              Retake
+                              Retake Live
                             </span>
                           </div>
                         </div>
@@ -538,21 +607,12 @@ export default function CustomerSelfInspectionPage() {
                               {ang.guide}
                             </span>
                           </div>
-                          <Badge variant="outline" className="text-[9px] mt-1 font-semibold">
-                            Tap to Capture
+                          <Badge variant="outline" className="text-[9px] mt-1 font-semibold border-blue-200 text-blue-700 bg-blue-50/50">
+                            Live Camera
                           </Badge>
                         </div>
                       )}
-
-                      {/* Hidden file input with mobile camera capture */}
-                      <input
-                        type="file"
-                        className="hidden"
-                        accept="image/*"
-                        capture="environment"
-                        onChange={(e) => handleFileChange(e, ang.key)}
-                      />
-                    </label>
+                    </div>
 
                     {/* Top action badges */}
                     {hasFile && (
@@ -575,6 +635,20 @@ export default function CustomerSelfInspectionPage() {
               })}
             </div>
 
+            {/* Live Camera Viewfinder Modal */}
+            {activeCameraAngle && (
+              <LiveCameraModal
+                isOpen={Boolean(activeCameraAngle)}
+                onClose={() => setActiveCameraAngle(null)}
+                title={activeCameraAngle.label}
+                guideText={activeCameraAngle.guide}
+                onCapture={(file) => {
+                  handleLivePhotoCapture(activeCameraAngle.key, file);
+                  setActiveCameraAngle(null);
+                }}
+              />
+            )}
+
             {/* Geotag Indicator */}
             <div className="flex items-center justify-between text-xs text-slate-500 px-1">
               <span>{uploadedCount} of 5 photos taken</span>
@@ -589,18 +663,46 @@ export default function CustomerSelfInspectionPage() {
               )}
             </div>
 
-            {/* Submit Button */}
-            <div className="pt-2">
-              <Button
-                type="submit"
-                size="lg"
-                isLoading={isSubmitting}
-                disabled={isSubmitting}
-                className="w-full font-bold text-sm py-4 rounded-2xl bg-primary hover:bg-secondary text-white shadow-xl shadow-primary/25 cursor-pointer"
-              >
-                <FileCheck2 className="h-5 w-5 mr-2" />
-                <span>Submit Inspection & Activate Coverage</span>
-              </Button>
+            {/* Sticky Bottom Bar for Mobile & Desktop */}
+            <div className="fixed bottom-0 inset-x-0 z-40 bg-white/95 backdrop-blur-md border-t border-slate-200/90 shadow-[0_-4px_20px_rgba(0,0,0,0.08)] py-3 px-3 sm:px-4">
+              <div className="max-w-2xl mx-auto flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                <div className="flex items-center justify-between sm:justify-start gap-2 text-xs">
+                  <div className="flex items-center gap-1.5 font-bold">
+                    <span
+                      className={`inline-flex items-center justify-center w-5 h-5 rounded-full text-[10px] ${
+                        uploadedCount === 5 ? "bg-emerald-500 text-white" : "bg-blue-600 text-white"
+                      }`}
+                    >
+                      {uploadedCount === 5 ? "✓" : uploadedCount}
+                    </span>
+                    <span className={uploadedCount === 5 ? "text-emerald-700 font-extrabold" : "text-slate-800"}>
+                      {uploadedCount === 5 ? "All 5 Photos Ready!" : `${uploadedCount} of 5 photos captured`}
+                    </span>
+                  </div>
+                  {geoData ? (
+                    <span className="text-[11px] text-emerald-600 font-semibold flex items-center gap-1">
+                      <MapPin className="h-3 w-3" /> GPS Tagged
+                    </span>
+                  ) : (
+                    <span className="text-[10px] text-slate-400">Auto-geotagged</span>
+                  )}
+                </div>
+
+                <Button
+                  type="submit"
+                  size="lg"
+                  isLoading={isSubmitting}
+                  disabled={isSubmitting}
+                  className={`w-full sm:w-auto font-bold text-sm py-3.5 sm:py-3 px-6 sm:px-8 rounded-xl sm:rounded-2xl cursor-pointer transition-all ${
+                    uploadedCount === 5
+                      ? "bg-blue-600 hover:bg-blue-700 text-white shadow-lg shadow-blue-600/30 ring-2 ring-blue-500/40"
+                      : "bg-blue-600 hover:bg-blue-700 text-white shadow-md shadow-blue-600/20"
+                  }`}
+                >
+                  <FileCheck2 className="h-4 w-4 sm:h-5 sm:w-5 mr-2 shrink-0" />
+                  <span>Submit Inspection & Activate Coverage</span>
+                </Button>
+              </div>
             </div>
           </form>
         )}

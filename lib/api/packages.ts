@@ -316,6 +316,16 @@ export const packagesApi = {
     return res.data?.data;
   },
 
+  getAllInspectionLinks: async (orderId: string | number) => {
+    const res = await api.get<any>(`/dealer-package-order/${orderId}/inspection-links`);
+    return res.data?.data || [];
+  },
+
+  closeInspectionLink: async (orderId: string | number, linkId: number) => {
+    const res = await api.patch<any>(`/dealer-package-order/${orderId}/inspection-link/${linkId}/close`, {});
+    return res.data?.data;
+  },
+
   getPublicInspection: async (orderIdentifier: string) => {
     const res = await api.get<any>(`/dealer-package-order/public/inspection/${encodeURIComponent(orderIdentifier.trim())}`);
     if (res?.data?.data) return res.data.data;
