@@ -98,9 +98,29 @@ body {
 .swal2-container {
   padding: 16px !important;
   z-index: 99999 !important;
+}
+
+/* Only modal backdrops get the darkened blur effect, NEVER toasts */
+.swal2-container:not(.swal2-top):not(.swal2-top-start):not(.swal2-top-end):not(.swal2-top-left):not(.swal2-top-right):not(.swal2-center-start):not(.swal2-center-end):not(.swal2-center-left):not(.swal2-center-right):not(.swal2-bottom):not(.swal2-bottom-start):not(.swal2-bottom-end):not(.swal2-bottom-left):not(.swal2-bottom-right) {
   background: rgba(15, 23, 42, 0.6) !important;
   backdrop-filter: blur(6px) !important;
   -webkit-backdrop-filter: blur(6px) !important;
+}
+
+/* Explicitly ensure toast containers are completely transparent and non-blocking */
+body.swal2-toast-shown .swal2-container,
+.swal2-container:has(.swal2-toast),
+.swal2-container.swal2-top-end,
+.swal2-container.swal2-top-right {
+  background: transparent !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  pointer-events: none !important;
+}
+
+body.swal2-toast-shown .swal2-popup,
+.swal2-container .swal2-toast {
+  pointer-events: auto !important;
 }
 
 .swal2-popup {

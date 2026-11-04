@@ -167,9 +167,28 @@ export default function DealerPackageDetailPage() {
     setUploadErrors({});
   };
 
+  const getInspectionUrl = (linkData?: { url?: string; token?: string } | null) => {
+    if (!linkData) return "";
+    if (typeof window !== "undefined" && window.location?.origin) {
+      if (linkData.token) {
+        return `${window.location.origin}/inspect/${linkData.token}`;
+      }
+      if (linkData.url) {
+        try {
+          const parsed = new URL(linkData.url);
+          return `${window.location.origin}${parsed.pathname}`;
+        } catch {
+          // ignore
+        }
+      }
+    }
+    return linkData.url || "";
+  };
+
   const openInspectionLinkModal = (linkData: any) => {
-    if (!linkData?.url || !order) return;
-    const url = linkData.url;
+    if (!linkData || !order) return;
+    const url = getInspectionUrl(linkData);
+    if (!url) return;
     const phone = order.customer?.customer_number || "";
     const cleanPhone = phone.replace(/[^0-9]/g, "");
     const customerName = order.customer?.customer_name || "Customer";
@@ -983,7 +1002,7 @@ export default function DealerPackageDetailPage() {
                             ? "Expired"
                             : "● Active"}
                         </Badge>
-                        <span className="font-mono text-[11px] text-slate-600 truncate max-w-xs">{link.url}</span>
+                        <span className="font-mono text-[11px] text-slate-600 truncate max-w-xs">{getInspectionUrl(link)}</span>
                       </div>
                       <p className="text-[10px] text-slate-400">
                         Generated {formatDate(link.created_at)} • {link.is_submitted && link.submitted_at ? `Submitted ${formatDate(link.submitted_at)}` : link.remaining_label}
@@ -992,7 +1011,7 @@ export default function DealerPackageDetailPage() {
                     <div className="flex items-center gap-2 shrink-0">
                       {(link.is_active || link.is_submitted) && (
                         <a
-                          href={link.url}
+                          href={getInspectionUrl(link)}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl text-xs font-semibold bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-700 transition-colors shadow-2xs"
@@ -1303,20 +1322,6 @@ export default function DealerPackageDetailPage() {
                     Generate encrypted links for your customer to capture photos. Older unsubmitted links automatically expire.
                   </p>
                 </div>
-                <Button
-                  type="button"
-                  onClick={handleCreateInspectionLink}
-                  disabled={isCreatingLink}
-                  size="sm"
-                  className="h-8 text-xs font-bold px-3.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl shadow-xs cursor-pointer shrink-0 self-start sm:self-auto"
-                >
-                  {isCreatingLink ? (
-                    <RefreshCw className="h-3 w-3 mr-1.5 animate-spin" />
-                  ) : (
-                    <Plus className="h-3 w-3 mr-1.5" />
-                  )}
-                  Create Link
-                </Button>
               </div>
 
               {/* Active Link Highlight Card */}
@@ -1341,7 +1346,7 @@ export default function DealerPackageDetailPage() {
                   <div className="bg-white border border-blue-200 rounded-xl p-3 flex flex-col md:flex-row md:items-center justify-between gap-3 shadow-2xs">
                     <div className="min-w-0 flex-1">
                       <p className="text-[10px] text-slate-400 font-semibold uppercase tracking-wider mb-1">Encrypted Inspection URL</p>
-                      <p className="font-mono text-xs text-blue-950 font-bold truncate select-all">{activeLink.url}</p>
+                      <p className="font-mono text-xs text-blue-950 font-bold truncate select-all">{getInspectionUrl(activeLink)}</p>
                     </div>
                     <div className="flex items-center gap-2 shrink-0 flex-wrap">
                       <Button
@@ -1349,7 +1354,7 @@ export default function DealerPackageDetailPage() {
                         size="sm"
                         variant="outline"
                         onClick={() => {
-                          navigator.clipboard?.writeText(activeLink.url);
+                          navigator.clipboard?.writeText(getInspectionUrl(activeLink));
                           showToast("success", "Link copied to clipboard!");
                         }}
                         className="text-xs font-bold rounded-xl border-slate-200 hover:bg-slate-50 text-slate-700 cursor-pointer"
@@ -1358,7 +1363,7 @@ export default function DealerPackageDetailPage() {
                       </Button>
                       <a
                         href={`https://wa.me/?text=${encodeURIComponent(
-                          `Hello ${order.customer?.name || "Customer"},\n\nPlease complete your vehicle inspection for RSA coverage using this official link:\n${activeLink.url}\n\nNote: This link will expire in 48 hours.`
+                          `Hello ${order.customer?.customer_name || "Customer"},\n\nPlease complete your vehicle inspection for RSA coverage using this official link:\n${getInspectionUrl(activeLink)}\n\nNote: This link will expire in 48 hours.`
                         )}`}
                         target="_blank"
                         rel="noopener noreferrer"
@@ -1367,7 +1372,7 @@ export default function DealerPackageDetailPage() {
                         <Share2 className="h-3.5 w-3.5" /> WhatsApp
                       </a>
                       <a
-                        href={activeLink.url}
+                        href={getInspectionUrl(activeLink)}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold border border-slate-200 transition-colors"
@@ -1449,7 +1454,7 @@ export default function DealerPackageDetailPage() {
                                     : "Inactive"}
                                 </Badge>
                                 <span className="font-mono text-[11px] text-slate-700 truncate max-w-xs sm:max-w-md">
-                                  {link.url}
+                                  {getInspectionUrl(link)}
                                 </span>
                               </div>
                               <div className="flex items-center gap-3 text-[11px] text-slate-500 flex-wrap">
@@ -1475,7 +1480,7 @@ export default function DealerPackageDetailPage() {
                             <div className="flex items-center gap-2 shrink-0 self-end sm:self-center flex-wrap">
                               {link.is_submitted && (
                                 <a
-                                  href={link.url}
+                                  href={getInspectionUrl(link)}
                                   target="_blank"
                                   rel="noopener noreferrer"
                                   className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 shadow-2xs transition-colors cursor-pointer"
