@@ -43,6 +43,28 @@ import Swal, {
   showOrderErrorModal,
 } from "@/lib/swal";
 
+const initialFormData = {
+  name: "",
+  number: "",
+  altNumber: "",
+  email: "",
+  building: "",
+  block: "",
+  road: "",
+  city: "",
+  state: "",
+  pincode: "",
+  gstNumber: "",
+  regNumber: "",
+  make: "",
+  model: "",
+  fuelType: "Petrol",
+  transmissionType: "Manual",
+  registrationYear: new Date().getFullYear(),
+  chassisNumber: "",
+  odometerReading: "",
+};
+
 export default function DealerPackagesPage() {
   const [plans, setPlans] = useState<any[]>([]);
   const [isLoadingPlans, setIsLoadingPlans] = useState(false);
@@ -73,6 +95,7 @@ export default function DealerPackagesPage() {
   const resetModalState = () => {
     setSelectedPlan(null);
     setCurrentStep(1);
+    setFormData(initialFormData);
     setErrors({});
     clearAllFiles();
     setIsVehicleFetched(false);
@@ -84,7 +107,9 @@ export default function DealerPackagesPage() {
   const openCheckoutModal = (plan: any) => {
     setSelectedPlan(plan);
     setCurrentStep(1);
+    setFormData(initialFormData);
     setErrors({});
+    clearAllFiles();
     setIsVehicleFetched(false);
     setIsFetchingVehicle(false);
     setVehicleFetchError(null);
@@ -92,27 +117,7 @@ export default function DealerPackagesPage() {
   };
 
   // Form State
-  const [formData, setFormData] = useState({
-    name: "",
-    number: "",
-    altNumber: "",
-    email: "",
-    building: "",
-    block: "",
-    road: "",
-    city: "",
-    state: "",
-    pincode: "",
-    gstNumber: "",
-    regNumber: "",
-    make: "",
-    model: "",
-    fuelType: "Petrol",
-    transmissionType: "Manual",
-    registrationYear: new Date().getFullYear(),
-    chassisNumber: "",
-    odometerReading: "",
-  });
+  const [formData, setFormData] = useState(initialFormData);
 
   // Files
   const [files, setFiles] = useState<{
@@ -1021,27 +1026,16 @@ export default function DealerPackagesPage() {
                       {errors.regNumber && <p className="text-xs text-red-600 font-medium">{errors.regNumber}</p>}
                     </div>
 
-                    {/* Quick helper for test plate & manual override */}
-                    <div className="flex flex-wrap items-center justify-between gap-2 text-xs text-slate-500 pt-0.5">
-                      <span className="text-[11px] text-slate-500">
-                        Test Plate:{" "}
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setFormData((prev) => ({ ...prev, regNumber: "HJ01ME5678" }));
-                            if (errors.regNumber) setErrors((prev) => ({ ...prev, regNumber: "" }));
-                            setVehicleFetchError(null);
-                          }}
-                          className="font-bold text-primary hover:underline cursor-pointer"
-                        >
-                          HJ01ME5678
-                        </button>
-                      </span>
+                    {/* Quick helper for manual override */}
+                    <div className="flex items-center justify-end text-xs text-slate-500 pt-0.5">
                       <button
                         type="button"
                         onClick={() => {
                           setIsManualOverride(true);
                           setIsVehicleFetched(true);
+                          if (!formData.regNumber.trim()) {
+                            setErrors((prev) => ({ ...prev, regNumber: "Registration number is required" }));
+                          }
                         }}
                         className="text-[11px] text-slate-400 hover:text-slate-600 underline cursor-pointer"
                       >
@@ -1053,22 +1047,14 @@ export default function DealerPackagesPage() {
                       <div className="p-3 rounded-xl bg-amber-50 border border-amber-200 text-xs text-amber-800 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
                         <span className="leading-snug">{vehicleFetchError}</span>
                         <div className="flex items-center gap-2 shrink-0">
-                          <Button
-                            type="button"
-                            size="sm"
-                            onClick={() => {
-                              setFormData((prev) => ({ ...prev, regNumber: "HJ01ME5678" }));
-                              setVehicleFetchError(null);
-                            }}
-                            className="h-7 text-xs font-bold px-2.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white cursor-pointer"
-                          >
-                            Use Test Plate
-                          </Button>
                           <button
                             type="button"
                             onClick={() => {
                               setIsManualOverride(true);
                               setIsVehicleFetched(true);
+                              if (!formData.regNumber.trim()) {
+                                setErrors((prev) => ({ ...prev, regNumber: "Registration number is required" }));
+                              }
                             }}
                             className="text-xs font-semibold text-amber-900 underline hover:text-black cursor-pointer px-1"
                           >
@@ -1095,6 +1081,7 @@ export default function DealerPackagesPage() {
                           setIsVehicleFetched(false);
                           setIsManualOverride(false);
                           setVehicleFetchError(null);
+                          if (errors.regNumber) setErrors((prev) => ({ ...prev, regNumber: "" }));
                         }}
                         className="text-xs font-bold text-primary hover:text-secondary underline cursor-pointer flex items-center gap-1 shrink-0"
                       >
@@ -1107,8 +1094,20 @@ export default function DealerPackagesPage() {
                       label="Registration Number *"
                       placeholder="e.g. MH01AB1234"
                       value={formData.regNumber}
-                      readOnly
-                      className="bg-slate-100/80 text-slate-700 cursor-not-allowed font-bold uppercase select-none border-slate-200"
+                      readOnly={!isManualOverride}
+                      onChange={(e) => {
+                        setFormData({
+                          ...formData,
+                          regNumber: e.target.value.replace(/[^a-zA-Z0-9]/g, "").toUpperCase(),
+                        });
+                        if (errors.regNumber) setErrors((prev) => ({ ...prev, regNumber: "" }));
+                      }}
+                      className={
+                        !isManualOverride
+                          ? "bg-slate-100/80 text-slate-700 cursor-not-allowed font-bold uppercase select-none border-slate-200"
+                          : "font-bold uppercase"
+                      }
+                      error={errors.regNumber}
                     />
 
                     {/* Make & Model (2 Columns) */}
