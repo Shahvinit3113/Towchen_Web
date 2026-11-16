@@ -47,150 +47,12 @@ export interface SubmitPackageOrderParams {
   geoData?: GeoData;
 }
 
-const mockPlans = [
-  {
-    id: 1,
-    name: "Gold Mobility Shield",
-    plan_period_months: 12,
-    incidents: 4,
-    distance_km: 50.0,
-    hotel_accommodation: 2,
-    cab_service: 2,
-    price_basic: 1999.0,
-    price_standard: 2999.0,
-    price_premium: 4999.0,
-    selected_segment: "Basic",
-    resolved_price: 1999.0
-  },
-  {
-    id: 2,
-    name: "Platinum Plus Shield",
-    plan_period_months: 24,
-    incidents: 6,
-    distance_km: 100.0,
-    hotel_accommodation: 4,
-    cab_service: 4,
-    price_basic: 3499.0,
-    price_standard: 4999.0,
-    price_premium: 7999.0,
-    selected_segment: "Basic",
-    resolved_price: 3499.0
-  }
-];
-
-const mockOrders = [
-  {
-    id: "ord-001",
-    order_number: "DPKG00000045",
-    plan_name: "Gold Mobility Shield",
-    car_segment: "Basic",
-    amount: 1999.0,
-    plan_period_months: 12,
-    incidents_allowed: 4,
-    incidents_used: 0,
-    distance_km_allowed: 50.0,
-    hotel_accommodation_allowed: 2,
-    hotel_accommodation_used: 0,
-    cab_service_allowed: 2,
-    cab_service_used: 0,
-    start_date: "2026-10-05T00:00:00.000Z",
-    expiry_date: "2027-10-05T00:00:00.000Z",
-    status: "Active",
-    payment_status: "PAID",
-    created_at: "2026-10-05T10:30:00.000Z",
-    customer: {
-      id: 1,
-      customer_name: "Rahul Sharma",
-      customer_number: "+919876543210",
-      alternative_number: "+919876543211",
-      email_address: "rahul.sharma@example.com",
-      building: "Galaxy Apartments, Flat 402",
-      block: "B-Wing",
-      road: "Linking Road, Bandra West",
-      city: "Mumbai",
-      state: "Maharashtra",
-      pincode: "400050",
-      gst_number: "27AABCT2341P1Z9"
-    },
-    vehicle: {
-      id: 1,
-      vehicle_reg_number: "MH02AB1234",
-      vehicle_make: "Maruti Suzuki",
-      vehicle_model: "Dzire",
-      vehicle_fuel_type: "Petrol",
-      transmission_type: "Manual",
-      registration_year: 2022,
-      chassis_number: "MA3EAA12S00123456",
-      current_odometer_reading: 34500,
-      car_segment: "Basic"
-    }
-  },
-  {
-    id: "ord-002",
-    order_number: "DPKG000000323",
-    plan_name: "Platinum Plus Shield",
-    car_segment: "Standard",
-    amount: 4999.0,
-    plan_period_months: 24,
-    incidents_allowed: 6,
-    incidents_used: 1,
-    distance_km_allowed: 100.0,
-    hotel_accommodation_allowed: 4,
-    hotel_accommodation_used: 0,
-    cab_service_allowed: 4,
-    cab_service_used: 0,
-    start_date: "2026-10-05T00:00:00.000Z",
-    expiry_date: "2028-10-05T00:00:00.000Z",
-    status: "Active",
-    payment_status: "PAID",
-    created_at: "2026-10-05T11:45:00.000Z",
-    customer: {
-      id: 2,
-      customer_name: "Rahul Sharma",
-      customer_number: "+919876543210",
-      alternative_number: null,
-      email_address: "rahul.sharma@example.com",
-      building: "Shanti Heights, Flat 101",
-      block: "A-Wing",
-      road: "S.V. Road, Andheri West",
-      city: "Mumbai",
-      state: "Maharashtra",
-      pincode: "400058",
-      gst_number: null
-    },
-    vehicle: {
-      id: 2,
-      vehicle_reg_number: "MH02AB1234",
-      vehicle_make: "Hyundai",
-      vehicle_model: "Creta",
-      vehicle_fuel_type: "Diesel",
-      transmission_type: "Automatic",
-      registration_year: 2023,
-      chassis_number: "MALC241CLNM987654",
-      current_odometer_reading: 21800,
-      car_segment: "Standard"
-    }
-  }
-];
-
 export const packagesApi = {
-  getDealerPackagePlans: async (segment?: string) => {
+  getDealerPackagePlans: async (segment?: string): Promise<any> => {
     const params = segment ? { segment } : {};
-    try {
-      const res = await api.get<any>(API_ENDPOINTS.packages.dealerPackagePlan, { params });
-      // If the API returns successfully, return the data (even if it's an empty array)
-      if (res.data && res.data.data !== undefined) return res.data.data;
-    } catch (e) {
-      console.log('Using mock plans due to API failure');
-    }
-    
-    // Return mock data fallback based on segment
-    const seg = segment || "Basic";
-    return mockPlans.map(plan => ({
-      ...plan,
-      selected_segment: seg,
-      resolved_price: seg === "Premium" ? plan.price_premium : (seg === "Standard" ? plan.price_standard : plan.price_basic)
-    }));
+    const res = await api.get<any>(API_ENDPOINTS.packages.dealerPackagePlan, { params });
+    const data = res.data?.data !== undefined ? res.data.data : res.data;
+    return Array.isArray(data) ? data : [];
   },
 
   submitDealerPackageOrder: async (data: SubmitPackageOrderParams) => {
@@ -253,29 +115,17 @@ export const packagesApi = {
     return res?.data?.data ?? res?.data;
   },
 
-  getDealerPackageOrders: async (params?: { page?: number; limit?: number; search?: string; status?: string; payment_status?: string }) => {
-    try {
-      const res = await api.get<any>(API_ENDPOINTS.packages.dealerPackageOrder, { params });
-      // If the API returns successfully, return the data (even if it's an empty array)
-      if (res.data && res.data.data !== undefined) return res.data.data;
-    } catch (e) {
-      console.log('Using mock orders due to API failure');
-    }
-    return mockOrders;
+  getDealerPackageOrders: async (params?: { page?: number; limit?: number; search?: string; status?: string; payment_status?: string }): Promise<any> => {
+    const res = await api.get<any>(API_ENDPOINTS.packages.dealerPackageOrder, { params });
+    const data = res.data?.data !== undefined ? res.data.data : res.data;
+    if (Array.isArray(data)) return data;
+    if (data?.items && Array.isArray(data.items)) return data.items;
+    return [];
   },
 
   getDealerPackageOrderDetail: async (id: string | number) => {
-    try {
-      const res = await api.get<any>(API_ENDPOINTS.packages.dealerPackageOrderDetail(id));
-      if (res.data && res.data.data !== undefined) return res.data.data;
-    } catch (e) {
-      console.log('Using mock order detail due to API failure');
-    }
-    return (
-      mockOrders.find(
-        (o) => String(o.id) === String(id) || String(o.order_number) === String(id)
-      ) || mockOrders[0]
-    );
+    const res = await api.get<any>(API_ENDPOINTS.packages.dealerPackageOrderDetail(id));
+    return res.data?.data !== undefined ? res.data.data : res.data;
   },
 
   

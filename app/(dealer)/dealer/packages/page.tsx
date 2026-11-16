@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { packagesApi } from "@/lib/api/packages";
 import { dealerApi } from "@/lib/api/dealer";
+import { vehiclesApi } from "@/lib/api/vehicles";
 import { formatCurrency, formatDate, cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -30,6 +31,9 @@ import {
   FileCheck,
   Sparkles,
   X,
+  RotateCcw,
+  Loader2,
+  Search,
 } from "lucide-react";
 import Swal, {
   Toast,
@@ -59,6 +63,33 @@ export default function DealerPackagesPage() {
   const [selectedPlan, setSelectedPlan] = useState<any | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
   const [currentStep, setCurrentStep] = useState(1);
+
+  // Cashfree Vehicle RC fetch state
+  const [isVehicleFetched, setIsVehicleFetched] = useState(false);
+  const [isFetchingVehicle, setIsFetchingVehicle] = useState(false);
+  const [vehicleFetchError, setVehicleFetchError] = useState<string | null>(null);
+  const [isManualOverride, setIsManualOverride] = useState(false);
+
+  const resetModalState = () => {
+    setSelectedPlan(null);
+    setCurrentStep(1);
+    setErrors({});
+    clearAllFiles();
+    setIsVehicleFetched(false);
+    setIsFetchingVehicle(false);
+    setVehicleFetchError(null);
+    setIsManualOverride(false);
+  };
+
+  const openCheckoutModal = (plan: any) => {
+    setSelectedPlan(plan);
+    setCurrentStep(1);
+    setErrors({});
+    setIsVehicleFetched(false);
+    setIsFetchingVehicle(false);
+    setVehicleFetchError(null);
+    setIsManualOverride(false);
+  };
 
   // Form State
   const [formData, setFormData] = useState({
@@ -206,10 +237,83 @@ export default function DealerPackagesPage() {
     setFiles({ front: null, rear: null, left: null, right: null, odometer: null });
   };
 
+  const handleFetchVehicleRc = async () => {
+    const regNo = (formData.regNumber || "").replace(/[^a-zA-Z0-9]/g, "").toUpperCase();
+    if (!regNo || regNo.length < 4) {
+      setErrors((prev) => ({ ...prev, regNumber: "Please enter a valid registration number" }));
+      return;
+    }
+
+    setIsFetchingVehicle(true);
+    setVehicleFetchError(null);
+
+    try {
+      const rc = await vehiclesApi.verifyVehicleRc(regNo);
+
+      if (rc && (rc.status === "VALID" || rc.reg_no || rc.vehicle_manufacturer_name || rc.chassis)) {
+        // Extract registration year from reg_date
+        let year = new Date().getFullYear();
+        if (rc.reg_date) {
+          const matchedYear = String(rc.reg_date).match(/\d{4}/);
+          if (matchedYear) {
+            year = parseInt(matchedYear[0], 10);
+          }
+        }
+
+        // Normalize Fuel Type to "Petrol" | "Diesel" | "CNG" | "Electric"
+        let normalizedFuel = "Petrol";
+        const rawFuel = String(rc.type || rc.fuel_type || "").toUpperCase();
+        if (rawFuel.includes("DIESEL")) normalizedFuel = "Diesel";
+        else if (rawFuel.includes("CNG")) normalizedFuel = "CNG";
+        else if (rawFuel.includes("ELEC") || rawFuel.includes("BATTERY") || rawFuel.includes("EV")) normalizedFuel = "Electric";
+
+        setFormData((prev) => ({
+          ...prev,
+          regNumber: rc.reg_no || rc.vehicle_number || regNo,
+          make: rc.vehicle_manufacturer_name || rc.maker || prev.make || "Unknown Make",
+          model: rc.model || prev.model || "Unknown Model",
+          fuelType: normalizedFuel,
+          registrationYear: year,
+          chassisNumber: rc.chassis || prev.chassisNumber || "N/A",
+          name: prev.name || rc.owner || rc.owner_name || "",
+        }));
+
+        setIsVehicleFetched(true);
+        setIsManualOverride(false);
+        setErrors((prev) => {
+          const clean = { ...prev };
+          delete clean.regNumber;
+          delete clean.make;
+          delete clean.model;
+          delete clean.chassisNumber;
+          delete clean.registrationYear;
+          return clean;
+        });
+        showToast("success", "Vehicle RC details fetched successfully!");
+      } else {
+        const errorMsg = rc?.message || "Vehicle RC record not found or invalid";
+        setVehicleFetchError(errorMsg);
+        showToast("error", errorMsg);
+      }
+    } catch (err: any) {
+      console.error("RC fetch error:", err);
+      const errMsg = err?.message || "Failed to fetch vehicle RC details. Check IP whitelisting or try manual entry.";
+      setVehicleFetchError(errMsg);
+      showToast("error", errMsg);
+    } finally {
+      setIsFetchingVehicle(false);
+    }
+  };
+
   const validateStep = (step: number): boolean => {
     const newErrors: Record<string, string> = {};
 
     if (step === 1) {
+      if (!isVehicleFetched && !isManualOverride) {
+        newErrors.regNumber = "Please fetch vehicle details using the registration number";
+        setErrors(newErrors);
+        return false;
+      }
       if (!formData.regNumber.trim()) newErrors.regNumber = "Registration number is required";
       else if (formData.regNumber.trim().length < 4) newErrors.regNumber = "Enter a valid registration number";
       if (!formData.make.trim()) newErrors.make = "Vehicle make is required";
@@ -259,6 +363,11 @@ export default function DealerPackagesPage() {
     e.preventDefault();
     if (!selectedPlan) return;
 
+    if (currentStep === 1 && !isVehicleFetched && !isManualOverride) {
+      await handleFetchVehicleRc();
+      return;
+    }
+
     if (!validateStep(currentStep)) return;
 
     if (currentStep < 4) {
@@ -282,10 +391,7 @@ export default function DealerPackagesPage() {
       };
 
       const purchase = await packagesApi.submitDealerPackageOrder(payload);
-      setSelectedPlan(null);
-      setCurrentStep(1);
-      setErrors({});
-      clearAllFiles();
+      resetModalState();
       if (purchase?.status === "PendingInspection") {
         showToast("info", `Order ${purchase?.order_number || ""} saved (Pending Inspection)`);
         const result = await showPendingInspectionModal(purchase?.order_number);
@@ -510,11 +616,7 @@ export default function DealerPackagesPage() {
 
                     <Button
                       className="w-full font-bold gap-2 h-9 sm:h-11 text-xs sm:text-sm rounded-xl group-hover:bg-secondary transition-colors"
-                      onClick={() => {
-                        setSelectedPlan(plan);
-                        setCurrentStep(1);
-                        setErrors({});
-                      }}
+                      onClick={() => openCheckoutModal(plan)}
                     >
                       Activate Plan{" "}
                       <ArrowRight className="h-3.5 w-3.5 sm:h-4 sm:w-4 transition-transform group-hover:translate-x-0.5" />
@@ -818,10 +920,9 @@ export default function DealerPackagesPage() {
                 size="sm"
                 type="button"
                 onClick={() => {
-                  setSelectedPlan(viewingDetailPlan);
+                  const plan = viewingDetailPlan;
                   setViewingDetailPlan(null);
-                  setCurrentStep(1);
-                  setErrors({});
+                  openCheckoutModal(plan);
                 }}
                 className="h-8 font-bold gap-1 text-xs px-3.5 rounded-xl cursor-pointer"
               >
@@ -835,7 +936,7 @@ export default function DealerPackagesPage() {
       {/* ── Checkout Modal ── */}
       <Modal
         isOpen={Boolean(selectedPlan)}
-        onClose={() => { setSelectedPlan(null); setCurrentStep(1); setErrors({}); clearAllFiles(); }}
+        onClose={resetModalState}
         title={`Activate ${selectedPlan?.name}`}
         description={`Segment: ${segment} | Price: ${formatCurrency(selectedPlan?.resolved_price || 0)}${dealerPayoutPercentage > 0 ? ` • Your Payout (${dealerPayoutPercentage}%): ${formatCurrency(Math.round((((selectedPlan?.resolved_price || 0) * dealerPayoutPercentage) / 100) * 100) / 100)}` : ""}`}
         maxWidth="4xl"
@@ -875,80 +976,254 @@ export default function DealerPackagesPage() {
             {/* ── Step 1: Vehicle Details ── */}
             {currentStep === 1 && (
               <div className="space-y-5">
-                <Input
-                  label="Registration Number *"
-                  placeholder="e.g. MH01AB1234"
-                  value={formData.regNumber}
-                  onChange={e => { setFormData({...formData, regNumber: e.target.value.toUpperCase()}); if (errors.regNumber) setErrors(prev => ({...prev, regNumber: ''})); }}
-                  error={errors.regNumber}
-                />
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                  <Input
-                    label="Make *"
-                    placeholder="e.g. Maruti Suzuki, Hyundai"
-                    value={formData.make}
-                    onChange={e => { setFormData({...formData, make: e.target.value}); if (errors.make) setErrors(prev => ({...prev, make: ''})); }}
-                    error={errors.make}
-                  />
-                  <Input
-                    label="Model *"
-                    placeholder="e.g. Swift, Creta, i20"
-                    value={formData.model}
-                    onChange={e => { setFormData({...formData, model: e.target.value}); if (errors.model) setErrors(prev => ({...prev, model: ''})); }}
-                    error={errors.model}
-                  />
-                </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                  <div className="w-full space-y-1.5">
-                    <label className="block text-xs font-semibold uppercase tracking-wider text-slate-700">Fuel Type *</label>
-                    <select
-                      className="flex h-11 w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-sm text-slate-900 transition-colors focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
-                      value={formData.fuelType}
-                      onChange={e => setFormData({...formData, fuelType: e.target.value})}
-                    >
-                      <option value="Petrol">Petrol</option>
-                      <option value="Diesel">Diesel</option>
-                      <option value="CNG">CNG</option>
-                      <option value="Electric">Electric</option>
-                    </select>
+                {!isVehicleFetched && !isManualOverride ? (
+                  /* Initial State: Only show Number Plate & Fetch Action (No extra card) */
+                  <div className="space-y-4">
+                    <div className="w-full space-y-1.5">
+                      <label className="block text-xs font-semibold uppercase tracking-wider text-slate-700">
+                        Registration Number *
+                      </label>
+                      <div className="flex flex-col sm:flex-row gap-2.5">
+                        <div className="relative flex-1">
+                          <input
+                            type="text"
+                            placeholder="e.g. MH01AB1234"
+                            value={formData.regNumber}
+                            onChange={(e) => {
+                              setFormData({
+                                ...formData,
+                                regNumber: e.target.value.replace(/[^a-zA-Z0-9]/g, "").toUpperCase(),
+                              });
+                              if (errors.regNumber) setErrors((prev) => ({ ...prev, regNumber: "" }));
+                              setVehicleFetchError(null);
+                            }}
+                            onKeyDown={(e) => {
+                              if (e.key === "Enter") {
+                                e.preventDefault();
+                                handleFetchVehicleRc();
+                              }
+                            }}
+                            className={cn(
+                              "flex h-11 w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-sm uppercase tracking-wider font-semibold text-slate-900 transition-colors placeholder:text-slate-400 placeholder:normal-case placeholder:font-normal focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20",
+                              errors.regNumber && "border-red-500 focus:border-red-500 focus:ring-red-500/20"
+                            )}
+                          />
+                        </div>
+                        <Button
+                          type="button"
+                          onClick={handleFetchVehicleRc}
+                          isLoading={isFetchingVehicle}
+                          className="h-11 px-6 font-bold rounded-xl shadow-sm cursor-pointer shrink-0 bg-primary hover:bg-secondary text-white w-full sm:w-auto"
+                        >
+                          Fetch Details <Sparkles className="h-4 w-4 ml-1.5" />
+                        </Button>
+                      </div>
+                      {errors.regNumber && <p className="text-xs text-red-600 font-medium">{errors.regNumber}</p>}
+                    </div>
+
+                    {/* Quick helper for test plate & manual override */}
+                    <div className="flex flex-wrap items-center justify-between gap-2 text-xs text-slate-500 pt-0.5">
+                      <span className="text-[11px] text-slate-500">
+                        Test Plate:{" "}
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setFormData((prev) => ({ ...prev, regNumber: "HJ01ME5678" }));
+                            if (errors.regNumber) setErrors((prev) => ({ ...prev, regNumber: "" }));
+                            setVehicleFetchError(null);
+                          }}
+                          className="font-bold text-primary hover:underline cursor-pointer"
+                        >
+                          HJ01ME5678
+                        </button>
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setIsManualOverride(true);
+                          setIsVehicleFetched(true);
+                        }}
+                        className="text-[11px] text-slate-400 hover:text-slate-600 underline cursor-pointer"
+                      >
+                        Skip to Manual Entry
+                      </button>
+                    </div>
+
+                    {vehicleFetchError && (
+                      <div className="p-3 rounded-xl bg-amber-50 border border-amber-200 text-xs text-amber-800 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
+                        <span className="leading-snug">{vehicleFetchError}</span>
+                        <div className="flex items-center gap-2 shrink-0">
+                          <Button
+                            type="button"
+                            size="sm"
+                            onClick={() => {
+                              setFormData((prev) => ({ ...prev, regNumber: "HJ01ME5678" }));
+                              setVehicleFetchError(null);
+                            }}
+                            className="h-7 text-xs font-bold px-2.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white cursor-pointer"
+                          >
+                            Use Test Plate
+                          </Button>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setIsManualOverride(true);
+                              setIsVehicleFetched(true);
+                            }}
+                            className="text-xs font-semibold text-amber-900 underline hover:text-black cursor-pointer px-1"
+                          >
+                            Manual Entry
+                          </button>
+                        </div>
+                      </div>
+                    )}
                   </div>
-                  <div className="w-full space-y-1.5">
-                    <label className="block text-xs font-semibold uppercase tracking-wider text-slate-700">Transmission *</label>
-                    <select
-                      className="flex h-11 w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-sm text-slate-900 transition-colors focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
-                      value={formData.transmissionType}
-                      onChange={e => setFormData({...formData, transmissionType: e.target.value})}
-                    >
-                      <option value="Manual">Manual</option>
-                      <option value="Automatic">Automatic</option>
-                    </select>
+                ) : (
+                  /* Fetched State: Show existing fields as in image, marked Read-Only */
+                  <div className="space-y-4 sm:space-y-5 animate-in fade-in duration-200">
+                    {/* Verified Strip Banner */}
+                    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 p-3 rounded-xl bg-emerald-50 border border-emerald-200">
+                      <div className="flex items-center gap-2">
+                        <CheckCircle2 className="h-4 w-4 text-emerald-600 shrink-0" />
+                        <span className="text-xs font-bold text-emerald-800">
+                          {isManualOverride ? "Manual Vehicle Entry" : "Vehicle RC Verified via Cashfree / VAHAN"}
+                        </span>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setIsVehicleFetched(false);
+                          setIsManualOverride(false);
+                          setVehicleFetchError(null);
+                        }}
+                        className="text-xs font-bold text-primary hover:text-secondary underline cursor-pointer flex items-center gap-1 shrink-0"
+                      >
+                        <RotateCcw className="h-3 w-3" /> Change Number
+                      </button>
+                    </div>
+
+                    {/* Registration Number Field */}
+                    <Input
+                      label="Registration Number *"
+                      placeholder="e.g. MH01AB1234"
+                      value={formData.regNumber}
+                      readOnly
+                      className="bg-slate-100/80 text-slate-700 cursor-not-allowed font-bold uppercase select-none border-slate-200"
+                    />
+
+                    {/* Make & Model (2 Columns) */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
+                      <Input
+                        label="Make *"
+                        placeholder="e.g. Maruti Suzuki, Hyundai"
+                        value={formData.make}
+                        readOnly={!isManualOverride}
+                        onChange={(e) => {
+                          setFormData({ ...formData, make: e.target.value });
+                          if (errors.make) setErrors((prev) => ({ ...prev, make: "" }));
+                        }}
+                        className={!isManualOverride ? "bg-slate-100/80 text-slate-700 cursor-not-allowed font-medium select-none border-slate-200" : ""}
+                        error={errors.make}
+                      />
+                      <Input
+                        label="Model *"
+                        placeholder="e.g. Swift, Creta, i20"
+                        value={formData.model}
+                        readOnly={!isManualOverride}
+                        onChange={(e) => {
+                          setFormData({ ...formData, model: e.target.value });
+                          if (errors.model) setErrors((prev) => ({ ...prev, model: "" }));
+                        }}
+                        className={!isManualOverride ? "bg-slate-100/80 text-slate-700 cursor-not-allowed font-medium select-none border-slate-200" : ""}
+                        error={errors.model}
+                      />
+                    </div>
+
+                    {/* Fuel Type & Transmission (2 Columns) */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
+                      <div className="w-full space-y-1.5">
+                        <label className="block text-xs font-semibold uppercase tracking-wider text-slate-700">
+                          Fuel Type *
+                        </label>
+                        <select
+                          disabled={!isManualOverride}
+                          className={`flex h-11 w-full rounded-xl border border-slate-200 px-3.5 py-2 text-sm text-slate-700 transition-colors focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 ${
+                            !isManualOverride ? "bg-slate-100/80 cursor-not-allowed font-medium select-none opacity-90" : "bg-white text-slate-900"
+                          }`}
+                          value={formData.fuelType}
+                          onChange={(e) => setFormData({ ...formData, fuelType: e.target.value })}
+                        >
+                          <option value="Petrol">Petrol</option>
+                          <option value="Diesel">Diesel</option>
+                          <option value="CNG">CNG</option>
+                          <option value="Electric">Electric</option>
+                        </select>
+                      </div>
+                      <div className="w-full space-y-1.5">
+                        <label className="block text-xs font-semibold uppercase tracking-wider text-slate-700">
+                          Transmission *
+                        </label>
+                        <select
+                          disabled={!isManualOverride}
+                          className={`flex h-11 w-full rounded-xl border border-slate-200 px-3.5 py-2 text-sm text-slate-700 transition-colors focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 ${
+                            !isManualOverride ? "bg-slate-100/80 cursor-not-allowed font-medium select-none opacity-90" : "bg-white text-slate-900"
+                          }`}
+                          value={formData.transmissionType}
+                          onChange={(e) => setFormData({ ...formData, transmissionType: e.target.value })}
+                        >
+                          <option value="Manual">Manual</option>
+                          <option value="Automatic">Automatic</option>
+                        </select>
+                      </div>
+                    </div>
+
+                    {/* Registration Year & Odometer Reading (2 Columns) */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
+                      <Input
+                        label="Registration Year *"
+                        placeholder="e.g. 2024"
+                        type="text"
+                        inputMode="numeric"
+                        value={formData.registrationYear ? String(formData.registrationYear) : ""}
+                        readOnly={!isManualOverride}
+                        onChange={(e) => {
+                          const val = e.target.value.replace(/[^0-9]/g, "").slice(0, 4);
+                          setFormData({ ...formData, registrationYear: Number(val) || 0 });
+                          if (errors.registrationYear) setErrors((prev) => ({ ...prev, registrationYear: "" }));
+                        }}
+                        className={!isManualOverride ? "bg-slate-100/80 text-slate-700 cursor-not-allowed font-medium select-none border-slate-200" : ""}
+                        error={errors.registrationYear}
+                      />
+                      <Input
+                        label="Odometer Reading (km) *"
+                        placeholder="e.g. 25000"
+                        type="text"
+                        inputMode="numeric"
+                        value={formData.odometerReading}
+                        onChange={(e) => {
+                          const cleanNum = e.target.value.replace(/[^0-9]/g, "");
+                          setFormData({ ...formData, odometerReading: cleanNum });
+                          if (errors.odometerReading) setErrors((prev) => ({ ...prev, odometerReading: "" }));
+                        }}
+                        error={errors.odometerReading}
+                      />
+                    </div>
+
+                    {/* Chassis Number */}
+                    <Input
+                      label="Chassis Number *"
+                      placeholder="e.g. MA3FJEB1S00123456"
+                      value={formData.chassisNumber}
+                      readOnly={!isManualOverride}
+                      onChange={(e) => {
+                        setFormData({ ...formData, chassisNumber: e.target.value.toUpperCase() });
+                        if (errors.chassisNumber) setErrors((prev) => ({ ...prev, chassisNumber: "" }));
+                      }}
+                      className={!isManualOverride ? "bg-slate-100/80 text-slate-700 cursor-not-allowed font-medium font-mono select-none border-slate-200" : ""}
+                      error={errors.chassisNumber}
+                    />
                   </div>
-                </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                  <Input
-                    label="Registration Year *"
-                    placeholder="e.g. 2024"
-                    type="number"
-                    value={formData.registrationYear}
-                    onChange={e => { setFormData({...formData, registrationYear: Number(e.target.value)}); if (errors.registrationYear) setErrors(prev => ({...prev, registrationYear: ''})); }}
-                    error={errors.registrationYear}
-                  />
-                  <Input
-                    label="Odometer Reading (km) *"
-                    placeholder="e.g. 25000"
-                    type="number"
-                    value={formData.odometerReading}
-                    onChange={e => { setFormData({...formData, odometerReading: e.target.value}); if (errors.odometerReading) setErrors(prev => ({...prev, odometerReading: ''})); }}
-                    error={errors.odometerReading}
-                  />
-                </div>
-                <Input
-                  label="Chassis Number *"
-                  placeholder="e.g. MA3FJEB1S00123456"
-                  value={formData.chassisNumber}
-                  onChange={e => { setFormData({...formData, chassisNumber: e.target.value.toUpperCase()}); if (errors.chassisNumber) setErrors(prev => ({...prev, chassisNumber: ''})); }}
-                  error={errors.chassisNumber}
-                />
+                )}
               </div>
             )}
 
@@ -1212,18 +1487,18 @@ export default function DealerPackagesPage() {
           </div>
 
           {/* Footer Actions */}
-          <div className="pt-5 border-t border-slate-100 flex justify-between gap-3 sticky -bottom-1 bg-white py-4 mt-8 z-10">
+          <div className="pt-4 border-t border-slate-100 flex flex-col-reverse sm:flex-row justify-between gap-3 sticky -bottom-1 bg-white py-3 mt-6 sm:mt-8 z-10">
             {currentStep > 1 ? (
-              <Button type="button" variant="outline" className="font-bold w-36 border-slate-200 hover:bg-slate-50" onClick={() => { setCurrentStep(prev => prev - 1); setErrors({}); }}>
+              <Button type="button" variant="outline" className="font-bold w-full sm:w-36 border-slate-200 hover:bg-slate-50 h-11" onClick={() => { setCurrentStep(prev => prev - 1); setErrors({}); }}>
                 &#8592; Back
               </Button>
             ) : (
-              <Button type="button" variant="outline" className="font-bold w-36 border-slate-200 hover:bg-slate-50" onClick={() => { setSelectedPlan(null); setCurrentStep(1); setErrors({}); clearAllFiles(); }}>
+              <Button type="button" variant="outline" className="font-bold w-full sm:w-36 border-slate-200 hover:bg-slate-50 h-11" onClick={resetModalState}>
                 Cancel
               </Button>
             )}
             
-            <Button type="submit" isLoading={isProcessing} className="font-bold w-52 shadow-lg hover:shadow-xl transition-shadow bg-primary hover:bg-secondary text-white">
+            <Button type="submit" isLoading={isProcessing} className="font-bold w-full sm:w-52 shadow-lg hover:shadow-xl transition-shadow bg-primary hover:bg-secondary text-white h-11">
               {currentStep < 4 ? "Next Step \u2192" : "Create Order"}
             </Button>
           </div>

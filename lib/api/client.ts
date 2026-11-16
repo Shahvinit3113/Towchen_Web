@@ -85,12 +85,6 @@ export async function apiClient<T>(
   const timer = setTimeout(() => controller.abort(), timeoutMs);
 
   try {
-    // If no external API base URL is provided, simulate or proceed
-    if (!API_BASE_URL && typeof window !== "undefined") {
-      // Allow seamless mock/fallback handler for initial evaluation
-      return handleMockOrLocalApi<T>(endpoint, options);
-    }
-
     const response = await fetch(url, {
       ...restOptions,
       headers: mergedHeaders,
@@ -125,127 +119,10 @@ export async function apiClient<T>(
       throw new ApiError(408, "Request timed out. Please try again.");
     }
     if (error instanceof ApiError) {
-      if (error.status === 404 && process.env.NODE_ENV !== "production") {
-        return handleMockOrLocalApi<T>(endpoint, options);
-      }
       throw error;
-    }
-    // If backend is not running, provide graceful simulation in development
-    if (process.env.NODE_ENV !== "production") {
-      return handleMockOrLocalApi<T>(endpoint, options);
     }
     throw new ApiError(500, error.message || "Network request failed");
   }
-}
-
-/**
- * High fidelity mock handler used when external API URL is not yet connected
- * Ensures developer can immediately test and interact with the UI.
- */
-async function handleMockOrLocalApi<T>(
-  endpoint: string,
-  options: RequestOptions
-): Promise<ApiResponse<T>> {
-  // Simulate network latency (200ms)
-  await new Promise((resolve) => setTimeout(resolve, 200));
-
-  const method = (options.method || "GET").toUpperCase();
-
-  // Booking
-  if (endpoint.includes("/towing/book")) {
-    const booking = {
-      bookingId: `TC-${Math.floor(100000 + Math.random() * 900000)}`,
-      status: "dispatched",
-      estimatedEtaMinutes: 14,
-      driverName: "Vikram Singh",
-      driverPhone: "+91 98765 43210",
-      towTruckPlate: "DL 01 AB 7890",
-      trackingUrl: "/track/live-demo",
-      totalAmount: 1849,
-    };
-    return { data: booking as unknown as T, success: true, status: 201 };
-  }
-
-  // Public Customer Inspection Mock / Fallback
-  if (endpoint.includes("/dealer-package-order/public/inspection/")) {
-    const segments = endpoint.split("/");
-    const param = decodeURIComponent(segments[segments.length - 1] || "");
-    const mockInspection = {
-      id: 2,
-      order_number: param || "DPKG00000045",
-      customer_name: "Customer",
-      customer_phone: "9876543210",
-      customer_email: "customer@example.com",
-      vehicle_reg_number: "GJ09DS4171",
-      vehicle_make: "TVS",
-      vehicle_model: "Ronin 225",
-      plan_name: "Gold Mobility Shield",
-      status: "PendingInspection",
-      is_completed: false,
-      uploaded_by_dealer: null,
-      package_pdf_url: null,
-    };
-    return {
-      data: { is_success: true, status: 200, data: mockInspection } as unknown as T,
-      success: true,
-      status: 200,
-    };
-  }
-
-  // Dealer Login
-  if (endpoint.includes("/dealer-auth/login") || endpoint.includes("/auth/dealer/login")) {
-    const body = options.body ? JSON.parse(options.body as string) : {};
-    const mockDealerSession = {
-      access_token: "jwt_mock_dealer_token_xyz987",
-      refresh_token: "jwt_mock_dealer_refresh_token_xyz987",
-      dealer: {
-        id: 1,
-        formated_id: "DLR0000001",
-        email: body.email || "dealer@nexttow.com",
-        role: "Dealer",
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-      },
-    };
-    return { data: mockDealerSession as unknown as T, success: true, status: 200 };
-  }
-
-  // Dealer Me
-  if (endpoint.includes("/dealer-auth/me") || endpoint.includes("/auth/me")) {
-    const mockDealer = {
-      id: 1,
-      formated_id: "DLR0000001",
-      email: "dealer@nexttow.com",
-      role: "Dealer",
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
-    };
-    return { data: mockDealer as unknown as T, success: true, status: 200 };
-  }
-
-  // Dealer Refresh
-  if (endpoint.includes("/dealer-auth/refresh")) {
-    const mockRefresh = {
-      access_token: "jwt_mock_dealer_token_refreshed_xyz987",
-      refresh_token: "jwt_mock_dealer_refresh_token_xyz987",
-      dealer: {
-        id: 1,
-        formated_id: "DLR0000001",
-        email: "dealer@nexttow.com",
-        role: "Dealer",
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-      },
-    };
-    return { data: mockRefresh as unknown as T, success: true, status: 200 };
-  }
-
-  // Fallback for list endpoints
-  return {
-    data: {} as T,
-    success: true,
-    status: 200,
-  };
 }
 
 export const api = {

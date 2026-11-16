@@ -44,25 +44,6 @@ export const authApi = {
       }
       throw new Error("Invalid session response received from dealer auth server");
     } catch (err: any) {
-      // If offline demo fallback account is explicitly used in development
-      if (
-        process.env.NODE_ENV !== "production" &&
-        credentials.email === "partner@apexmotors.com"
-      ) {
-        const mockDealerSession: UserSession = {
-          id: "dlr-9941",
-          name: "Apex Motors Logistics",
-          businessName: "Apex Motors Autocare Pvt Ltd",
-          email: credentials.email,
-          phone: "+91 98112 33445",
-          role: "dealer",
-          token: "jwt_mock_dealer_token_xyz987",
-          refreshToken: "jwt_mock_dealer_refresh_token_xyz987",
-          dealerId: "dlr-9941",
-        };
-        setClientSession(mockDealerSession);
-        return mockDealerSession;
-      }
       throw err;
     }
   },

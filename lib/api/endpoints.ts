@@ -25,6 +25,10 @@ export const API_ENDPOINTS = {
     detail: (id: string) => `/vehicles/${id}`,
     uploadRc: (id: string) => `/vehicles/${id}/rc-document`,
     uploadInspection: (id: string) => `/vehicles/${id}/inspection`,
+    verifyRc: "/verification/vehicle-rc",
+  },
+  verification: {
+    vehicleRc: "/verification/vehicle-rc",
   },
   packages: {
     dealerPackagePlan: "/dealer-package-plan",
