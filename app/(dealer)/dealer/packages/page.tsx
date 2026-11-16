@@ -305,6 +305,11 @@ export default function DealerPackagesPage() {
       const errMsg = err?.message || "Failed to fetch vehicle RC details. Check IP whitelisting or try manual entry.";
       setVehicleFetchError(errMsg);
       showToast("error", errMsg);
+
+      // Auto-switch to manual override if daily limit (25 req/day) is hit so dealers are never blocked
+      if (err?.status === 429 || errMsg.toLowerCase().includes("daily limit")) {
+        setIsManualOverride(true);
+      }
     } finally {
       setIsFetchingVehicle(false);
     }
