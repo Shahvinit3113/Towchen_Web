@@ -43,9 +43,14 @@ export const vehiclesApi = {
     return (res.data as any)?.data || res.data;
   },
 
-  verifyVehicleRc: async (vehicleNumber: string): Promise<any> => {
+  verifyVehicleRc: async (
+    vehicleNumber: string,
+    options?: { rejectCommercial?: boolean; dealerId?: number }
+  ): Promise<any> => {
     const res = await api.post<any>(API_ENDPOINTS.verification.vehicleRc, {
       vehicle_number: vehicleNumber,
+      reject_commercial: options?.rejectCommercial ?? true,
+      dealer_id: options?.dealerId,
     });
     return (res.data as any)?.data || res.data;
   },

@@ -4,16 +4,32 @@ import { WalletSummary, WalletTransaction, PayoutRequest } from "@/types";
 
 export const walletApi = {
   getSummary: async (): Promise<WalletSummary> => {
-    const res = await api.get<WalletSummary>(API_ENDPOINTS.wallet.summary);
-    return (res.data as any)?.data || res.data;
+    try {
+      const res = await api.get<WalletSummary>(API_ENDPOINTS.wallet.summary);
+      return (res.data as any)?.data || res.data;
+    } catch {
+      return {
+        dealerId: "",
+        currentBalance: 0,
+        lifetimeEarnings: 0,
+        pendingPayouts: 0,
+        lockedReserve: 0,
+        totalWithdrawn: 0,
+        currency: "INR",
+      };
+    }
   },
 
   getTransactions: async (): Promise<WalletTransaction[]> => {
-    const res = await api.get<WalletTransaction[]>(
-      API_ENDPOINTS.wallet.transactions
-    );
-    const data = (res.data as any)?.data || res.data;
-    return Array.isArray(data) ? data : [];
+    try {
+      const res = await api.get<WalletTransaction[]>(
+        API_ENDPOINTS.wallet.transactions
+      );
+      const data = (res.data as any)?.data || res.data;
+      return Array.isArray(data) ? data : [];
+    } catch {
+      return [];
+    }
   },
 
   getPayoutRequests: async (): Promise<PayoutRequest[]> => {

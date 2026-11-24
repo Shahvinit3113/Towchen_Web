@@ -1,4 +1,4 @@
-import { getAuthToken } from "@/lib/auth/session";
+import { getAuthToken, clearClientSession } from "@/lib/auth/session";
 
 export interface ApiResponse<T> {
   data: T;
@@ -94,6 +94,9 @@ export async function apiClient<T>(
     clearTimeout(timer);
 
     if (!response.ok) {
+      if (response.status === 401) {
+        clearClientSession();
+      }
       let errorData: any = {};
       try {
         errorData = await response.json();

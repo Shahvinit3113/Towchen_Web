@@ -116,11 +116,15 @@ export const packagesApi = {
   },
 
   getDealerPackageOrders: async (params?: { page?: number; limit?: number; search?: string; status?: string; payment_status?: string }): Promise<any> => {
-    const res = await api.get<any>(API_ENDPOINTS.packages.dealerPackageOrder, { params });
-    const data = res.data?.data !== undefined ? res.data.data : res.data;
-    if (Array.isArray(data)) return data;
-    if (data?.items && Array.isArray(data.items)) return data.items;
-    return [];
+    try {
+      const res = await api.get<any>(API_ENDPOINTS.packages.dealerPackageOrder, { params });
+      const data = res.data?.data !== undefined ? res.data.data : res.data;
+      if (Array.isArray(data)) return data;
+      if (data?.items && Array.isArray(data.items)) return data.items;
+      return [];
+    } catch {
+      return [];
+    }
   },
 
   getDealerPackageOrderDetail: async (id: string | number) => {

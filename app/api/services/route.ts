@@ -1,5 +1,11 @@
 import { NextResponse } from "next/server";
 
+export interface BackendSubServiceCondition {
+  id: number;
+  sub_service_id: number;
+  condition: string;
+}
+
 export interface BackendSubService {
   id: number;
   name: string;
@@ -11,6 +17,7 @@ export interface BackendSubService {
   ton?: number;
   image_url?: string | null;
   journey_type?: string;
+  conditions?: BackendSubServiceCondition[];
 }
 
 export interface BackendService {
@@ -31,21 +38,79 @@ export interface ServiceOptionItem {
   description?: string;
   base_price?: number;
   base_distance?: number;
+  extra_distance_price?: number;
+  ton?: number;
+  journey_type?: string;
+  conditions?: string[];
   icon: string;
 }
 
-// Fallback matching backend DB exactly
+// Fallback matching PostgreSQL database exactly
 const DEFAULT_BACKEND_SERVICES: BackendService[] = [
   {
     id: 1,
     name: "Towing",
     description: "Vehicle towing and breakdown recovery",
     sub_services: [
-      { id: 1, name: "Flatbed", service_id: 1, is_active: true, base_price: 100, base_distance: 5 },
-      { id: 3, name: "Underlift", service_id: 1, is_active: true, base_price: 100, base_distance: 5 },
-      { id: 4, name: "Zero Degree", service_id: 1, is_active: true, base_price: 120, base_distance: 5 },
-      { id: 5, name: "2-Wheeler Flatbed", service_id: 1, is_active: true, base_price: 80, base_distance: 5 },
-      { id: 11, name: "Flatbed Towing", service_id: 1, is_active: true, base_price: 100, base_distance: 5 },
+      {
+        id: 1,
+        name: "Flatbed",
+        service_id: 1,
+        is_active: true,
+        base_price: 100,
+        base_distance: 5,
+        extra_distance_price: 20,
+        ton: 1.5,
+        journey_type: "FourWay",
+        conditions: [
+          { id: 1, sub_service_id: 1, condition: "Condition 2" },
+          { id: 2, sub_service_id: 1, condition: "Condition 1" },
+        ],
+      },
+      {
+        id: 3,
+        name: "Underlift",
+        service_id: 1,
+        is_active: true,
+        base_price: 100,
+        base_distance: 5,
+        extra_distance_price: 20,
+        ton: 1.5,
+        journey_type: "FourWay",
+      },
+      {
+        id: 4,
+        name: "Zero Degree",
+        service_id: 1,
+        is_active: true,
+        base_price: 100,
+        base_distance: 5,
+        extra_distance_price: 20,
+        ton: 1.5,
+        journey_type: "FourWay",
+      },
+      {
+        id: 5,
+        name: "2-Wheeler Flatbed",
+        service_id: 1,
+        is_active: true,
+        base_price: 100,
+        base_distance: 5,
+        extra_distance_price: 20,
+        ton: 1.5,
+        journey_type: "FourWay",
+      },
+      {
+        id: 11,
+        name: "Flatbed Towing",
+        service_id: 1,
+        is_active: true,
+        base_price: 100,
+        base_distance: 5,
+        extra_distance_price: 20,
+        ton: 1.5,
+        journey_type: "FourWay",
+      },
     ],
   },
   {
@@ -53,8 +118,28 @@ const DEFAULT_BACKEND_SERVICES: BackendService[] = [
     name: "Technician",
     description: "On-demand roadside assistance and quick repair",
     sub_services: [
-      { id: 2, name: "Jump Start", service_id: 2, is_active: true, base_price: 60, base_distance: 5 },
-      { id: 6, name: "Mechanic", service_id: 2, is_active: true, base_price: 80, base_distance: 5 },
+      {
+        id: 2,
+        name: "Jump Start",
+        service_id: 2,
+        is_active: true,
+        base_price: 100,
+        base_distance: 5,
+        extra_distance_price: 20,
+        ton: 1.5,
+        journey_type: "ThreeWay",
+      },
+      {
+        id: 6,
+        name: "Mechanic",
+        service_id: 2,
+        is_active: true,
+        base_price: 100,
+        base_distance: 5,
+        extra_distance_price: 20,
+        ton: 1.5,
+        journey_type: "ThreeWay",
+      },
     ],
   },
   {
@@ -62,7 +147,17 @@ const DEFAULT_BACKEND_SERVICES: BackendService[] = [
     name: "Custody",
     description: "Secure vehicle storage and custody handling",
     sub_services: [
-      { id: 7, name: "Custodian", service_id: 3, is_active: true, base_price: 150, base_distance: 5 },
+      {
+        id: 7,
+        name: "Custodian",
+        service_id: 3,
+        is_active: true,
+        base_price: 100,
+        base_distance: 5,
+        extra_distance_price: 20,
+        ton: 1.5,
+        journey_type: "ThreeWay",
+      },
     ],
   },
   {
@@ -70,9 +165,28 @@ const DEFAULT_BACKEND_SERVICES: BackendService[] = [
     name: "Hydra",
     description: "Heavy crane and specialized winch recovery",
     sub_services: [
-      { id: 8, name: "12 Ton", service_id: 4, is_active: true, base_price: 250, base_distance: 5 },
-      { id: 9, name: "20 Ton", service_id: 4, is_active: true, base_price: 350, base_distance: 5 },
-      { id: 10, name: "25+ Ton", service_id: 4, is_active: true, base_price: 500, base_distance: 5 },
+      {
+        id: 8,
+        name: "12 Ton",
+        service_id: 4,
+        is_active: true,
+        base_price: 100,
+        base_distance: 5,
+        extra_distance_price: 20,
+        ton: 1.5,
+        journey_type: "ThreeWay",
+      },
+      {
+        id: 10,
+        name: "25+ Ton",
+        service_id: 4,
+        is_active: true,
+        base_price: 100,
+        base_distance: 5,
+        extra_distance_price: 20,
+        ton: 1.5,
+        journey_type: "ThreeWay",
+      },
     ],
   },
 ];
@@ -102,6 +216,10 @@ function normalizeOptions(services: BackendService[]): ServiceOptionItem[] {
               ? `${ss.name} Tow`
               : ss.name;
 
+          const condList = ss.conditions && Array.isArray(ss.conditions)
+            ? ss.conditions.map((c) => c.condition)
+            : undefined;
+
           options.push({
             id: slug,
             name: ss.name,
@@ -112,6 +230,10 @@ function normalizeOptions(services: BackendService[]): ServiceOptionItem[] {
             description: s.description || undefined,
             base_price: ss.base_price,
             base_distance: ss.base_distance,
+            extra_distance_price: ss.extra_distance_price,
+            ton: ss.ton,
+            journey_type: ss.journey_type,
+            conditions: condList,
             icon: mapIconName(ss.name),
           });
         }

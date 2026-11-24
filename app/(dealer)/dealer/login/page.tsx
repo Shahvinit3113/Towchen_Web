@@ -1,11 +1,12 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { dealerLoginSchema, DealerLoginFormData } from "@/lib/validations";
 import { authApi } from "@/lib/api/auth";
+import { getClientSession, clearClientSession } from "@/lib/auth/session";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
@@ -18,6 +19,21 @@ export default function DealerLoginPage() {
   const router = useRouter();
   const [authError, setAuthError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    const session = getClientSession();
+    if (session && session.role === "dealer" && session.token) {
+      authApi
+        .getDealerMe()
+        .then(() => {
+          router.replace("/dealer/dashboard");
+        })
+        .catch(() => {
+          // Token is expired or invalid - clear it cleanly
+          clearClientSession();
+        });
+    }
+  }, [router]);
 
   const {
     register,
@@ -37,7 +53,7 @@ export default function DealerLoginPage() {
     setAuthError(null);
     try {
       await authApi.loginDealer(credentials);
-      window.location.href = "/dealer/dashboard";
+      router.push("/dealer/dashboard");
     } catch (err: any) {
       setAuthError(err.message || "Invalid dealer credentials.");
       setIsLoading(false);

@@ -11,6 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Modal } from "@/components/ui/modal";
 import {
   CheckCircle2,
+  AlertCircle,
   ArrowRight,
   Camera,
   MapPin,
@@ -242,6 +243,65 @@ export default function DealerPackagesPage() {
     setFiles({ front: null, rear: null, left: null, right: null, odometer: null });
   };
 
+  const checkIsCommercialRc = (rc: any): { isCommercial: boolean; reason: string } => {
+    if (!rc) return { isCommercial: false, reason: "" };
+    if (rc.is_commercial) {
+      return { isCommercial: true, reason: rc.commercial_reason || rc.class || "Commercial vehicle" };
+    }
+
+    const category = String(rc.vehicle_category || rc.category || "").toUpperCase().trim();
+    if (category === "TRANSPORT" || (category.includes("COMMERCIAL") && !category.includes("NON-COMMERCIAL"))) {
+      return { isCommercial: true, reason: `Vehicle category is ${category}` };
+    }
+
+    const vehicleClass = String(rc.class || rc.vehicle_class || "").toUpperCase().trim();
+    const vehicleType = String(rc.type || rc.body_type || "").toUpperCase().trim();
+    const combined = `${vehicleClass} ${vehicleType}`;
+
+    const commercialKeywords = [
+      "GOODS CARRIER",
+      "GOODS VEHICLE",
+      "LIGHT GOODS",
+      "MEDIUM GOODS",
+      "HEAVY GOODS",
+      "LGV",
+      "HGV",
+      "MGV",
+      "LCV",
+      "MAXI CAB",
+      "MOTOR CAB",
+      "TAXI",
+      "CAB",
+      "TOURIST",
+      "STAGE CARRIAGE",
+      "CONTRACT CARRIAGE",
+      "OMNIBUS",
+      "BUS",
+      "AMBULANCE",
+      "COMMERCIAL",
+      "PUBLIC SERVICE",
+      "TRAILER",
+      "DUMPER",
+      "TIPPER",
+      "TANKER",
+      "AUTO RICKSHAW",
+      "E-RICKSHAW",
+      "THREE WHEELER",
+      "3-WHEELER",
+      "TRACTOR",
+      "DELIVERY VAN",
+      "LOAD CARRIER",
+    ];
+
+    for (const kw of commercialKeywords) {
+      if (combined.includes(kw)) {
+        return { isCommercial: true, reason: rc.class || rc.type || kw };
+      }
+    }
+
+    return { isCommercial: false, reason: "" };
+  };
+
   const handleFetchVehicleRc = async () => {
     const regNo = (formData.regNumber || "").replace(/[^a-zA-Z0-9]/g, "").toUpperCase();
     if (!regNo || regNo.length < 4) {
@@ -253,7 +313,21 @@ export default function DealerPackagesPage() {
     setVehicleFetchError(null);
 
     try {
-      const rc = await vehiclesApi.verifyVehicleRc(regNo);
+      const rc = await vehiclesApi.verifyVehicleRc(regNo, { rejectCommercial: true });
+
+      // Check if commercial vehicle
+      const commercialStatus = checkIsCommercialRc(rc);
+      if (commercialStatus.isCommercial) {
+        const errorMsg = `This vehicle (${regNo}) is registered as a Commercial vehicle [${commercialStatus.reason}]. Commercial vehicles cannot be prefilled into dealer packages.`;
+        setVehicleFetchError(errorMsg);
+        setIsVehicleFetched(false);
+        setErrors((prev) => ({
+          ...prev,
+          regNumber: `Commercial vehicle detected (${commercialStatus.reason}). Details cannot be prefilled.`,
+        }));
+        showToast("error", errorMsg);
+        return;
+      }
 
       if (rc && (rc.status === "VALID" || rc.reg_no || rc.vehicle_manufacturer_name || rc.chassis)) {
         // Extract registration year from reg_date
@@ -302,9 +376,20 @@ export default function DealerPackagesPage() {
       }
     } catch (err: any) {
       console.error("RC fetch error:", err);
-      const errMsg = err?.message || "Failed to fetch vehicle RC details. Check IP whitelisting or try manual entry.";
+      const errMsg =
+        err?.response?.data?.message ||
+        err?.message ||
+        "Failed to fetch vehicle RC details. Check IP whitelisting or try manual entry.";
       setVehicleFetchError(errMsg);
+      setIsVehicleFetched(false);
       showToast("error", errMsg);
+
+      if (errMsg.toLowerCase().includes("commercial")) {
+        setErrors((prev) => ({
+          ...prev,
+          regNumber: errMsg,
+        }));
+      }
 
       // Auto-switch to manual override if daily limit (25 req/day) is hit so dealers are never blocked
       if (err?.status === 429 || errMsg.toLowerCase().includes("daily limit")) {
@@ -1049,9 +1134,31 @@ export default function DealerPackagesPage() {
                     </div>
 
                     {vehicleFetchError && (
-                      <div className="p-3 rounded-xl bg-amber-50 border border-amber-200 text-xs text-amber-800 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
-                        <span className="leading-snug">{vehicleFetchError}</span>
-                        <div className="flex items-center gap-2 shrink-0">
+                      <div
+                        className={cn(
+                          "p-3.5 rounded-xl border text-xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3",
+                          vehicleFetchError.toLowerCase().includes("commercial")
+                            ? "bg-red-50/90 border-red-200 text-red-900"
+                            : "bg-amber-50 border-amber-200 text-amber-800"
+                        )}
+                      >
+                        <div className="flex items-start gap-2.5">
+                          <AlertCircle
+                            className={cn(
+                              "h-4 w-4 shrink-0 mt-0.5",
+                              vehicleFetchError.toLowerCase().includes("commercial")
+                                ? "text-red-600"
+                                : "text-amber-600"
+                            )}
+                          />
+                          <div className="space-y-0.5">
+                            {vehicleFetchError.toLowerCase().includes("commercial") && (
+                              <p className="font-bold text-red-950">Commercial Vehicle Notice</p>
+                            )}
+                            <p className="leading-snug">{vehicleFetchError}</p>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2 shrink-0 self-end sm:self-center">
                           <button
                             type="button"
                             onClick={() => {
@@ -1061,7 +1168,12 @@ export default function DealerPackagesPage() {
                                 setErrors((prev) => ({ ...prev, regNumber: "Registration number is required" }));
                               }
                             }}
-                            className="text-xs font-semibold text-amber-900 underline hover:text-black cursor-pointer px-1"
+                            className={cn(
+                              "text-xs font-bold underline cursor-pointer px-1 whitespace-nowrap",
+                              vehicleFetchError.toLowerCase().includes("commercial")
+                                ? "text-red-700 hover:text-red-950"
+                                : "text-amber-900 hover:text-black"
+                            )}
                           >
                             Manual Entry
                           </button>

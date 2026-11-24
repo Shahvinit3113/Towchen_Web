@@ -2,9 +2,11 @@
 
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { dealerApi } from "@/lib/api/dealer";
 import { walletApi } from "@/lib/api/wallet";
 import { packagesApi } from "@/lib/api/packages";
+import { clearClientSession } from "@/lib/auth/session";
 import { WalletSummary, WalletTransaction } from "@/types";
 import { formatCurrency, formatDate } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -29,6 +31,7 @@ export default function DealerDashboardPage() {
   const [transactions, setTransactions] = useState<WalletTransaction[]>([]);
   const [packageOrders, setPackageOrders] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const router = useRouter();
 
   useEffect(() => {
     async function loadData() {
@@ -41,14 +44,19 @@ export default function DealerDashboardPage() {
         setStats(statsData);
         setTransactions(txns);
         setPackageOrders(Array.isArray(pkgs) ? pkgs : (pkgs?.data || pkgs?.items || []));
-      } catch (err) {
-        console.error("Dashboard data load error:", err);
+      } catch (err: any) {
+        if (err?.status === 401) {
+          clearClientSession();
+          router.replace("/dealer/login");
+          return;
+        }
+        console.warn("Dashboard data load warning:", err?.message || err);
       } finally {
         setLoading(false);
       }
     }
     loadData();
-  }, []);
+  }, [router]);
   if (loading) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[50vh] text-slate-400">

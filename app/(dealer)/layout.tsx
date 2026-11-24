@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { usePathname, useRouter } from "next/navigation";
-import { getClientSession } from "@/lib/auth/session";
+import { getClientSession, clearClientSession } from "@/lib/auth/session";
 import { authApi } from "@/lib/api/auth";
 import { DealerSidebar } from "@/components/layout/dealer-sidebar";
 import { DealerHeader } from "@/components/layout/dealer-header";
@@ -23,22 +23,24 @@ export default function DealerLayout({
   useEffect(() => {
     const session = getClientSession();
     if (isLoginPage) {
-      if (session && session.role === "dealer") {
-        router.replace("/dealer/dashboard");
-      }
+      // Do not auto-redirect from login page without valid session check
+      return;
+    }
+
+    if (!session || session.role !== "dealer") {
+      setAuthVerified(false);
+      router.replace("/dealer/login");
     } else {
-      if (!session || session.role !== "dealer") {
-        router.replace("/dealer/login");
-      } else {
-        setAuthVerified(true);
-        // Verify and refresh dealer profile with GET /dealer-auth/me
-        if (session.token && session.role === "dealer") {
-          authApi.refreshDealerSession().catch((err: any) => {
-            if (err?.status === 401) {
-              router.replace("/dealer/login");
-            }
-          });
-        }
+      setAuthVerified(true);
+      // Verify and refresh dealer profile with GET /dealer-auth/me
+      if (session.token && session.role === "dealer") {
+        authApi.refreshDealerSession().catch((err: any) => {
+          if (err?.status === 401) {
+            clearClientSession();
+            setAuthVerified(false);
+            router.replace("/dealer/login");
+          }
+        });
       }
     }
   }, [pathname, isLoginPage, router]);

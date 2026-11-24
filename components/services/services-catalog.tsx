@@ -36,6 +36,10 @@ export interface CatalogServiceItem {
   description: string;
   base_price: number;
   base_distance?: number;
+  extra_distance_price?: number;
+  ton?: number;
+  journey_type?: string;
+  conditions?: string[];
   iconName: string;
   features: string[];
 }
@@ -64,148 +68,152 @@ function getIconForService(name: string, category: string): React.ComponentType<
   return Truck;
 }
 
-function getFeaturesForService(name: string, category: string, baseDistance?: number): string[] {
-  const dist = baseDistance ? `${baseDistance} km` : "5 km";
+function getFeaturesForService(
+  name: string,
+  category: string,
+  baseDistance: number = 5,
+  extraDistancePrice: number = 20,
+  ton?: number,
+  journeyType?: string,
+  conditions?: string[]
+): string[] {
+  const dist = `${baseDistance} km`;
+  const extraPrice = `₹${extraDistancePrice}/km extra`;
+  const list: string[] = [];
+
+  // If specific conditions exist from DB (sub_service_condtion), prepend them
+  if (conditions && conditions.length > 0) {
+    conditions.forEach((c) => {
+      if (c && !list.includes(c)) list.push(c);
+    });
+  }
+
   const lower = `${name} ${category}`.toLowerCase();
 
   if (lower.includes("flatbed")) {
-    return [
-      "Zero ground-contact hydraulic tilt deck",
-      `First ${dist} transport included`,
-      "Ideal for AWD, 4x4, & low-clearance luxury cars",
-      "Soft nylon wheel webbings & safety rigging",
-      "Live GPS tracking with real-time arrival ETA",
-    ];
+    list.push("Zero ground-contact hydraulic tilt deck");
+    list.push(`First ${dist} transport included (+${extraPrice})`);
+    list.push("Ideal for AWD, 4x4, & low-clearance luxury cars");
+    list.push("Soft nylon wheel webbings & safety rigging");
+    list.push("Live GPS tracking with real-time arrival ETA");
+  } else if (lower.includes("underlift") || lower.includes("wheel-lift")) {
+    list.push("Low-clearance basement & tight parking capable");
+    list.push(`First ${dist} transit included (+${extraPrice})`);
+    list.push("Equipped with dollies for all-wheel recovery");
+    list.push("Rapid 5-minute hookup by certified technician");
+    list.push("Bumper & chassis zero-scratch guarantee");
+  } else if (lower.includes("zero degree")) {
+    list.push("Ultra-low approach angle for exotics & supercars");
+    list.push(`First ${dist} secure transit included (+${extraPrice})`);
+    list.push("Hydraulic parallel slide deck with soft winching");
+    list.push("Full transit safety protocols & damage-free guarantee");
+    list.push("Senior specialized handling operator dispatched");
+  } else if (lower.includes("2-wheeler")) {
+    list.push("Specialized motorcycle wheel chocks & cradle bed");
+    list.push(`First ${dist} motorcycle transport included (+${extraPrice})`);
+    list.push("Quad-point soft strap tie-downs for handlebars");
+    list.push("Enclosed protection against road debris");
+    list.push("Priority express roadside arrival");
+  } else if (lower.includes("jump") || lower.includes("battery")) {
+    list.push("Commercial 12V / 24V jump booster equipment");
+    list.push("Full battery health & alternator diagnostic test");
+    list.push(`Service radius up to ${dist} included (+${extraPrice})`);
+    list.push("Rapid ~20-minute roadside dispatch");
+    list.push("All vehicle makes, hybrids, & start-stop models");
+  } else if (lower.includes("mechanic") || lower.includes("tech")) {
+    list.push("Certified mobile automotive technician on-site");
+    list.push("Instant OBD-II error scan & minor repair triage");
+    list.push("Coolant, belt, fuse, & hose emergency checks");
+    list.push(`Service radius up to ${dist} included (+${extraPrice})`);
+    list.push("Transparent upfront pricing before repair work");
+  } else if (lower.includes("custod")) {
+    list.push("24/7 CCTV-monitored secure vehicle holding compound");
+    list.push("Insured custody storage & gated vehicle protection");
+    list.push("Comprehensive check-in condition photograph report");
+    list.push("Safe custody handling for insurance & accident holds");
+    list.push("Authorized release protocol with verification");
+  } else if (lower.includes("hydra") || lower.includes("crane") || lower.includes("ton")) {
+    list.push(`Heavy hydraulic boom & dual winch (${ton || 12}+ Ton rated)`);
+    list.push("Rollover uprighting & steep ditch extraction");
+    list.push("Commercial highway collision scene containment");
+    list.push(`Includes ${dist} on-site recovery operations (+${extraPrice})`);
+    list.push("Certified heavy vehicle recovery operators");
+  } else {
+    list.push(`First ${dist} coverage included in base rate (+${extraPrice})`);
+    list.push("Rapid emergency priority dispatch 24/7");
+    list.push("Background-checked & certified operators");
+    list.push("Live GPS location tracking for customer");
+    list.push("Transparent pricing with no hidden charges");
   }
 
-  if (lower.includes("underlift") || lower.includes("wheel-lift")) {
-    return [
-      "Low-clearance basement & tight parking capable",
-      `First ${dist} transit included`,
-      "Equipped with dollies for all-wheel recovery",
-      "Rapid 5-minute hookup by certified technician",
-      "Bumper & chassis zero-scratch guarantee",
-    ];
+  if (journeyType) {
+    const routeLabel = journeyType === "FourWay" ? "4-Way Towing Fleet Deployment" : "3-Way On-Demand Rapid Response";
+    if (!list.includes(routeLabel)) list.push(routeLabel);
   }
 
-  if (lower.includes("zero degree")) {
-    return [
-      "Ultra-low approach angle for exotics & supercars",
-      `First ${dist} enclosed/secure transit included`,
-      "Hydraulic parallel slide deck with soft winching",
-      "Full transit insurance coverage up to ₹50 Lakhs",
-      "Senior specialized handling driver dispatched",
-    ];
-  }
-
-  if (lower.includes("2-wheeler")) {
-    return [
-      "Specialized motorcycle wheel chocks & cradle bed",
-      `First ${dist} motorcycle transport included`,
-      "Quad-point soft strap tie-downs for handlebars",
-      "Enclosed protection against road debris",
-      "Priority express roadside arrival",
-    ];
-  }
-
-  if (lower.includes("jump") || lower.includes("battery")) {
-    return [
-      "Commercial 12V / 24V jump booster equipment",
-      "Full battery health & alternator diagnostic test",
-      `Service radius up to ${dist} included`,
-      "Rapid ~20-minute roadside dispatch",
-      "All vehicle makes, hybrids, & start-stop models",
-    ];
-  }
-
-  if (lower.includes("mechanic") || lower.includes("tech")) {
-    return [
-      "Certified mobile automotive technician on-site",
-      "Instant OBD-II error scan & minor repair triage",
-      "Coolant, belt, fuse, & hose emergency checks",
-      `Service radius up to ${dist} included`,
-      "Transparent upfront pricing before repair work",
-    ];
-  }
-
-  if (lower.includes("custod")) {
-    return [
-      "24/7 CCTV-monitored secure vehicle holding compound",
-      "Insured custody storage & gated vehicle protection",
-      "Comprehensive check-in condition photograph report",
-      "Safe custody handling for insurance & accident holds",
-      "Authorized release protocol with verification",
-    ];
-  }
-
-  if (lower.includes("hydra") || lower.includes("crane") || lower.includes("ton")) {
-    return [
-      "Heavy hydraulic boom & dual winch gear",
-      "Rollover uprighting & steep ditch extraction",
-      "Commercial highway collision scene containment",
-      "Police & insurance documentation coordination",
-      "Certified heavy vehicle recovery operators",
-    ];
-  }
-
-  return [
-    `First ${dist} coverage included in base rate`,
-    "Rapid emergency priority dispatch 24/7",
-    "Background-checked & certified operators",
-    "Live GPS location tracking for customer",
-    "Transparent pricing with no hidden charges",
-  ];
+  return list;
 }
 
+// Exactly mirror database records as default state (service & sub_service tables)
 const DEFAULT_CATALOG_ITEMS: CatalogServiceItem[] = [
   {
     id: "flatbed",
     slug: "flatbed-towing",
-    name: "Flatbed Towing",
+    name: "Flatbed",
     title: "Flatbed Hydraulic Towing",
     category: "Towing",
     service_id: 1,
     sub_service_id: 1,
     description:
       "Premier zero-ground contact hydraulic platform transport for luxury sedans, electric vehicles, AWDs, and accident-damaged cars.",
-    base_price: 1499,
+    base_price: 100,
     base_distance: 5,
+    extra_distance_price: 20,
+    ton: 1.5,
+    journey_type: "FourWay",
+    conditions: ["Condition 2", "Condition 1"],
     iconName: "Truck",
-    features: getFeaturesForService("Flatbed", "Towing", 5),
+    features: getFeaturesForService("Flatbed", "Towing", 5, 20, 1.5, "FourWay", ["Condition 2", "Condition 1"]),
   },
   {
     id: "underlift",
     slug: "wheel-lift-towing",
-    name: "Underlift Quick Clearance",
-    title: "Wheel-Lift Quick Clearance",
+    name: "Underlift",
+    title: "Underlift Quick Clearance Towing",
     category: "Towing",
     service_id: 1,
     sub_service_id: 3,
     description:
       "Agile pneumatic wheel-lift extraction specifically designed for tight underground basements, low ceilings, and congested urban streets.",
-    base_price: 1099,
+    base_price: 100,
     base_distance: 5,
+    extra_distance_price: 20,
+    ton: 1.5,
+    journey_type: "FourWay",
     iconName: "Truck",
-    features: getFeaturesForService("Underlift", "Towing", 5),
+    features: getFeaturesForService("Underlift", "Towing", 5, 20, 1.5, "FourWay"),
   },
   {
     id: "zero_degree",
     slug: "zero-degree-towing",
-    name: "Zero Degree Flatbed",
-    title: "Zero Degree Low-Clearance Flatbed",
+    name: "Zero Degree",
+    title: "Zero Degree Low-Clearance Towing",
     category: "Towing",
     service_id: 1,
     sub_service_id: 4,
     description:
-      "Ultra-low approach angle platform engineered specifically for exotic supercars, custom sports cars, and slammed lowered vehicles.",
-    base_price: 1899,
+      "Ultra-low approach angle platform engineered specifically for exotic supercars, sports cars, and low ground-clearance vehicles.",
+    base_price: 100,
     base_distance: 5,
+    extra_distance_price: 20,
+    ton: 1.5,
+    journey_type: "FourWay",
     iconName: "Truck",
-    features: getFeaturesForService("Zero Degree", "Towing", 5),
+    features: getFeaturesForService("Zero Degree", "Towing", 5, 20, 1.5, "FourWay"),
   },
   {
     id: "2_wheeler_flatbed",
-    slug: "2-wheeler-towing",
+    slug: "2-wheeler-flatbed",
     name: "2-Wheeler Flatbed",
     title: "Motorcycle & Scooter Transport",
     category: "Towing",
@@ -213,85 +221,121 @@ const DEFAULT_CATALOG_ITEMS: CatalogServiceItem[] = [
     sub_service_id: 5,
     description:
       "Customized motorcycle transport bed with heavy-duty wheel chocks and quad soft-tie down straps ensuring zero tip-overs.",
-    base_price: 699,
+    base_price: 100,
     base_distance: 5,
+    extra_distance_price: 20,
+    ton: 1.5,
+    journey_type: "FourWay",
     iconName: "Truck",
-    features: getFeaturesForService("2-Wheeler Flatbed", "Towing", 5),
+    features: getFeaturesForService("2-Wheeler Flatbed", "Towing", 5, 20, 1.5, "FourWay"),
+  },
+  {
+    id: "flatbed_towing",
+    slug: "flatbed-towing-service",
+    name: "Flatbed Towing",
+    title: "Flatbed Long-Distance Towing",
+    category: "Towing",
+    service_id: 1,
+    sub_service_id: 11,
+    description:
+      "Heavy-duty zero-contact flatbed transport equipped for extended regional transit and multi-city breakdown relocation.",
+    base_price: 100,
+    base_distance: 5,
+    extra_distance_price: 20,
+    ton: 1.5,
+    journey_type: "FourWay",
+    iconName: "Truck",
+    features: getFeaturesForService("Flatbed Towing", "Towing", 5, 20, 1.5, "FourWay"),
   },
   {
     id: "jump_start",
     slug: "jump-start",
-    name: "Jump Start Assistance",
+    name: "Jump Start",
     title: "Emergency Battery Jumpstart & Diagnostic",
     category: "Technician",
     service_id: 2,
     sub_service_id: 2,
     description:
       "Rapid roadside battery booster dispatch with digital voltage health analysis for all cars, hybrids, and commercial vehicles.",
-    base_price: 499,
+    base_price: 100,
     base_distance: 5,
+    extra_distance_price: 20,
+    ton: 1.5,
+    journey_type: "ThreeWay",
     iconName: "BatteryCharging",
-    features: getFeaturesForService("Jump Start", "Technician", 5),
+    features: getFeaturesForService("Jump Start", "Technician", 5, 20, 1.5, "ThreeWay"),
   },
   {
     id: "mechanic",
     slug: "mobile-mechanic",
-    name: "Mobile Roadside Mechanic",
-    title: "On-Site Mechanical Diagnostics & Triage",
+    name: "Mechanic",
+    title: "Mobile Roadside Mechanic",
     category: "Technician",
     service_id: 2,
     sub_service_id: 6,
     description:
       "Certified mechanic dispatched directly to your vehicle with scan tools to troubleshoot engine cutoffs, overheating, and sensor alerts.",
-    base_price: 799,
+    base_price: 100,
     base_distance: 5,
+    extra_distance_price: 20,
+    ton: 1.5,
+    journey_type: "ThreeWay",
     iconName: "Wrench",
-    features: getFeaturesForService("Mechanic", "Technician", 5),
-  },
-  {
-    id: "12_ton",
-    slug: "accident-recovery",
-    name: "12 Ton Crane & Winch Recovery",
-    title: "12 Ton Hydra Accident Recovery",
-    category: "Hydra",
-    service_id: 4,
-    sub_service_id: 8,
-    description:
-      "Medium heavy-duty hydraulic boom crane for rollover uprighting, deep ditch retrieval, and heavy collision scene extractions.",
-    base_price: 2499,
-    base_distance: 5,
-    iconName: "ShieldCheck",
-    features: getFeaturesForService("12 Ton", "Hydra", 5),
-  },
-  {
-    id: "20_ton",
-    slug: "heavy-recovery-20-ton",
-    name: "20 Ton Heavy Winch Recovery",
-    title: "20 Ton Commercial Heavy Recovery",
-    category: "Hydra",
-    service_id: 4,
-    sub_service_id: 9,
-    description:
-      "Twin-line heavy industrial recovery rig capable of pulling overturned trucks, buses, and loaded freight vehicles.",
-    base_price: 3499,
-    base_distance: 5,
-    iconName: "ShieldCheck",
-    features: getFeaturesForService("20 Ton", "Hydra", 5),
+    features: getFeaturesForService("Mechanic", "Technician", 5, 20, 1.5, "ThreeWay"),
   },
   {
     id: "custodian",
     slug: "vehicle-custody",
-    name: "Secure Vehicle Custody",
+    name: "Custodian",
     title: "Secure Compound Vehicle Custody",
     category: "Custody",
     service_id: 3,
     sub_service_id: 7,
     description:
       "Safe, CCTV-monitored vehicle holding facility for accident vehicles awaiting surveyor assessment or delayed repair.",
-    base_price: 1500,
+    base_price: 100,
     base_distance: 5,
+    extra_distance_price: 20,
+    ton: 1.5,
+    journey_type: "ThreeWay",
     iconName: "Key",
-    features: getFeaturesForService("Custodian", "Custody", 5),
+    features: getFeaturesForService("Custodian", "Custody", 5, 20, 1.5, "ThreeWay"),
+  },
+  {
+    id: "12_ton",
+    slug: "12-ton-hydra",
+    name: "12 Ton",
+    title: "12 Ton Hydra Crane & Winch Recovery",
+    category: "Hydra",
+    service_id: 4,
+    sub_service_id: 8,
+    description:
+      "Medium heavy-duty hydraulic boom crane for rollover uprighting, deep ditch retrieval, and heavy collision scene extractions.",
+    base_price: 100,
+    base_distance: 5,
+    extra_distance_price: 20,
+    ton: 12,
+    journey_type: "ThreeWay",
+    iconName: "ShieldCheck",
+    features: getFeaturesForService("12 Ton", "Hydra", 5, 20, 12, "ThreeWay"),
+  },
+  {
+    id: "25_plus_ton",
+    slug: "25-plus-ton-hydra",
+    name: "25+ Ton",
+    title: "25+ Ton Extreme Heavy Duty Winch Recovery",
+    category: "Hydra",
+    service_id: 4,
+    sub_service_id: 10,
+    description:
+      "High-capacity industrial crane and winching rig for massive commercial vehicle extrication, highway blockages, and multi-axle trailers.",
+    base_price: 100,
+    base_distance: 5,
+    extra_distance_price: 20,
+    ton: 25,
+    journey_type: "ThreeWay",
+    iconName: "ShieldCheck",
+    features: getFeaturesForService("25+ Ton", "Hydra", 5, 20, 25, "ThreeWay"),
   },
 ];
 
@@ -320,6 +364,14 @@ export function ServicesCatalog() {
                 if (sub.is_active !== false) {
                   const slug = sub.name.toLowerCase().replace(/[^a-z0-9]+/g, "-");
                   const id = sub.name.toLowerCase().replace(/[^a-z0-9]+/g, "_");
+                  const baseDist = sub.base_distance ? Number(sub.base_distance) : 5;
+                  const baseFare = sub.base_price !== undefined && sub.base_price !== null ? Number(sub.base_price) : 100;
+                  const extraFare = sub.extra_distance_price !== undefined && sub.extra_distance_price !== null ? Number(sub.extra_distance_price) : 20;
+                  const tonCap = sub.ton ? Number(sub.ton) : undefined;
+                  const conditions = sub.conditions && Array.isArray(sub.conditions)
+                    ? sub.conditions.map((c: any) => (typeof c === "string" ? c : c.condition)).filter(Boolean)
+                    : [];
+
                   items.push({
                     id,
                     slug,
@@ -332,10 +384,14 @@ export function ServicesCatalog() {
                       sub.description ||
                       s.description ||
                       `Professional ${sub.name} roadside assistance dispatched across the city 24/7.`,
-                    base_price: sub.base_price ? Number(sub.base_price) : 999,
-                    base_distance: sub.base_distance ? Number(sub.base_distance) : 5,
+                    base_price: baseFare,
+                    base_distance: baseDist,
+                    extra_distance_price: extraFare,
+                    ton: tonCap,
+                    journey_type: sub.journey_type,
+                    conditions,
                     iconName: sub.icon || "Truck",
-                    features: getFeaturesForService(sub.name, catName, sub.base_distance),
+                    features: getFeaturesForService(sub.name, catName, baseDist, extraFare, tonCap, sub.journey_type, conditions),
                   });
                 }
               });
@@ -349,10 +405,11 @@ export function ServicesCatalog() {
                 category: catName,
                 service_id: s.id,
                 description: s.description || "24/7 emergency vehicle assistance and towing service.",
-                base_price: 999,
+                base_price: 100,
                 base_distance: 5,
+                extra_distance_price: 20,
                 iconName: "Truck",
-                features: getFeaturesForService(s.name, catName, 5),
+                features: getFeaturesForService(s.name, catName, 5, 20),
               });
             }
           });
@@ -540,11 +597,18 @@ export function ServicesCatalog() {
                     >
                       <Icon className="h-6 w-6" />
                     </div>
-                    <span
-                      className={`text-[11px] font-bold px-3 py-1 rounded-full border ${badgeBg}`}
-                    >
-                      {srv.category} Fleet
-                    </span>
+                    <div className="flex items-center gap-1.5 flex-wrap justify-end">
+                      {srv.ton && srv.ton > 1.5 && (
+                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-100 text-slate-700 border border-slate-200">
+                          {srv.ton} Ton Rig
+                        </span>
+                      )}
+                      <span
+                        className={`text-[11px] font-bold px-3 py-1 rounded-full border ${badgeBg}`}
+                      >
+                        {srv.category} Fleet
+                      </span>
+                    </div>
                   </div>
 
                   {/* Title & Description */}
@@ -592,6 +656,11 @@ export function ServicesCatalog() {
                         </span>
                       )}
                     </div>
+                    {srv.extra_distance_price ? (
+                      <span className="text-[10px] text-slate-400 font-medium block">
+                        +₹{srv.extra_distance_price}/km extra
+                      </span>
+                    ) : null}
                   </div>
 
                   <Link href={`/?service=${srv.id}#estimate-calculator`}>

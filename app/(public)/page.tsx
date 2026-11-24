@@ -161,14 +161,14 @@ export default function HomePage() {
               </div>
 
               {/* Main Headline */}
-              <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-5xl xl:text-6xl font-black tracking-tight leading-[1.12]">
-                <span className="text-white block">Need a Tow?</span>
-                <span className="text-[#a5c4ff] block">We&apos;re Ready to Help.</span>
+              <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-4xl xl:text-5xl font-black tracking-tight leading-[1.12]">
+                <span className="text-white block">Vehicle Stopped? Don't Panic.</span>
+                <span className="text-[#a5c4ff] block">We&apos;re On Our Way.</span>
               </h1>
 
               {/* Subheadline */}
               <p className="text-sm sm:text-base lg:text-lg text-slate-300 max-w-xl mx-auto lg:mx-0 leading-relaxed font-normal">
-                Fast, reliable towing and roadside assistance when you need it most — with upfront pricing and real-time driver tracking.
+                Safe towing and roadside help in minutes - check your price upfront and track your truck live.
               </p>
 
               {/* Action Buttons */}
