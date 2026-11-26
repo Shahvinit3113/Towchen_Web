@@ -44,6 +44,16 @@ import Swal, {
   showOrderErrorModal,
 } from "@/lib/swal";
 
+const CAR_SEGMENTS = [
+  { label: "Gold", value: "Basic" },
+  { label: "Platinum", value: "Standard" },
+  { label: "Diamond", value: "Premium" },
+] as const;
+
+const getSegmentLabel = (val: string) => {
+  return CAR_SEGMENTS.find((s) => s.value === val || s.label.toLowerCase() === val?.toLowerCase())?.label || val;
+};
+
 const initialFormData = {
   name: "",
   number: "",
@@ -528,16 +538,16 @@ export default function DealerPackagesPage() {
       </div>
 
       {/* Segment Tabs */}
-      <div className="flex items-center gap-1 sm:gap-2 bg-slate-100 p-1 sm:p-1.5 rounded-xl sm:rounded-2xl w-full sm:w-fit overflow-x-auto">
-        {["Basic", "Standard", "Premium"].map(seg => (
+      <div className="grid grid-cols-3 sm:flex items-center gap-1 sm:gap-2 bg-slate-100 p-1 sm:p-1.5 rounded-xl sm:rounded-2xl w-full sm:w-fit">
+        {CAR_SEGMENTS.map(seg => (
           <button
-            key={seg}
-            onClick={() => setSegment(seg)}
-            className={`flex-1 sm:flex-initial text-center px-3 sm:px-5 py-1.5 sm:py-2.5 rounded-lg sm:rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer ${
-              segment === seg ? "bg-white text-slate-900 shadow-2xs" : "text-slate-500 hover:text-slate-700"
+            key={seg.value}
+            onClick={() => setSegment(seg.value)}
+            className={`text-center px-3 sm:px-6 py-2 sm:py-2.5 rounded-lg sm:rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer whitespace-nowrap ${
+              segment === seg.value ? "bg-white text-slate-900 shadow-2xs font-black" : "text-slate-500 hover:text-slate-700"
             }`}
           >
-            {seg}
+            {seg.label}
           </button>
         ))}
       </div>
@@ -590,8 +600,8 @@ export default function DealerPackagesPage() {
                         </p>
                       </div>
                     </div>
-                    <Badge variant="secondary" className="text-[10px] shrink-0">
-                      {segment}
+                    <Badge variant="secondary" className="text-[10px] shrink-0 font-bold">
+                      {getSegmentLabel(segment)}
                     </Badge>
                   </div>
 
@@ -858,7 +868,7 @@ export default function DealerPackagesPage() {
         isOpen={Boolean(viewingDetailPlan)}
         onClose={() => setViewingDetailPlan(null)}
         title={viewingDetailPlan ? viewingDetailPlan.name : "Package Details"}
-        description={`${segment} Segment • RSA Specifications`}
+        description={`${getSegmentLabel(segment)} Tier • RSA Specifications`}
         maxWidth="2xl"
       >
         {viewingDetailPlan && (
@@ -867,7 +877,7 @@ export default function DealerPackagesPage() {
             <div className="flex items-center justify-between gap-2 p-2.5 rounded-xl bg-slate-50 border border-slate-200/80">
               <div className="flex items-center gap-1.5 flex-wrap">
                 <Badge variant="secondary" className="text-[10px] py-0 px-2 font-bold">
-                  {segment} Segment
+                  {getSegmentLabel(segment)} Tier
                 </Badge>
                 <span className="text-[11px] font-medium text-slate-500 flex items-center gap-1">
                   <Clock className="h-3 w-3 text-primary" />
@@ -1033,7 +1043,7 @@ export default function DealerPackagesPage() {
         isOpen={Boolean(selectedPlan)}
         onClose={resetModalState}
         title={`Activate ${selectedPlan?.name}`}
-        description={`Segment: ${segment} | Price: ${formatCurrency(selectedPlan?.resolved_price || 0)}${dealerPayoutPercentage > 0 ? ` • Your Payout (${dealerPayoutPercentage}%): ${formatCurrency(Math.round((((selectedPlan?.resolved_price || 0) * dealerPayoutPercentage) / 100) * 100) / 100)}` : ""}`}
+        description={`Tier: ${getSegmentLabel(segment)} | Price: ${formatCurrency(selectedPlan?.resolved_price || 0)}${dealerPayoutPercentage > 0 ? ` • Your Payout (${dealerPayoutPercentage}%): ${formatCurrency(Math.round((((selectedPlan?.resolved_price || 0) * dealerPayoutPercentage) / 100) * 100) / 100)}` : ""}`}
         maxWidth="4xl"
       >
         <form onSubmit={handleCheckout} className="pt-2 max-h-[78vh] overflow-y-auto px-1 flex flex-col">

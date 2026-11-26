@@ -13,6 +13,7 @@ import {
   LogOut,
   ExternalLink,
   User,
+  FileText,
 } from "lucide-react";
 import { authApi } from "@/lib/api/auth";
 import { useRouter } from "next/navigation";
@@ -21,6 +22,7 @@ import { cn } from "@/lib/utils";
 const ICONS: Record<string, React.ReactNode> = {
   LayoutDashboard: <LayoutDashboard className="h-4 w-4" />,
   ShieldCheck: <ShieldCheck className="h-4 w-4" />,
+  FileText: <FileText className="h-4 w-4" />,
   History: <History className="h-4 w-4" />,
   MessageSquare: <MessageSquare className="h-4 w-4" />,
   User: <User className="h-4 w-4" />,
